@@ -9,8 +9,7 @@ const creatorProfileSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
-      unique: true,
-      index: true,
+      unique: true, // unique implies an index; no separate index: true needed
     },
     displayName: {
       type: String,
@@ -65,7 +64,7 @@ const creatorProfileSchema = new Schema(
   defaultSchemaOptions
 );
 
-creatorProfileSchema.index({ user: 1 }, { unique: true });
+// user unique index already created by unique: true on the field
 creatorProfileSchema.index({ primaryPlatform: 1 });
 creatorProfileSchema.index({ growthScore: -1 });
 

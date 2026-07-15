@@ -5,13 +5,14 @@
 
 import { Router } from 'express';
 import healthRouter from './health.js';
+import authRouter from './auth.js';
 
 const router = Router();
 
 router.use('/health', healthRouter);
+router.use('/auth', authRouter);
 
 // Future routes will be mounted here:
-// router.use('/auth',        authRouter);
 // router.use('/users',       userRouter);
 // router.use('/analytics',   analyticsRouter);
 // router.use('/insights',    insightsRouter);

@@ -85,8 +85,7 @@ const userSchema = new Schema(
   defaultSchemaOptions
 );
 
-// Indexes
-userSchema.index({ email: 1 }, { unique: true });
+// Indexes (email unique index is already declared on the field itself)
 userSchema.index({ status: 1 });
 userSchema.index({ subscriptionPlan: 1 });
 userSchema.index({ createdAt: -1 });

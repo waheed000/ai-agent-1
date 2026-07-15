@@ -15,13 +15,7 @@ const refreshTokenSchema = new Schema(
       required: true,
       index: true,
     },
-    token: {
-      type: String,
-      required: true,
-      unique: true,
-      select: false,
-    },
-    // Hashed token stored for DB lookup (never store raw token in DB)
+    // Only the SHA-256 hash of the token is persisted — the raw token is never stored
     tokenHash: {
       type: String,
       required: true,
@@ -48,13 +42,17 @@ const refreshTokenSchema = new Schema(
       type: String,
       default: null, // token family for refresh token rotation attack detection
     },
+    lastUsedAt: {
+      type: Date,
+      default: null,
+    },
   },
   defaultSchemaOptions
 );
 
 // TTL index — MongoDB automatically deletes expired token documents
 refreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-refreshTokenSchema.index({ tokenHash: 1 }, { unique: true });
+// tokenHash unique index is already on the field; only add compound/non-duplicate indexes here
 refreshTokenSchema.index({ user: 1, isRevoked: 1 });
 
 const RefreshToken = mongoose.model('RefreshToken', refreshTokenSchema);

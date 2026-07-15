@@ -1,0 +1,233 @@
+You are continuing the existing CreatorOS AI backend.
+
+Implement ONLY Phase 3A.
+
+Do NOT modify previous architecture.
+
+Do NOT implement anything from future phases.
+
+======================================
+TODO
+======================================
+
+□ Create UserRepository
+
+□ Create RefreshTokenRepository
+
+□ Create PasswordService
+
+□ Create TokenService
+
+□ Create AuthService
+
+□ Create authentication validators
+
+□ Create authentication controllers
+
+□ Create authentication routes
+
+======================================
+Authentication
+======================================
+
+□ POST /api/v1/auth/register
+
+□ POST /api/v1/auth/login
+
+□ POST /api/v1/auth/logout
+
+□ POST /api/v1/auth/logout-all
+
+□ POST /api/v1/auth/refresh-token
+
+======================================
+Registration
+======================================
+
+□ Validate request body
+
+□ Validate email format
+
+□ Check duplicate email
+
+□ Validate password strength
+
+□ Hash password using bcrypt
+
+□ Create User
+
+□ Create CreatorProfile automatically
+
+□ Generate Access Token
+
+□ Generate Refresh Token
+
+□ Store hashed Refresh Token
+
+□ Return authentication response
+
+======================================
+Login
+======================================
+
+□ Validate credentials
+
+□ Compare password
+
+□ Reject inactive users
+
+□ Reject deleted users
+
+□ Update lastLogin
+
+□ Generate new Access Token
+
+□ Generate new Refresh Token
+
+□ Rotate Refresh Token
+
+□ Save hashed Refresh Token
+
+□ Return authentication response
+
+======================================
+JWT
+======================================
+
+□ Access Token
+
+□ Refresh Token
+
+□ Separate secrets
+
+□ Separate expiry
+
+□ Token verification
+
+□ Token decoding
+
+□ Token rotation
+
+□ Token revocation
+
+======================================
+Refresh Token
+======================================
+
+□ Store hashed token only
+
+□ Store expiry
+
+□ Store device info
+
+□ Store IP address
+
+□ Store user agent
+
+□ Store token family
+
+□ Store lastUsedAt
+
+□ Store revoked status
+
+======================================
+Logout
+======================================
+
+□ Logout current device
+
+□ Logout all devices
+
+□ Revoke Refresh Token
+
+□ Remove cookie
+
+======================================
+Security
+======================================
+
+□ Password hashing
+
+□ Strong password policy
+
+□ Secure HTTP-only cookies
+
+□ Authentication middleware
+
+□ Authorization middleware
+
+□ Optional authentication middleware
+
+□ Owner middleware
+
+□ Authentication rate limiter
+
+□ Input sanitization
+
+□ Prevent duplicate registration
+
+□ Prevent user enumeration
+
+□ Prevent invalid JWT access
+
+□ Handle expired JWT
+
+□ Handle expired Refresh Token
+
+======================================
+Validation
+======================================
+
+□ Validate every endpoint
+
+□ Return standardized validation errors
+
+□ Use centralized validators
+
+======================================
+Testing
+======================================
+
+□ Register
+
+□ Login
+
+□ Refresh Token
+
+□ Logout
+
+□ Logout All
+
+□ Invalid JWT
+
+□ Expired JWT
+
+□ Invalid password
+
+□ Duplicate email
+
+□ Deleted account
+
+□ Inactive account
+
+======================================
+Do NOT implement
+======================================
+
+OAuth
+
+Social Media APIs
+
+Analytics
+
+AI
+
+Competitors
+
+Reports
+
+Notifications
+
+Background Jobs
+
+Anything outside authentication.
