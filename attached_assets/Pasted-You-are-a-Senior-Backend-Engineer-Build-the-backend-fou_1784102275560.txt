@@ -1,0 +1,377 @@
+You are a Senior Backend Engineer.
+
+Build the backend foundation for a production-ready SaaS application called "CreatorOS AI".
+
+Tech Stack:
+
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+
+IMPORTANT REQUIREMENTS
+
+This is NOT a tutorial project.
+
+Build the project exactly like a production SaaS backend.
+
+Do NOT generate any frontend.
+
+Do NOT generate dummy data.
+
+Do NOT create fake APIs.
+
+Do NOT seed the database.
+
+Do NOT create mock responses.
+
+Everything should be production-ready.
+
+--------------------------------------------------
+DATABASE
+--------------------------------------------------
+
+For development, use an in-memory MongoDB database (mongodb-memory-server).
+
+However, architect the project so switching to MongoDB Atlas later only requires changing the MONGODB_URI environment variable.
+
+Create a proper database configuration layer.
+
+If MONGODB_URI exists:
+
+→ Connect to Atlas.
+
+Otherwise:
+
+→ Automatically start mongodb-memory-server.
+
+No code elsewhere should know which database is being used.
+
+--------------------------------------------------
+PROJECT STRUCTURE
+--------------------------------------------------
+
+Create the following structure:
+
+src/
+
+config/
+database/
+controllers/
+routes/
+models/
+services/
+repositories/
+middleware/
+validators/
+utils/
+docs/
+
+app.js
+server.js
+
+Use clean architecture.
+
+Controllers should only receive requests and return responses.
+
+Business logic belongs inside services.
+
+Database queries belong inside repositories.
+
+--------------------------------------------------
+PHASE 1
+PROJECT FOUNDATION
+--------------------------------------------------
+
+Implement:
+
+Express application
+
+Environment configuration
+
+Centralized configuration module
+
+Database initialization
+
+Global error handler
+
+404 handler
+
+Async error wrapper
+
+Security middleware
+
+Helmet
+
+Compression
+
+CORS
+
+Rate Limiting
+
+Request logging using Morgan
+
+Cookie Parser
+
+JSON parsing
+
+URL encoded parser
+
+Environment validation
+
+Graceful shutdown
+
+Centralized API response format
+
+Create reusable response helpers:
+
+success()
+
+created()
+
+badRequest()
+
+unauthorized()
+
+forbidden()
+
+notFound()
+
+serverError()
+
+Use consistent JSON responses throughout the application.
+
+--------------------------------------------------
+ERROR HANDLING
+--------------------------------------------------
+
+Create custom error classes.
+
+Examples:
+
+AppError
+
+ValidationError
+
+AuthenticationError
+
+AuthorizationError
+
+NotFoundError
+
+DatabaseError
+
+Create one centralized error middleware.
+
+Never expose stack traces in production.
+
+--------------------------------------------------
+LOGGER
+--------------------------------------------------
+
+Create a reusable logger service.
+
+Support:
+
+info
+
+warn
+
+error
+
+debug
+
+Console logging is enough for now, but architect it so Winston/Pino can replace it later.
+
+--------------------------------------------------
+API VERSIONING
+--------------------------------------------------
+
+All routes should be under
+
+/api/v1
+
+--------------------------------------------------
+HEALTH CHECK
+--------------------------------------------------
+
+Create:
+
+GET /api/v1/health
+
+Return:
+
+Server status
+
+Database status
+
+Environment
+
+Uptime
+
+Timestamp
+
+Application version
+
+--------------------------------------------------
+PHASE 2
+DATABASE DESIGN
+--------------------------------------------------
+
+Create Mongoose models only.
+
+No CRUD endpoints yet.
+
+Design proper schemas with validation, timestamps, indexes, enums, references, and reusable schema patterns.
+
+Create the following models:
+
+User
+
+CreatorProfile
+
+ConnectedAccount
+
+Post
+
+PostAnalytics
+
+AudienceAnalytics
+
+FollowersHistory
+
+Competitor
+
+CompetitorPost
+
+TrendData
+
+GrowthReport
+
+WeeklyPlan
+
+Notification
+
+ContentIdea
+
+ScheduledContent
+
+AiExecution
+
+RefreshToken
+
+--------------------------------------------------
+USER MODEL
+--------------------------------------------------
+
+Include fields such as:
+
+name
+
+email
+
+password
+
+avatar
+
+role
+
+subscriptionPlan
+
+isVerified
+
+status
+
+lastLogin
+
+createdAt
+
+updatedAt
+
+Use proper validation.
+
+Hash password middleware should NOT be implemented yet.
+
+--------------------------------------------------
+SCHEMA REQUIREMENTS
+--------------------------------------------------
+
+Every schema must include:
+
+timestamps
+
+appropriate indexes
+
+soft delete support
+
+status fields where appropriate
+
+references using ObjectId
+
+validation
+
+enums
+
+Create reusable schema utilities whenever possible.
+
+--------------------------------------------------
+CONFIGURATION
+--------------------------------------------------
+
+Create a centralized config module.
+
+Support:
+
+PORT
+
+NODE_ENV
+
+JWT_SECRET
+
+JWT_REFRESH_SECRET
+
+MONGODB_URI
+
+CLIENT_URL
+
+LOG_LEVEL
+
+Read all values from environment variables.
+
+--------------------------------------------------
+CODE QUALITY
+--------------------------------------------------
+
+Use ES Modules.
+
+Follow clean architecture.
+
+Write modular code.
+
+Avoid duplication.
+
+Create reusable utilities.
+
+Keep functions small.
+
+Use async/await.
+
+Use proper folder separation.
+
+--------------------------------------------------
+OUTPUT
+--------------------------------------------------
+
+Return the complete backend implementation for only Phase 1 and Phase 2.
+
+Do NOT implement authentication.
+
+Do NOT implement APIs except the health endpoint.
+
+Do NOT implement AI.
+
+Do NOT implement social media integrations.
+
+Do NOT implement business logic beyond the project foundation and database models.
+
+The result should be a clean, scalable backend foundation ready for future phases.
