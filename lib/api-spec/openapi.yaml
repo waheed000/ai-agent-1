@@ -3,20 +3,36 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: CreatorOS AI API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication
+  - name: dashboard
+    description: Dashboard overview
+  - name: analytics
+    description: Platform analytics
+  - name: insights
+    description: AI insights and recommendations
+  - name: content
+    description: Content strategy and calendar
+  - name: competitors
+    description: Competitor intelligence
+  - name: trends
+    description: Trend discovery
+  - name: reports
+    description: Reports generation
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +40,494 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # ─── Auth ───────────────────────────────────────────────────────────────────
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResult"
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResult"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  # ─── Dashboard ──────────────────────────────────────────────────────────────
+  /dashboard/overview:
+    get:
+      operationId: getDashboardOverview
+      tags: [dashboard]
+      summary: Growth overview metrics
+      responses:
+        "200":
+          description: Overview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardOverview"
+
+  /dashboard/growth-chart:
+    get:
+      operationId: getGrowthChart
+      tags: [dashboard]
+      summary: Growth chart data (followers, engagement, reach over time)
+      parameters:
+        - in: query
+          name: period
+          schema:
+            type: string
+            enum: [7d, 30d, 90d]
+      responses:
+        "200":
+          description: Chart data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GrowthChartData"
+
+  /dashboard/ai-summary:
+    get:
+      operationId: getAiSummary
+      tags: [dashboard]
+      summary: AI-generated weekly summary
+      responses:
+        "200":
+          description: AI summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiSummary"
+
+  /dashboard/top-content:
+    get:
+      operationId: getTopContent
+      tags: [dashboard]
+      summary: Top performing content posts
+      responses:
+        "200":
+          description: Top posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TopPost"
+
+  /dashboard/growth-score:
+    get:
+      operationId: getGrowthScore
+      tags: [dashboard]
+      summary: Creator growth score
+      responses:
+        "200":
+          description: Growth score
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GrowthScore"
+
+  # ─── Analytics ──────────────────────────────────────────────────────────────
+  /analytics/metrics:
+    get:
+      operationId: getAnalyticsMetrics
+      tags: [analytics]
+      summary: Platform metrics
+      parameters:
+        - in: query
+          name: platform
+          schema:
+            type: string
+            enum: [instagram, youtube, linkedin, tiktok, all]
+        - in: query
+          name: period
+          schema:
+            type: string
+            enum: [7d, 30d, 90d]
+      responses:
+        "200":
+          description: Metrics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyticsMetrics"
+
+  /analytics/chart:
+    get:
+      operationId: getAnalyticsChart
+      tags: [analytics]
+      summary: Analytics chart data
+      parameters:
+        - in: query
+          name: platform
+          schema:
+            type: string
+        - in: query
+          name: metric
+          schema:
+            type: string
+        - in: query
+          name: period
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Chart series
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChartSeries"
+
+  /analytics/content-performance:
+    get:
+      operationId: getContentPerformance
+      tags: [analytics]
+      summary: Content performance table
+      parameters:
+        - in: query
+          name: platform
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Content rows
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContentPerformanceRow"
+
+  /analytics/platform-breakdown:
+    get:
+      operationId: getPlatformBreakdown
+      tags: [analytics]
+      summary: Platform audience breakdown (pie chart data)
+      responses:
+        "200":
+          description: Breakdown
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PlatformSlice"
+
+  # ─── AI Insights ────────────────────────────────────────────────────────────
+  /insights/growth-analysis:
+    get:
+      operationId: getGrowthAnalysis
+      tags: [insights]
+      summary: AI growth analysis agent output
+      responses:
+        "200":
+          description: Growth analysis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GrowthAnalysis"
+
+  /insights/content-agent:
+    get:
+      operationId: getContentAgentInsights
+      tags: [insights]
+      summary: AI content agent weaknesses and suggestions
+      responses:
+        "200":
+          description: Content insights
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContentAgentInsights"
+
+  /insights/growth-coach:
+    get:
+      operationId: getGrowthCoachPlan
+      tags: [insights]
+      summary: Weekly growth coach plan
+      responses:
+        "200":
+          description: Weekly plan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GrowthCoachPlan"
+
+  # ─── Content Strategy ───────────────────────────────────────────────────────
+  /content/ideas:
+    get:
+      operationId: getContentIdeas
+      tags: [content]
+      summary: AI-generated content ideas
+      responses:
+        "200":
+          description: Content ideas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContentIdea"
+
+  /content/calendar:
+    get:
+      operationId: getContentCalendar
+      tags: [content]
+      summary: Content calendar items
+      parameters:
+        - in: query
+          name: month
+          schema:
+            type: integer
+        - in: query
+          name: year
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Calendar items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CalendarItem"
+    post:
+      operationId: createCalendarItem
+      tags: [content]
+      summary: Add a calendar item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CalendarItemInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CalendarItem"
+
+  /content/analyze:
+    post:
+      operationId: analyzeContent
+      tags: [content]
+      summary: Analyze post text with AI
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContentAnalyzeInput"
+      responses:
+        "200":
+          description: Analysis result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContentAnalysisResult"
+
+  # ─── Competitors ─────────────────────────────────────────────────────────────
+  /competitors:
+    get:
+      operationId: getCompetitors
+      tags: [competitors]
+      summary: List tracked competitors
+      responses:
+        "200":
+          description: Competitors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Competitor"
+    post:
+      operationId: addCompetitor
+      tags: [competitors]
+      summary: Add a competitor to track
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompetitorInput"
+      responses:
+        "201":
+          description: Added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Competitor"
+
+  /competitors/{id}:
+    get:
+      operationId: getCompetitor
+      tags: [competitors]
+      summary: Get competitor details
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Competitor detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompetitorDetail"
+    delete:
+      operationId: deleteCompetitor
+      tags: [competitors]
+      summary: Remove a competitor
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  /competitors/comparison:
+    get:
+      operationId: getCompetitorComparison
+      tags: [competitors]
+      summary: You vs competitor comparison chart
+      parameters:
+        - in: query
+          name: competitorId
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Comparison data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ComparisonData"
+
+  # ─── Trends ──────────────────────────────────────────────────────────────────
+  /trends:
+    get:
+      operationId: getTrends
+      tags: [trends]
+      summary: Trending topics, hashtags, keywords, and formats
+      parameters:
+        - in: query
+          name: category
+          schema:
+            type: string
+            enum: [topics, hashtags, keywords, formats, all]
+      responses:
+        "200":
+          description: Trends
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TrendItem"
+
+  # ─── Reports ─────────────────────────────────────────────────────────────────
+  /reports:
+    get:
+      operationId: getReports
+      tags: [reports]
+      summary: List generated reports
+      responses:
+        "200":
+          description: Reports
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Report"
+
+  /reports/generate:
+    post:
+      operationId: generateReport
+      tags: [reports]
+      summary: Generate a new report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReportGenerateInput"
+      responses:
+        "201":
+          description: Generated report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Report"
+
+  /reports/{id}:
+    get:
+      operationId: getReport
+      tags: [reports]
+      summary: Get report detail
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Report detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReportDetail"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +535,531 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    # Auth
+    LoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        rememberMe:
+          type: boolean
+
+    RegisterInput:
+      type: object
+      required: [name, email, password, category]
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        category:
+          type: string
+          enum: [developer, designer, entrepreneur, educator, other]
+
+    AuthResult:
+      type: object
+      required: [token, user]
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+
+    User:
+      type: object
+      required: [id, name, email, category, plan]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        category:
+          type: string
+        plan:
+          type: string
+          enum: [free, creator, pro, agency]
+        avatarUrl:
+          type: ["string", "null"]
+
+    # Dashboard
+    DashboardOverview:
+      type: object
+      required: [followers, followersGrowth, reach, reachGrowth, engagement, engagementGrowth, impressions, impressionsGrowth]
+      properties:
+        followers:
+          type: integer
+        followersGrowth:
+          type: number
+        reach:
+          type: integer
+        reachGrowth:
+          type: number
+        engagement:
+          type: number
+        engagementGrowth:
+          type: number
+        impressions:
+          type: integer
+        impressionsGrowth:
+          type: number
+
+    GrowthChartData:
+      type: object
+      required: [labels, followers, engagement, reach]
+      properties:
+        labels:
+          type: array
+          items:
+            type: string
+        followers:
+          type: array
+          items:
+            type: integer
+        engagement:
+          type: array
+          items:
+            type: number
+        reach:
+          type: array
+          items:
+            type: integer
+
+    AiSummary:
+      type: object
+      required: [headline, detail, highlights]
+      properties:
+        headline:
+          type: string
+        detail:
+          type: string
+        highlights:
+          type: array
+          items:
+            type: string
+
+    TopPost:
+      type: object
+      required: [id, title, platform, type, likes, comments, shares, engagementScore, thumbnailUrl, publishedAt]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        platform:
+          type: string
+        type:
+          type: string
+        likes:
+          type: integer
+        comments:
+          type: integer
+        shares:
+          type: integer
+        engagementScore:
+          type: number
+        thumbnailUrl:
+          type: string
+        publishedAt:
+          type: string
+
+    GrowthScore:
+      type: object
+      required: [score, consistency, engagement, contentQuality, trend]
+      properties:
+        score:
+          type: integer
+        consistency:
+          type: integer
+        engagement:
+          type: integer
+        contentQuality:
+          type: integer
+        trend:
+          type: string
+          enum: [up, down, stable]
+
+    # Analytics
+    AnalyticsMetrics:
+      type: object
+      required: [followers, reach, engagement, impressions, watchTime]
+      properties:
+        followers:
+          type: integer
+        followersChange:
+          type: number
+        reach:
+          type: integer
+        reachChange:
+          type: number
+        engagement:
+          type: number
+        engagementChange:
+          type: number
+        impressions:
+          type: integer
+        impressionsChange:
+          type: number
+        watchTime:
+          type: ["integer", "null"]
+        watchTimeChange:
+          type: ["number", "null"]
+
+    ChartSeries:
+      type: object
+      required: [labels, series]
+      properties:
+        labels:
+          type: array
+          items:
+            type: string
+        series:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChartLine"
+
+    ChartLine:
+      type: object
+      required: [name, data]
+      properties:
+        name:
+          type: string
+        data:
+          type: array
+          items:
+            type: number
+
+    ContentPerformanceRow:
+      type: object
+      required: [id, title, type, platform, likes, comments, shares, score, publishedAt]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        type:
+          type: string
+        platform:
+          type: string
+        likes:
+          type: integer
+        comments:
+          type: integer
+        shares:
+          type: integer
+        score:
+          type: number
+        publishedAt:
+          type: string
+
+    PlatformSlice:
+      type: object
+      required: [platform, percentage, followers]
+      properties:
+        platform:
+          type: string
+        percentage:
+          type: number
+        followers:
+          type: integer
+
+    # AI Insights
+    GrowthAnalysis:
+      type: object
+      required: [problems, recommendations, urgency]
+      properties:
+        problems:
+          type: array
+          items:
+            type: string
+        recommendations:
+          type: array
+          items:
+            type: string
+        urgency:
+          type: string
+          enum: [low, medium, high]
+
+    ContentAgentInsights:
+      type: object
+      required: [weaknesses, suggestions, topFormats]
+      properties:
+        weaknesses:
+          type: array
+          items:
+            type: string
+        suggestions:
+          type: array
+          items:
+            type: string
+        topFormats:
+          type: array
+          items:
+            type: string
+
+    GrowthCoachPlan:
+      type: object
+      required: [week, days]
+      properties:
+        week:
+          type: string
+        days:
+          type: array
+          items:
+            $ref: "#/components/schemas/CoachDay"
+
+    CoachDay:
+      type: object
+      required: [day, task, format, rationale]
+      properties:
+        day:
+          type: string
+        task:
+          type: string
+        format:
+          type: string
+        rationale:
+          type: string
+
+    # Content
+    ContentIdea:
+      type: object
+      required: [id, title, hook, format, expectedEngagement, difficulty, platform]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        hook:
+          type: string
+        format:
+          type: string
+        expectedEngagement:
+          type: string
+          enum: [low, medium, high, viral]
+        difficulty:
+          type: string
+          enum: [easy, medium, hard]
+        platform:
+          type: string
+
+    CalendarItem:
+      type: object
+      required: [id, title, date, status, platform, format]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        date:
+          type: string
+        status:
+          type: string
+          enum: [idea, draft, published]
+        platform:
+          type: string
+        format:
+          type: string
+
+    CalendarItemInput:
+      type: object
+      required: [title, date, platform, format]
+      properties:
+        title:
+          type: string
+        date:
+          type: string
+        status:
+          type: string
+          enum: [idea, draft, published]
+        platform:
+          type: string
+        format:
+          type: string
+
+    ContentAnalyzeInput:
+      type: object
+      required: [text]
+      properties:
+        text:
+          type: string
+
+    ContentAnalysisResult:
+      type: object
+      required: [hookScore, ctaScore, engagementPotential, feedback, suggestions]
+      properties:
+        hookScore:
+          type: integer
+        ctaScore:
+          type: integer
+        engagementPotential:
+          type: integer
+        feedback:
+          type: string
+        suggestions:
+          type: array
+          items:
+            type: string
+
+    # Competitors
+    Competitor:
+      type: object
+      required: [id, username, platform, followers, followersGrowth, postingFrequency, addedAt]
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        platform:
+          type: string
+        followers:
+          type: integer
+        followersGrowth:
+          type: number
+        postingFrequency:
+          type: number
+        avatarUrl:
+          type: ["string", "null"]
+        addedAt:
+          type: string
+
+    CompetitorInput:
+      type: object
+      required: [username, platform]
+      properties:
+        username:
+          type: string
+        platform:
+          type: string
+
+    CompetitorDetail:
+      type: object
+      required: [id, username, platform, followers, followersGrowth, postingFrequency, bestPosts, contentStrategy]
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        platform:
+          type: string
+        followers:
+          type: integer
+        followersGrowth:
+          type: number
+        postingFrequency:
+          type: number
+        bestPosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/TopPost"
+        contentStrategy:
+          type: array
+          items:
+            type: string
+        avatarUrl:
+          type: ["string", "null"]
+
+    ComparisonData:
+      type: object
+      required: [labels, you, competitor, competitorName]
+      properties:
+        labels:
+          type: array
+          items:
+            type: string
+        you:
+          type: array
+          items:
+            type: number
+        competitor:
+          type: array
+          items:
+            type: number
+        competitorName:
+          type: string
+
+    # Trends
+    TrendItem:
+      type: object
+      required: [id, name, category, popularity, growthRate, suggestedContent]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        category:
+          type: string
+          enum: [topics, hashtags, keywords, formats]
+        popularity:
+          type: integer
+        growthRate:
+          type: number
+        suggestedContent:
+          type: string
+        platform:
+          type: ["string", "null"]
+
+    # Reports
+    Report:
+      type: object
+      required: [id, type, createdAt, status, period]
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [weekly, monthly]
+        createdAt:
+          type: string
+        status:
+          type: string
+          enum: [ready, generating]
+        period:
+          type: string
+        downloadUrl:
+          type: ["string", "null"]
+
+    ReportGenerateInput:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [weekly, monthly]
+
+    ReportDetail:
+      type: object
+      required: [id, type, period, createdAt, growthSummary, bestContent, problems, recommendations]
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        period:
+          type: string
+        createdAt:
+          type: string
+        growthSummary:
+          type: string
+        bestContent:
+          type: array
+          items:
+            $ref: "#/components/schemas/TopPost"
+        problems:
+          type: array
+          items:
+            type: string
+        recommendations:
+          type: array
+          items:
+            type: string
+        downloadUrl:
+          type: ["string", "null"]
