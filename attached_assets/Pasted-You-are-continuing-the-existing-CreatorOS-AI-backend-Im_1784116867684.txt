@@ -1,0 +1,189 @@
+You are continuing the existing CreatorOS AI backend.
+
+Implement ONLY Phase 3B.
+
+Do NOT modify previous architecture.
+
+Do NOT implement future phases.
+
+======================================
+TODO
+======================================
+
+□ Create CreatorProfileRepository
+
+□ Create UserService
+
+□ Create profile validators
+
+□ Create profile controllers
+
+□ Create profile routes
+
+======================================
+Endpoints
+======================================
+
+□ GET /api/v1/auth/me
+
+□ PATCH /api/v1/auth/profile
+
+□ PATCH /api/v1/auth/change-password
+
+□ DELETE /api/v1/auth/account
+
+======================================
+Current User
+======================================
+
+□ Return authenticated user
+
+□ Populate CreatorProfile
+
+□ Exclude sensitive fields
+
+□ Return standardized response
+
+======================================
+Profile Update
+======================================
+
+Allow updating only:
+
+□ Name
+
+□ Avatar URL
+
+□ Bio
+
+□ Country
+
+□ Timezone
+
+□ Language
+
+□ Creator Niche
+
+□ Goals
+
+□ Experience Level
+
+Reject updates to:
+
+□ Email
+
+□ Password
+
+□ Role
+
+□ Subscription Plan
+
+□ Status
+
+======================================
+Password Change
+======================================
+
+□ Verify current password
+
+□ Validate new password
+
+□ Hash new password
+
+□ Invalidate Refresh Tokens
+
+□ Force re-login
+
+======================================
+Account Deletion
+======================================
+
+□ Soft delete account
+
+□ Soft delete CreatorProfile
+
+□ Revoke all Refresh Tokens
+
+□ Mark account inactive
+
+□ Return success response
+
+======================================
+Middleware
+======================================
+
+□ authenticate()
+
+□ currentUser()
+
+□ owner()
+
+======================================
+Validation
+======================================
+
+□ Validate every request
+
+□ Reject invalid payloads
+
+□ Reject unknown fields
+
+□ Validate URLs
+
+□ Validate timezone
+
+□ Validate language
+
+======================================
+Security
+======================================
+
+□ Never expose password
+
+□ Never expose Refresh Tokens
+
+□ Never expose internal IDs unnecessarily
+
+□ Prevent unauthorized updates
+
+======================================
+Testing
+======================================
+
+□ View profile
+
+□ Update profile
+
+□ Invalid update
+
+□ Unauthorized update
+
+□ Change password
+
+□ Invalid current password
+
+□ Delete account
+
+□ Verify deleted account cannot login
+
+======================================
+Do NOT implement
+======================================
+
+OAuth
+
+Social Media APIs
+
+Analytics
+
+AI
+
+Competitors
+
+Reports
+
+Notifications
+
+Background Jobs
+
+Anything outside user profile and account management.

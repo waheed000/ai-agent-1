@@ -10,6 +10,7 @@
 
 import TokenService from '../services/TokenService.js';
 import UserRepository from '../repositories/UserRepository.js';
+import CreatorProfileRepository from '../repositories/CreatorProfileRepository.js';
 import {
   AuthenticationError,
   AuthorizationError,
@@ -106,6 +107,23 @@ export const authorize = (...allowedRoles) =>
     }
     next();
   };
+
+/**
+ * Current-user enrichment middleware.
+ * Must follow authenticate(). Fetches the CreatorProfile and attaches it
+ * to req.profile so controllers never need to query it directly.
+ *
+ * Usage: router.get('/me', authenticate, currentUser, handler)
+ */
+export const currentUser = async (req, _res, next) => {
+  try {
+    if (!req.user) return next(new AuthenticationError('Not authenticated'));
+    req.profile = await CreatorProfileRepository.findByUserId(req.user._id) ?? null;
+    next();
+  } catch (err) {
+    next(err);
+  }
+};
 
 /**
  * Owner guard — the authenticated user must own the resource.

@@ -56,6 +56,14 @@ const creatorProfileSchema = new Schema(
       max: 100,
       default: 0,
     },
+    experienceLevel: {
+      type: String,
+      enum: {
+        values: ['beginner', 'intermediate', 'advanced', 'professional'],
+        message: 'Invalid experience level: {VALUE}',
+      },
+      default: null,
+    },
     onboardingCompleted: {
       type: Boolean,
       default: false,
