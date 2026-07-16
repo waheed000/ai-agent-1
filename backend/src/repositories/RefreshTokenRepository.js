@@ -4,6 +4,7 @@
  */
 
 import RefreshToken from '../models/RefreshToken.js';
+import { parseUserAgent } from '../utils/uaParser.js';
 import { DatabaseError } from '../utils/errors.js';
 
 class RefreshTokenRepository {
@@ -14,6 +15,15 @@ class RefreshTokenRepository {
     try {
       // Never persist the raw token — only the hash
       const { token: _raw, ...safeData } = data;
+
+      // Auto-parse UA string into structured session fields if not already provided
+      if (safeData.userAgent && !safeData.browser) {
+        const parsed = parseUserAgent(safeData.userAgent);
+        safeData.browser = parsed.browser;
+        safeData.os = parsed.os;
+        safeData.deviceName = parsed.deviceName;
+      }
+
       const doc = new RefreshToken(safeData);
       await doc.save();
       return doc.toObject();

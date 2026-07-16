@@ -40,6 +40,43 @@ const config = {
   logging: {
     level: process.env.LOG_LEVEL || 'info',
   },
+
+  // AES-256-GCM key for encrypting stored OAuth tokens.
+  // Must be a 64-character hex string (32 bytes).
+  // Generate with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+  encryption: {
+    key: process.env.ENCRYPTION_KEY || 'a'.repeat(64), // dev fallback — MUST be overridden in production
+  },
+
+  // OAuth provider credentials — set via environment variables.
+  // No provider is integrated yet; placeholders are here for Phase 5+.
+  oauth: {
+    youtube: {
+      clientId: process.env.YOUTUBE_CLIENT_ID || '',
+      clientSecret: process.env.YOUTUBE_CLIENT_SECRET || '',
+      redirectUri: process.env.YOUTUBE_REDIRECT_URI || '',
+    },
+    instagram: {
+      clientId: process.env.INSTAGRAM_CLIENT_ID || '',
+      clientSecret: process.env.INSTAGRAM_CLIENT_SECRET || '',
+      redirectUri: process.env.INSTAGRAM_REDIRECT_URI || '',
+    },
+    linkedin: {
+      clientId: process.env.LINKEDIN_CLIENT_ID || '',
+      clientSecret: process.env.LINKEDIN_CLIENT_SECRET || '',
+      redirectUri: process.env.LINKEDIN_REDIRECT_URI || '',
+    },
+    tiktok: {
+      clientId: process.env.TIKTOK_CLIENT_ID || '',
+      clientSecret: process.env.TIKTOK_CLIENT_SECRET || '',
+      redirectUri: process.env.TIKTOK_REDIRECT_URI || '',
+    },
+    x: {
+      clientId: process.env.X_CLIENT_ID || '',
+      clientSecret: process.env.X_CLIENT_SECRET || '',
+      redirectUri: process.env.X_REDIRECT_URI || '',
+    },
+  },
 };
 
 export default config;

@@ -1,0 +1,199 @@
+You are continuing the existing CreatorOS AI backend.
+
+Implement ONLY Phase 4.
+
+Do NOT modify previous architecture.
+
+Do NOT implement analytics, AI, reports or competitors.
+
+==================================================
+TODO
+==================================================
+
+□ Create ConnectedAccountRepository
+
+□ Create SessionRepository
+
+□ Create OAuthService
+
+□ Create SessionService
+
+□ Create ConnectedAccountService
+
+□ Create OAuth controllers
+
+□ Create OAuth routes
+
+==================================================
+Session Management
+==================================================
+
+Implement:
+
+□ GET /api/v1/account/sessions
+
+□ DELETE /api/v1/account/sessions/:id
+
+□ DELETE /api/v1/account/sessions
+
+Each session must store:
+
+□ Session ID
+
+□ User ID
+
+□ Device Name
+
+□ Browser
+
+□ Operating System
+
+□ IP Address
+
+□ Login Time
+
+□ Last Activity
+
+□ Refresh Token ID
+
+□ Is Current Session
+
+Users should be able to:
+
+□ View all active sessions
+
+□ Logout a specific device
+
+□ Logout every device except current
+
+==================================================
+Connected Accounts
+==================================================
+
+Implement CRUD for connected accounts.
+
+Endpoints:
+
+□ GET /api/v1/integrations
+
+□ DELETE /api/v1/integrations/:platform
+
+Store:
+
+□ Platform
+
+□ Username
+
+□ Platform User ID
+
+□ Access Token (encrypted)
+
+□ Refresh Token (encrypted)
+
+□ Token Expiry
+
+□ Connection Status
+
+□ Last Sync
+
+□ Last Error
+
+□ Permissions
+
+==================================================
+OAuth Infrastructure
+==================================================
+
+DO NOT integrate any provider yet.
+
+Build a reusable OAuth framework.
+
+Create:
+
+OAuthService
+
+BaseOAuthProvider
+
+OAuthProviderFactory
+
+The architecture must allow adding new providers without changing business logic.
+
+Provider interface:
+
+connect()
+
+disconnect()
+
+refreshToken()
+
+validateConnection()
+
+getProfile()
+
+==================================================
+Encryption
+==================================================
+
+Encrypt:
+
+□ Access Tokens
+
+□ Refresh Tokens
+
+Use Node crypto.
+
+Do NOT store tokens in plain text.
+
+==================================================
+Configuration
+==================================================
+
+Prepare configuration placeholders for:
+
+YouTube
+
+Instagram
+
+LinkedIn
+
+TikTok
+
+X
+
+Keep credentials in environment variables.
+
+==================================================
+Testing
+==================================================
+
+Verify:
+
+□ Session listing
+
+□ Session revocation
+
+□ Connected account CRUD
+
+□ Token encryption
+
+□ OAuth infrastructure
+
+Do NOT implement real OAuth providers yet.
+
+==================================================
+DO NOT IMPLEMENT
+==================================================
+
+Analytics
+
+AI
+
+Reports
+
+Competitors
+
+Content Planner
+
+Notifications
+
+Background Jobs

@@ -46,6 +46,10 @@ const refreshTokenSchema = new Schema(
       type: Date,
       default: null,
     },
+    // Parsed from userAgent at creation time — used for session display
+    browser: { type: String, default: null },
+    os: { type: String, default: null },
+    deviceName: { type: String, default: null },
   },
   defaultSchemaOptions
 );

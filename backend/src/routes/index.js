@@ -6,14 +6,17 @@
 import { Router } from 'express';
 import healthRouter from './health.js';
 import authRouter from './auth.js';
+import accountRouter from './account.js';
+import integrationsRouter from './integrations.js';
 
 const router = Router();
 
 router.use('/health', healthRouter);
 router.use('/auth', authRouter);
+router.use('/account', accountRouter);
+router.use('/integrations', integrationsRouter);
 
 // Future routes will be mounted here:
-// router.use('/users',       userRouter);
 // router.use('/analytics',   analyticsRouter);
 // router.use('/insights',    insightsRouter);
 // router.use('/content',     contentRouter);
