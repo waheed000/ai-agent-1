@@ -1,0 +1,171 @@
+You are continuing the existing CreatorOS AI backend.
+
+IMPORTANT:
+- Continue from the current production-ready backend.
+- Do NOT rewrite or refactor previous phases unless absolutely necessary.
+- Maintain the existing clean architecture:
+  Routes → Controllers → Services → Repositories → MongoDB.
+- Continue using ES Modules, centralized config, response helpers, error handling, and validation.
+
+Implement ONLY Phase 6 and Phase 7.
+
+==================================================
+PHASE 6 — BACKGROUND JOBS & SYNC SCHEDULER
+==================================================
+
+GOAL:
+Build a production-ready background job system that schedules and processes social media synchronization tasks.
+
+TECH STACK:
+- BullMQ
+- Redis
+- Existing PlatformManager and SyncService
+- Existing ConnectedAccount model and repositories
+
+==================================================
+TODO
+==================================================
+
+□ Add Redis configuration to the centralized config module.
+□ Create a QueueService abstraction so BullMQ is not used directly across the codebase.
+□ Create queue definitions for:
+   - socialSyncQueue
+   - analyticsQueue
+   - trendQueue
+   - reportQueue
+   - notificationQueue
+□ Create workers for:
+   - Social account synchronization
+   - Analytics recalculation
+   - Trend data refresh
+   - Weekly report generation
+   - Notification processing
+□ Create repeatable scheduled jobs:
+   - Every hour: refresh social analytics
+   - Every 6 hours: fetch new posts
+   - Every midnight: calculate growth metrics
+   - Every Monday: generate weekly reports
+   - Every day: refresh trend data
+□ Ensure jobs can be retried on transient failures.
+□ Add exponential backoff with jitter for retryable jobs.
+□ Log job start, completion, failure, duration, and affected records.
+□ Prevent duplicate sync jobs for the same user/platform pair.
+□ Store job execution metadata in the existing AiExecution model or a dedicated JobExecution model if needed.
+□ Add queue health monitoring endpoints:
+   - GET /api/v1/jobs/health
+   - GET /api/v1/jobs/queues
+□ Add manual job trigger endpoint:
+   - POST /api/v1/jobs/platforms/:platform/sync
+
+==================================================
+JOB PROCESSING REQUIREMENTS
+==================================================
+
+□ Each sync job must:
+   - Validate the connected account.
+   - Refresh expired tokens if supported.
+   - Fetch profile data.
+   - Fetch posts.
+   - Fetch analytics.
+   - Fetch audience data.
+   - Fetch follower history.
+   - Update database records using upserts.
+   - Update last sync time and status.
+   - Save sync errors without crashing the entire queue.
+□ Failed jobs should be retried only for retryable errors such as:
+   - Network failures
+   - Rate limits
+   - Temporary provider errors
+□ Authentication errors should mark the account as needing reauthorization.
+
+==================================================
+PHASE 7 — ANALYTICS ENGINE
+==================================================
+
+GOAL:
+Build a deterministic analytics engine that calculates all CreatorOS AI metrics from stored database data. Do NOT use AI to calculate metrics.
+
+==================================================
+TODO
+==================================================
+
+□ Create AnalyticsService.
+□ Create analytics utility modules for:
+   - engagement calculations
+   - growth calculations
+   - posting consistency
+   - audience analysis
+   - best time analysis
+   - content scoring
+□ Create repositories or queries needed for analytics aggregation.
+□ Calculate and store the following metrics:
+   - Follower growth rate
+   - Engagement rate
+   - Reach growth
+   - Impressions growth
+   - Posting frequency
+   - Best posting times
+   - Top performing content
+   - Worst performing content
+   - Audience growth
+   - Average engagement per post
+   - Content velocity
+   - Posting consistency score
+   - Overall content score
+□ Ensure calculations use historical data from:
+   - FollowersHistory
+   - PostAnalytics
+   - AudienceAnalytics
+   - Post
+□ Store historical analytics snapshots so trends can be analyzed over time.
+□ Create analytics summary endpoints:
+   - GET /api/v1/analytics/overview
+   - GET /api/v1/analytics/growth
+   - GET /api/v1/analytics/engagement
+   - GET /api/v1/analytics/content-performance
+   - GET /api/v1/analytics/best-posting-time
+   - GET /api/v1/analytics/audience
+□ Add query parameters for:
+   - platform
+   - startDate
+   - endDate
+   - comparison period
+□ Return normalized data suitable for charts and dashboards.
+
+==================================================
+ANALYTICS RULES
+==================================================
+
+□ All metrics must be calculated by backend code, not by AI.
+□ Engagement rate should be calculated using stored interaction and follower data.
+□ Growth rate should compare historical snapshots.
+□ Best posting time should analyze engagement by hour and day.
+□ Content score should combine engagement, reach, shares, comments, and consistency.
+□ Missing or partial data should be handled gracefully.
+
+==================================================
+TESTING
+==================================================
+
+□ Add tests for queue scheduling and worker execution.
+□ Add tests for retry and failure handling.
+□ Add tests for duplicate job prevention.
+□ Add tests for each analytics calculation.
+□ Add tests for analytics API endpoints.
+□ Ensure all existing tests continue to pass.
+
+==================================================
+DO NOT IMPLEMENT
+==================================================
+
+AI agents
+AI insights
+Competitor intelligence
+Trend engine AI analysis
+Growth reports with AI-generated text
+Notifications UI
+Content planner
+Subscription billing
+Any frontend code
+
+The result should be a production-ready background job system and deterministic analytics engine that can support future AI agent features.

@@ -48,6 +48,14 @@ const config = {
     key: process.env.ENCRYPTION_KEY || 'a'.repeat(64), // dev fallback — MUST be overridden in production
   },
 
+  redis: {
+    host: process.env.REDIS_HOST || '127.0.0.1',
+    port: parseInt(process.env.REDIS_PORT || '6379', 10),
+    password: process.env.REDIS_PASSWORD || undefined,
+    db: parseInt(process.env.REDIS_DB || '0', 10),
+    maxRetriesPerRequest: null, // required by BullMQ
+  },
+
   // OAuth provider credentials — set via environment variables.
   // No provider is integrated yet; placeholders are here for Phase 5+.
   oauth: {
