@@ -1,0 +1,229 @@
+You are continuing the CreatorOS AI backend.
+
+Implement ONLY Phase 5.
+
+Do NOT modify previous architecture.
+
+==================================================
+GOAL
+==================================================
+
+Build a production-ready social media integration framework.
+
+Implement ONE provider completely.
+
+Preferred provider:
+
+YouTube
+
+The architecture must support future providers:
+
+Instagram
+
+LinkedIn
+
+TikTok
+
+X
+
+without code duplication.
+
+==================================================
+TODO
+==================================================
+
+Create:
+
+□ BasePlatformService
+
+□ PlatformFactory
+
+□ PlatformManager
+
+Create provider:
+
+□ YouTubePlatformService
+
+Prepare empty providers:
+
+□ InstagramPlatformService
+
+□ LinkedInPlatformService
+
+□ TikTokPlatformService
+
+□ XPlatformService
+
+==================================================
+Provider Interface
+==================================================
+
+Every provider must implement:
+
+connect()
+
+disconnect()
+
+refreshAccessToken()
+
+validateConnection()
+
+fetchProfile()
+
+fetchPosts()
+
+fetchAnalytics()
+
+fetchAudience()
+
+fetchComments()
+
+fetchFollowers()
+
+fetchMetrics()
+
+==================================================
+Synchronization
+==================================================
+
+Implement synchronization service.
+
+Endpoints:
+
+POST /api/v1/platforms/:platform/sync
+
+GET /api/v1/platforms/:platform/status
+
+The sync process should:
+
+□ Validate account
+
+□ Fetch latest profile
+
+□ Fetch posts
+
+□ Fetch analytics
+
+□ Fetch audience metrics
+
+□ Update database
+
+□ Update last sync time
+
+□ Save sync errors
+
+==================================================
+Database Updates
+==================================================
+
+Update:
+
+ConnectedAccount
+
+Post
+
+PostAnalytics
+
+AudienceAnalytics
+
+FollowersHistory
+
+No duplicate records.
+
+Use upsert where appropriate.
+
+==================================================
+Error Handling
+==================================================
+
+Handle:
+
+□ Expired tokens
+
+□ Invalid tokens
+
+□ API rate limits
+
+□ Network failures
+
+□ Partial sync failures
+
+Retry where appropriate.
+
+==================================================
+Logging
+==================================================
+
+Log:
+
+Sync start
+
+Sync success
+
+Sync failure
+
+Duration
+
+Records updated
+
+Platform
+
+==================================================
+Response
+==================================================
+
+Return:
+
+Platform
+
+Sync status
+
+Records updated
+
+Duration
+
+Last sync
+
+Errors
+
+==================================================
+Testing
+==================================================
+
+Verify:
+
+Connect account
+
+Disconnect account
+
+Profile sync
+
+Posts sync
+
+Analytics sync
+
+Audience sync
+
+Expired token
+
+Invalid token
+
+Retry logic
+
+==================================================
+DO NOT IMPLEMENT
+==================================================
+
+AI
+
+Analytics Engine
+
+Competitors
+
+Growth Reports
+
+Trend Engine
+
+Notifications
+
+Background Jobs

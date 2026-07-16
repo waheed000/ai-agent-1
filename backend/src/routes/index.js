@@ -8,6 +8,7 @@ import healthRouter from './health.js';
 import authRouter from './auth.js';
 import accountRouter from './account.js';
 import integrationsRouter from './integrations.js';
+import platformsRouter from './platforms.js';
 
 const router = Router();
 
@@ -15,6 +16,7 @@ router.use('/health', healthRouter);
 router.use('/auth', authRouter);
 router.use('/account', accountRouter);
 router.use('/integrations', integrationsRouter);
+router.use('/platforms', platformsRouter);
 
 // Future routes will be mounted here:
 // router.use('/analytics',   analyticsRouter);
