@@ -1,0 +1,416 @@
+You are continuing the existing CreatorOS AI backend.
+
+Implement ONLY Phase 11, Phase 12 and Phase 13.
+
+Do NOT modify previous architecture.
+
+Continue using the existing clean architecture.
+
+Controllers
+↓
+Services
+↓
+Repositories
+↓
+Database
+
+Maintain repository pattern.
+
+Maintain event-driven architecture.
+
+Maintain AI provider abstraction.
+
+Maintain QueueService abstraction.
+
+=========================================================
+PHASE 11
+Reports & Strategy Engine
+=========================================================
+
+Create
+
+ReportRepository
+
+StrategyRepository
+
+ReportService
+
+StrategyService
+
+ReportController
+
+StrategyController
+
+ReportValidators
+
+StrategyValidators
+
+Create endpoints
+
+POST /api/v1/reports/generate
+
+GET /api/v1/reports
+
+GET /api/v1/reports/:id
+
+GET /api/v1/reports/latest
+
+DELETE /api/v1/reports/:id
+
+POST /api/v1/strategy/generate
+
+GET /api/v1/strategy
+
+GET /api/v1/strategy/latest
+
+Reports should combine
+
+Analytics
+
+Competitor Intelligence
+
+Trend Engine
+
+AI Agent Results
+
+Historical Growth
+
+Generate
+
+Weekly Report
+
+Monthly Report
+
+Quarterly Report
+
+Yearly Report
+
+Every report should include
+
+Executive Summary
+
+Growth Metrics
+
+Engagement Metrics
+
+Content Performance
+
+Competitor Comparison
+
+Trend Summary
+
+AI Insights
+
+Weaknesses
+
+Strengths
+
+Recommended Actions
+
+KPIs
+
+Priority Score
+
+Next Week Goals
+
+Store every report.
+
+Never overwrite reports.
+
+Create Strategy Engine
+
+Generate
+
+7 Day Plan
+
+30 Day Plan
+
+90 Day Roadmap
+
+Growth Experiments
+
+Action Checklist
+
+Risk Analysis
+
+Success Probability
+
+=========================================================
+PHASE 12
+Notification Engine
+=========================================================
+
+Create
+
+NotificationRepository
+
+NotificationService
+
+NotificationController
+
+NotificationDispatcher
+
+NotificationPreferences
+
+NotificationValidators
+
+Create endpoints
+
+GET /api/v1/notifications
+
+PATCH /api/v1/notifications/:id/read
+
+PATCH /api/v1/notifications/read-all
+
+DELETE /api/v1/notifications/:id
+
+PATCH /api/v1/notifications/preferences
+
+Create notification types
+
+Growth Drop
+
+Growth Milestone
+
+Trend Alert
+
+Competitor Alert
+
+Weekly Report Ready
+
+Monthly Report Ready
+
+AI Recommendation
+
+Publishing Reminder
+
+Failed Sync
+
+Expired Token
+
+Notification engine must listen to EventBus.
+
+Do not tightly couple services.
+
+Support
+
+In-App Notifications
+
+Email interface only
+
+WebSocket interface only
+
+Push interface only
+
+Implement interfaces.
+
+Do not integrate providers.
+
+=========================================================
+PHASE 13
+Content Planner
+=========================================================
+
+Create
+
+PlannerRepository
+
+PlannerService
+
+PlannerController
+
+PublishingService
+
+CalendarService
+
+DraftRepository
+
+ContentWorkflow
+
+PlannerValidators
+
+Endpoints
+
+POST /api/v1/planner/generate
+
+GET /api/v1/planner
+
+PATCH /api/v1/planner/:id
+
+DELETE /api/v1/planner/:id
+
+GET /api/v1/calendar
+
+POST /api/v1/drafts
+
+PATCH /api/v1/drafts/:id
+
+DELETE /api/v1/drafts/:id
+
+Planner should use
+
+Analytics
+
+Trends
+
+Competitor Analysis
+
+Growth Strategy
+
+AI Agents
+
+Generate
+
+Content Calendar
+
+Weekly Schedule
+
+Monthly Schedule
+
+Publishing Plan
+
+Campaign Plan
+
+Series Plan
+
+Each content item should contain
+
+Title
+
+Description
+
+Platform
+
+Suggested Time
+
+Estimated Reach
+
+Estimated Engagement
+
+Priority
+
+Goal
+
+Hashtags
+
+Keywords
+
+AI Caption
+
+Content Type
+
+Publishing Status
+
+Workflow
+
+Draft
+
+Review
+
+Approved
+
+Scheduled
+
+Published
+
+Archived
+
+Planner must support
+
+Recurring Content
+
+Series
+
+Campaigns
+
+Dependencies
+
+Approval Flow
+
+=========================================================
+EVENTS
+=========================================================
+
+ReportsGenerated
+
+StrategyGenerated
+
+NotificationCreated
+
+PlannerGenerated
+
+DraftCreated
+
+ContentPublished
+
+All modules must communicate through EventBus.
+
+=========================================================
+QUEUE
+=========================================================
+
+Generate reports using QueueService.
+
+Generate planner asynchronously.
+
+Dispatch notifications asynchronously.
+
+=========================================================
+CACHE
+=========================================================
+
+Cache
+
+Latest Reports
+
+Latest Strategy
+
+Planner
+
+Calendar
+
+=========================================================
+TESTING
+=========================================================
+
+Unit test
+
+Report Engine
+
+Strategy Engine
+
+Notification Engine
+
+Planner
+
+Calendar
+
+Workflow
+
+Queues
+
+Events
+
+=========================================================
+DO NOT IMPLEMENT
+=========================================================
+
+Billing
+
+Subscriptions
+
+Teams
+
+Organizations
+
+Admin Panel
+
+Frontend
+
+Only implement
+
+Phase 11
+
+Phase 12
+
+Phase 13

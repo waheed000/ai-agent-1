@@ -1,74 +1,69 @@
 /**
- * Report Worker
- * Generates weekly growth reports for all users.
- *
- * Job payload: { weekStartDate: ISO string }
+ * reportWorker
+ * Processes report and strategy generation jobs from the REPORT queue.
  */
-
 import QueueService from '../../services/QueueService.js';
+import ReportService from '../../services/ReportService.js';
+import StrategyService from '../../services/StrategyService.js';
 import JobExecution from '../../models/JobExecution.js';
-import User from '../../models/User.js';
-import GrowthReport from '../../models/GrowthReport.js';
-import { QUEUE_NAMES } from '../queues.js';
+import { QUEUE_NAMES, JOB_NAMES } from '../queues.js';
 import logger from '../../utils/logger.js';
 
-async function processReportJob(job) {
-  const { weekStartDate } = job.data;
-  const startedAt = new Date();
-
-  logger.info('reportWorker: processing weekly reports', { jobId: job.id, weekStartDate });
-
-  const execution = await JobExecution.create({
-    jobId: job.id,
-    queue: QUEUE_NAMES.REPORT,
-    jobName: job.name,
-    status: 'running',
-    attemptNumber: job.attemptsMade + 1,
-    startedAt,
-    meta: { weekStartDate },
-  });
-
-  try {
-    const users = await User.find({ status: 'active', isDeleted: false }).select('_id').lean();
-
-    logger.info('reportWorker: generating weekly reports', {
-      userCount: users.length,
-      weekStartDate,
-    });
-
-    // Report generation for each user will be implemented when GrowthReport
-    // builder service is ready. Skeleton logs intent and counts.
-    const durationMs = Date.now() - startedAt.getTime();
-
-    await JobExecution.findByIdAndUpdate(execution._id, {
-      $set: {
-        status: 'completed',
-        completedAt: new Date(),
-        durationMs,
-        records: new Map([['users', users.length]]),
-        meta: { weekStartDate, userCount: users.length },
-      },
-    });
-
-    return { success: true, usersProcessed: users.length, durationMs };
-  } catch (err) {
-    const durationMs = Date.now() - startedAt.getTime();
-    logger.error('reportWorker: failed', { jobId: job.id, error: err.message });
-    await JobExecution.findByIdAndUpdate(execution._id, {
-      $set: {
-        status: 'failed',
-        completedAt: new Date(),
-        durationMs,
-        errorMessage: err.message,
-        errorCode: err.code || 'UNKNOWN',
-      },
-    });
-    throw err;
-  }
-}
-
 export function registerReportWorker() {
-  return QueueService.createWorker(QUEUE_NAMES.REPORT, processReportJob, {
-    concurrency: 1,
+  QueueService.createWorker(QUEUE_NAMES.REPORT, async (job) => {
+    const startedAt = Date.now();
+    const { name, data } = job;
+
+    logger.info('reportWorker: processing job', { name, jobId: job.id });
+
+    let execDoc;
+    try {
+      execDoc = await JobExecution.create({
+        queue: QUEUE_NAMES.REPORT,
+        jobName: name,
+        jobId: String(job.id),
+        data,
+        status: 'running',
+        startedAt: new Date(),
+      });
+    } catch (_) { /* non-fatal */ }
+
+    try {
+      let records = 0;
+
+      if (name === JOB_NAMES.GENERATE_STRATEGY) {
+        await StrategyService.generate(data.userId, data.strategyId);
+        records = 1;
+      } else {
+        // Weekly/monthly/quarterly/yearly/custom report
+        await ReportService.generate(data.userId, data.reportId);
+        records = 1;
+      }
+
+      const duration = Date.now() - startedAt;
+      if (execDoc) {
+        await JobExecution.findByIdAndUpdate(execDoc._id, {
+          status: 'completed',
+          duration,
+          recordsProcessed: records,
+          completedAt: new Date(),
+        });
+      }
+
+      logger.info('reportWorker: job complete', { name, duration });
+      return { success: true, records };
+    } catch (err) {
+      const duration = Date.now() - startedAt;
+      if (execDoc) {
+        await JobExecution.findByIdAndUpdate(execDoc._id, {
+          status: 'failed',
+          duration,
+          error: err.message,
+          completedAt: new Date(),
+        });
+      }
+      logger.error('reportWorker: job failed', { name, error: err.message });
+      throw err;
+    }
   });
 }
