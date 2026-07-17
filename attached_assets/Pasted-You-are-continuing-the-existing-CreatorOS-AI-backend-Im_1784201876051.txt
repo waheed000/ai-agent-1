@@ -1,0 +1,461 @@
+You are continuing the existing CreatorOS AI backend.
+
+Implement ONLY Phase 8, Phase 9 and Phase 10.
+
+Do NOT modify previous architecture.
+
+Continue using the existing clean architecture.
+
+Controllers
+
+↓
+
+Services
+
+↓
+
+Repositories
+
+↓
+
+Database
+
+Do NOT place business logic in controllers.
+
+====================================================
+
+PHASE 8
+
+Competitor Intelligence Engine
+
+====================================================
+
+Create:
+
+CompetitorRepository
+
+CompetitorPostRepository
+
+CompetitorAnalyticsRepository
+
+CompetitorService
+
+CompetitorController
+
+CompetitorValidators
+
+Implement endpoints:
+
+POST /api/v1/competitors
+
+GET /api/v1/competitors
+
+DELETE /api/v1/competitors/:id
+
+GET /api/v1/competitors/:id/overview
+
+POST /api/v1/competitors/:id/sync
+
+The sync pipeline should:
+
+Fetch competitor profile
+
+Fetch recent posts
+
+Fetch engagement
+
+Fetch posting frequency
+
+Fetch follower growth
+
+Fetch hashtags
+
+Store historical snapshots
+
+Never overwrite historical data.
+
+Implement competitor scoring.
+
+Calculate:
+
+Engagement comparison
+
+Posting consistency
+
+Growth comparison
+
+Content frequency
+
+Content mix
+
+Gap analysis
+
+Store comparison history.
+
+====================================================
+
+PHASE 9
+
+Trend Intelligence Engine
+
+====================================================
+
+Create:
+
+TrendRepository
+
+TrendService
+
+TrendController
+
+TrendValidators
+
+TrendCollector
+
+TrendAnalyzer
+
+Implement:
+
+GET /api/v1/trends
+
+GET /api/v1/trends/topics
+
+GET /api/v1/trends/hashtags
+
+GET /api/v1/trends/creators
+
+POST /api/v1/trends/refresh
+
+Collect:
+
+Trending hashtags
+
+Trending keywords
+
+Trending creators
+
+Trending topics
+
+Trending formats
+
+Trending content types
+
+Trending publishing times
+
+Store every trend snapshot.
+
+Never overwrite.
+
+Calculate:
+
+Trend velocity
+
+Trend score
+
+Trend popularity
+
+Trend confidence
+
+Trend lifespan
+
+Trend category
+
+====================================================
+
+PHASE 10
+
+AI Multi-Agent System
+
+====================================================
+
+Create:
+
+AgentOrchestrator
+
+AgentRegistry
+
+AIProvider
+
+GeminiProvider
+
+OpenAIProvider
+
+PromptBuilder
+
+PromptTemplates
+
+ContextBuilder
+
+MemoryService
+
+AgentExecutionRepository
+
+====================================================
+
+Implement AI Providers
+
+====================================================
+
+AIProvider interface
+
+GeminiProvider
+
+OpenAIProvider
+
+Providers should be interchangeable.
+
+Agents must never know which provider is used.
+
+====================================================
+
+Create AI Agents
+
+====================================================
+
+AnalyticsAgent
+
+ContentAgent
+
+TrendAgent
+
+CompetitorAgent
+
+GrowthCoachAgent
+
+====================================================
+
+Analytics Agent
+
+====================================================
+
+Input:
+
+Analytics Engine output only.
+
+Never calculate metrics.
+
+Generate:
+
+Performance explanation
+
+Weaknesses
+
+Strengths
+
+Recommendations
+
+====================================================
+
+Content Agent
+
+====================================================
+
+Input:
+
+Recent posts
+
+Analytics
+
+Audience
+
+Generate:
+
+Content ideas
+
+Caption ideas
+
+Series ideas
+
+Posting improvements
+
+====================================================
+
+Trend Agent
+
+====================================================
+
+Input:
+
+Trend Engine output
+
+Creator niche
+
+Generate:
+
+Trending topics
+
+Trending hashtags
+
+Trending formats
+
+====================================================
+
+Competitor Agent
+
+====================================================
+
+Input:
+
+Competitor Intelligence
+
+Generate:
+
+Content gaps
+
+Missed opportunities
+
+Competitive advantages
+
+====================================================
+
+Growth Coach Agent
+
+====================================================
+
+Combine outputs from all agents.
+
+Generate:
+
+Weekly Growth Plan
+
+Monthly Strategy
+
+Action Items
+
+KPIs
+
+Priority Tasks
+
+====================================================
+
+AI Memory
+
+====================================================
+
+Store:
+
+Prompts
+
+Responses
+
+Context
+
+Recommendations
+
+Execution time
+
+Provider
+
+Token usage
+
+Cost
+
+Model
+
+====================================================
+
+Prompt Builder
+
+====================================================
+
+Every prompt should be generated through PromptBuilder.
+
+Never hardcode prompts inside agents.
+
+====================================================
+
+Context Builder
+
+====================================================
+
+Build context from:
+
+Analytics
+
+Audience
+
+Posts
+
+Competitors
+
+Trends
+
+Historical Reports
+
+====================================================
+
+Event System
+
+====================================================
+
+Create:
+
+eventBus.js
+
+eventTypes.js
+
+listeners/
+
+AnalyticsCompleted
+
+PlatformSynced
+
+TrendUpdated
+
+CompetitorUpdated
+
+AIReportGenerated
+
+GrowthPlanGenerated
+
+Agents should react to events.
+
+Do NOT tightly couple services.
+
+====================================================
+
+Caching
+
+====================================================
+
+Create CacheService.
+
+Prepare Redis caching.
+
+Cache:
+
+Analytics
+
+Trend results
+
+Competitor results
+
+AI responses
+
+====================================================
+
+Testing
+
+====================================================
+
+Unit test every agent.
+
+Test provider switching.
+
+Test event system.
+
+Test cache.
+
+Test AI orchestration.
+
+Do NOT implement Reports.
+
+Do NOT implement Notifications.
+
+Do NOT implement Billing.
+
+Do NOT implement Teams.
+
+Do NOT implement Content Planner.
+
+Only implement Phase 8, Phase 9 and Phase 10.

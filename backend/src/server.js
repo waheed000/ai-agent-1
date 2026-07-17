@@ -1,14 +1,16 @@
 /**
  * Server entry point.
  * Connects to the database, initialises background job infrastructure,
- * starts the HTTP server, and wires up graceful shutdown.
+ * cache, event listeners, starts the HTTP server, and wires up graceful shutdown.
  */
 
 import app from './app.js';
 import config from './config/index.js';
 import { connectDatabase, disconnectDatabase } from './database/index.js';
 import QueueService from './services/QueueService.js';
+import CacheService from './services/CacheService.js';
 import { initScheduler } from './queues/scheduler.js';
+import { initListeners } from './events/listeners/index.js';
 import logger from './utils/logger.js';
 
 let server;
@@ -17,17 +19,23 @@ async function start() {
   // 1. Database
   await connectDatabase();
 
-  // 2. Background job system (Redis + BullMQ workers + cron)
-  //    Failures are non-fatal — the HTTP server still starts.
+  // 2. Cache (Redis — non-fatal if unavailable)
+  await CacheService.init();
+
+  // 3. Background job system (Redis + BullMQ workers + cron — non-fatal)
   await QueueService.init();
   await initScheduler();
 
-  // 3. HTTP server
+  // 4. Event listeners (must be after QueueService so listeners can enqueue jobs)
+  initListeners();
+
+  // 5. HTTP server
   server = app.listen(config.server.port, () => {
     logger.info(`Server started`, {
       port: config.server.port,
       env: config.env,
       pid: process.pid,
+      cacheEnabled: CacheService.enabled,
       queuesEnabled: QueueService.enabled,
     });
   });
@@ -46,6 +54,7 @@ async function shutdown(signal) {
   server?.close(async () => {
     logger.info('HTTP server closed');
     await QueueService.shutdown();
+    await CacheService.disconnect();
     await disconnectDatabase();
     logger.info('Shutdown complete');
     process.exit(0);

@@ -10,6 +10,8 @@ import integrationsRouter from './integrations.js';
 import platformsRouter from './platforms.js';
 import jobsRouter from './jobs.js';
 import analyticsRouter from './analytics.js';
+import competitorsRouter from './competitors.js';
+import trendsRouter from './trends.js';
 
 const router = Router();
 
@@ -20,12 +22,7 @@ router.use('/integrations', integrationsRouter);
 router.use('/platforms', platformsRouter);
 router.use('/jobs', jobsRouter);
 router.use('/analytics', analyticsRouter);
-
-// Future routes will be mounted here:
-// router.use('/insights',    insightsRouter);
-// router.use('/content',     contentRouter);
-// router.use('/competitors', competitorRouter);
-// router.use('/trends',      trendsRouter);
-// router.use('/reports',     reportsRouter);
+router.use('/competitors', competitorsRouter);
+router.use('/trends', trendsRouter);
 
 export default router;
