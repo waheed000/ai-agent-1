@@ -21,3 +21,10 @@ export { default as ContentIdea } from './ContentIdea.js';
 export { default as ScheduledContent } from './ScheduledContent.js';
 export { default as AiExecution } from './AiExecution.js';
 export { default as RefreshToken } from './RefreshToken.js';
+// Phase 14
+export { default as Workspace }   from './Workspace.js';
+export { default as ApiKey }      from './ApiKey.js';
+export { default as AuditLog }    from './AuditLog.js';
+export { default as UsageRecord } from './UsageRecord.js';
+export { default as FeatureFlag } from './FeatureFlag.js';
+export { default as Settings }    from './Settings.js';

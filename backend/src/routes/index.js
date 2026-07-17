@@ -21,6 +21,14 @@ import notificationsRouter from './notifications.js';
 import plannerRouter       from './planner.js';
 import calendarRouter      from './calendar.js';
 import draftsRouter        from './drafts.js';
+// Phase 14
+import workspacesRouter    from './workspaces.js';
+import apikeysRouter       from './apikeys.js';
+import searchRouter        from './search.js';
+import settingsRouter      from './settings.js';
+import usageRouter         from './usage.js';
+import auditRouter         from './audit.js';
+import featuresRouter      from './features.js';
 
 const router = Router();
 
@@ -39,5 +47,13 @@ router.use('/notifications', notificationsRouter);
 router.use('/planner',       plannerRouter);
 router.use('/calendar',      calendarRouter);
 router.use('/drafts',        draftsRouter);
+// Phase 14
+router.use('/workspaces',    workspacesRouter);
+router.use('/apikeys',       apikeysRouter);
+router.use('/search',        searchRouter);
+router.use('/settings',      settingsRouter);
+router.use('/usage',         usageRouter);
+router.use('/audit',         auditRouter);
+router.use('/features',      featuresRouter);
 
 export default router;

@@ -1,0 +1,357 @@
+You are continuing the existing CreatorOS AI backend.
+
+Implement ONLY Phase 14.
+
+Do NOT modify previous architecture.
+
+Continue using clean architecture.
+
+Controllers
+
+↓
+
+Services
+
+↓
+
+Repositories
+
+↓
+
+MongoDB
+
+Maintain repository pattern.
+
+Maintain EventBus.
+
+Maintain QueueService.
+
+Maintain CacheService.
+
+======================================================
+
+PHASE 14
+
+Enterprise Platform Features
+
+======================================================
+
+Create
+
+WorkspaceRepository
+
+WorkspaceService
+
+WorkspaceController
+
+WorkspaceValidators
+
+TeamRepository
+
+TeamService
+
+PermissionService
+
+ApiKeyRepository
+
+ApiKeyService
+
+AuditRepository
+
+AuditService
+
+UsageRepository
+
+UsageService
+
+FeatureRepository
+
+FeatureService
+
+SettingsRepository
+
+SettingsService
+
+SearchService
+
+SearchController
+
+======================================================
+
+WORKSPACES
+
+======================================================
+
+Endpoints
+
+POST /api/v1/workspaces
+
+GET /api/v1/workspaces
+
+GET /api/v1/workspaces/:id
+
+PATCH /api/v1/workspaces/:id
+
+DELETE /api/v1/workspaces/:id
+
+Each workspace contains
+
+Users
+
+Connected Accounts
+
+Reports
+
+Analytics
+
+Competitors
+
+Planner
+
+AI Memory
+
+Notification Preferences
+
+Settings
+
+Soft delete only.
+
+======================================================
+
+TEAM MANAGEMENT
+
+======================================================
+
+Endpoints
+
+POST /api/v1/workspaces/:id/invite
+
+GET /api/v1/workspaces/:id/members
+
+PATCH /api/v1/workspaces/:id/members/:user
+
+DELETE /api/v1/workspaces/:id/members/:user
+
+Roles
+
+Owner
+
+Admin
+
+Editor
+
+Viewer
+
+Permission middleware
+
+Workspace ownership validation
+
+======================================================
+
+API KEYS
+
+======================================================
+
+Endpoints
+
+POST /api/v1/apikeys
+
+GET /api/v1/apikeys
+
+PATCH /api/v1/apikeys/:id
+
+DELETE /api/v1/apikeys/:id
+
+Store
+
+hashed key
+
+createdAt
+
+expiresAt
+
+lastUsedAt
+
+revoked
+
+description
+
+Never store raw API Keys.
+
+======================================================
+
+USAGE TRACKING
+
+======================================================
+
+Track
+
+AI Requests
+
+Reports
+
+Notifications
+
+Planner
+
+Competitors
+
+Analytics
+
+Queue Jobs
+
+Store historical usage.
+
+======================================================
+
+AUDIT LOG
+
+======================================================
+
+Store
+
+login
+
+logout
+
+workspace events
+
+member events
+
+API Keys
+
+AI Executions
+
+Report Generation
+
+Planner Generation
+
+Settings Changes
+
+======================================================
+
+FEATURE FLAGS
+
+======================================================
+
+Create
+
+AI
+
+Reports
+
+Planner
+
+Notifications
+
+Competitors
+
+Trends
+
+Analytics
+
+Support enable/disable.
+
+======================================================
+
+SETTINGS
+
+======================================================
+
+Workspace Settings
+
+User Settings
+
+Notification Settings
+
+AI Settings
+
+Timezone
+
+Language
+
+Theme
+
+======================================================
+
+GLOBAL SEARCH
+
+======================================================
+
+Endpoints
+
+GET /api/v1/search
+
+Search across
+
+Reports
+
+Planner
+
+Competitors
+
+Posts
+
+Ideas
+
+Notifications
+
+Trends
+
+Return grouped results.
+
+======================================================
+
+EVENTS
+
+======================================================
+
+WorkspaceCreated
+
+WorkspaceDeleted
+
+ApiKeyCreated
+
+ApiKeyRevoked
+
+MemberInvited
+
+SettingsUpdated
+
+UsageRecorded
+
+======================================================
+
+TESTING
+
+======================================================
+
+Unit test every module.
+
+Test permissions.
+
+Test ownership.
+
+Test API Keys.
+
+Test audit logs.
+
+Test search.
+
+======================================================
+
+DO NOT IMPLEMENT
+
+Billing
+
+Stripe
+
+Payments
+
+Subscriptions
+
+Invoices
+
+Frontend
+
+Only implement Phase 14.

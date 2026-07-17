@@ -14,6 +14,14 @@ import { registerReportGeneratedListener }    from './ReportGenerated.js';
 import { registerStrategyGeneratedListener }  from './StrategyGenerated.js';
 import { registerNotificationCreatedListener } from './NotificationCreated.js';
 import { registerPlannerGeneratedListener }   from './PlannerGenerated.js';
+// Phase 14
+import { registerWorkspaceCreatedListener }  from './WorkspaceCreated.js';
+import { registerWorkspaceDeletedListener }  from './WorkspaceDeleted.js';
+import { registerApiKeyCreatedListener }     from './ApiKeyCreated.js';
+import { registerApiKeyRevokedListener }     from './ApiKeyRevoked.js';
+import { registerMemberInvitedListener }     from './MemberInvited.js';
+import { registerSettingsUpdatedListener }   from './SettingsUpdated.js';
+import { registerUsageRecordedListener }     from './UsageRecorded.js';
 import logger from '../../utils/logger.js';
 
 export function initListeners() {
@@ -29,6 +37,14 @@ export function initListeners() {
   registerStrategyGeneratedListener();
   registerNotificationCreatedListener();
   registerPlannerGeneratedListener();
+  // Phase 14
+  registerWorkspaceCreatedListener();
+  registerWorkspaceDeletedListener();
+  registerApiKeyCreatedListener();
+  registerApiKeyRevokedListener();
+  registerMemberInvitedListener();
+  registerSettingsUpdatedListener();
+  registerUsageRecordedListener();
 
   logger.info('EventBus: all listeners registered');
 }

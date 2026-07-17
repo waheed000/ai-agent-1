@@ -45,4 +45,13 @@ export const EVENT_TYPES = {
   // Jobs
   JOB_COMPLETED: 'job.completed',
   JOB_FAILED:    'job.failed',
+
+  // Phase 14 — Enterprise Platform
+  WORKSPACE_CREATED: 'workspace.created',
+  WORKSPACE_DELETED: 'workspace.deleted',
+  API_KEY_CREATED:   'apikey.created',
+  API_KEY_REVOKED:   'apikey.revoked',
+  MEMBER_INVITED:    'member.invited',
+  SETTINGS_UPDATED:  'settings.updated',
+  USAGE_RECORDED:    'usage.recorded',
 };
