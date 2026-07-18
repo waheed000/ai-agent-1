@@ -40,7 +40,9 @@ class UsageRepository {
 
   async summarizeByUser(userId, { from, to } = {}) {
     try {
-      const match = { user: userId };
+      // Aggregation pipelines do NOT auto-cast — must explicitly convert to ObjectId
+      const userOId = new UsageRecord.base.Types.ObjectId(String(userId));
+      const match = { user: userOId };
       if (from || to) {
         match.recordedAt = {};
         if (from) match.recordedAt.$gte = new Date(from);
@@ -64,8 +66,10 @@ class UsageRepository {
 
   async countByCategory(userId, category) {
     try {
+      // Aggregation pipelines do NOT auto-cast — must explicitly convert to ObjectId
+      const userOId = new UsageRecord.base.Types.ObjectId(String(userId));
       const result = await UsageRecord.aggregate([
-        { $match: { user: userId, category } },
+        { $match: { user: userOId, category } },
         { $group: { _id: null, total: { $sum: '$count' } } },
       ]);
       return result[0]?.total ?? 0;

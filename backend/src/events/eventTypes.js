@@ -48,6 +48,7 @@ export const EVENT_TYPES = {
 
   // Phase 14 — Enterprise Platform
   WORKSPACE_CREATED: 'workspace.created',
+  WORKSPACE_UPDATED: 'workspace.updated',
   WORKSPACE_DELETED: 'workspace.deleted',
   API_KEY_CREATED:   'apikey.created',
   API_KEY_REVOKED:   'apikey.revoked',

@@ -1,0 +1,1 @@
+- [Phase 14 QA findings](phase14-qa.md) — 8 bugs fixed; aggregate ObjectId cast, wrong event, missing revoke route, conflict status, feature flag guard, search skip, ValidationError type, workspace audit endpoint.

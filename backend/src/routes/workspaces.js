@@ -30,4 +30,7 @@ router.get('/:id/members',             validateWorkspaceId,   asyncHandler(Works
 router.patch('/:id/members/:user',     validateUpdateMember,  asyncHandler(WorkspaceController.updateMember));
 router.delete('/:id/members/:user',    validateRemoveMember,  asyncHandler(WorkspaceController.removeMember));
 
+// Workspace-scoped audit logs
+router.get('/:id/audit',              validateWorkspaceId,   asyncHandler(WorkspaceController.getAuditLogs));
+
 export default router;

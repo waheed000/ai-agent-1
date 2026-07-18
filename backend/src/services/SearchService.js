@@ -16,10 +16,10 @@ function buildRegex(query) {
   return new RegExp(escaped, 'i');
 }
 
-async function safeFind(Model, filter, projection, limit) {
+async function safeFind(Model, filter, projection, limit, skip = 0) {
   if (!Model) return [];
   try {
-    return await Model.find(filter, projection).limit(limit).lean();
+    return await Model.find(filter, projection).skip(skip).limit(limit).lean();
   } catch {
     return [];
   }
@@ -33,7 +33,7 @@ const SearchService = {
    * @param {number} limit — per-group result limit (default 10)
    * @returns {{ reports, planner, competitors, posts, ideas, notifications, trends }}
    */
-  async search(userId, query, limit = 10) {
+  async search(userId, query, limit = 10, skip = 0) {
     const rx = buildRegex(query);
     const userOId = new mongoose.Types.ObjectId(String(userId));
     const userFilter = { user: userOId, isDeleted: false };
@@ -44,7 +44,7 @@ const SearchService = {
         model('Report'),
         { ...userFilter, $or: [{ title: rx }, { executiveSummary: rx }] },
         { title: 1, type: 1, status: 1, generatedAt: 1 },
-        limit
+        limit, skip
       ),
 
       // Planner items (ContentPlan)
@@ -52,7 +52,7 @@ const SearchService = {
         model('ContentPlan'),
         { ...userFilter, $or: [{ title: rx }, { caption: rx }] },
         { title: 1, platform: 1, status: 1, suggestedTime: 1 },
-        limit
+        limit, skip
       ),
 
       // Competitors
@@ -60,7 +60,7 @@ const SearchService = {
         model('Competitor'),
         { ...userFilter, $or: [{ name: rx }, { handle: rx }, { notes: rx }] },
         { name: 1, handle: 1, platform: 1 },
-        limit
+        limit, skip
       ),
 
       // Posts
@@ -68,7 +68,7 @@ const SearchService = {
         model('Post'),
         { ...userFilter, $or: [{ title: rx }, { caption: rx }, { hashtags: rx }] },
         { title: 1, caption: 1, platform: 1, publishedAt: 1 },
-        limit
+        limit, skip
       ),
 
       // Content Ideas
@@ -76,23 +76,23 @@ const SearchService = {
         model('ContentIdea'),
         { ...userFilter, $or: [{ title: rx }, { description: rx }] },
         { title: 1, description: 1, platform: 1, status: 1 },
-        limit
+        limit, skip
       ),
 
-      // Notifications
+      // Notifications — user-scoped (no isDeleted field on Notification)
       safeFind(
         model('Notification'),
         { user: userOId, $or: [{ title: rx }, { message: rx }] },
         { title: 1, message: 1, type: 1, read: 1, createdAt: 1 },
-        limit
+        limit, skip
       ),
 
-      // Trends
+      // Trends — platform-wide data; no per-user filter by design
       safeFind(
         model('TrendData'),
         { $or: [{ name: rx }, { description: rx }, { hashtags: rx }] },
         { name: 1, category: 1, status: 1, trendScore: 1 },
-        limit
+        limit, skip
       ),
     ]);
 

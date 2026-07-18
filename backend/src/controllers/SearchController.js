@@ -15,11 +15,12 @@ const SearchController = {
     if (!errors.isEmpty()) return badRequest(res, 'Validation failed', errors.array());
 
     try {
-      const { q, limit } = req.query;
+      const { q, limit, skip } = req.query;
       const results = await SearchService.search(
         String(req.user._id),
         q,
-        limit ? Math.min(parseInt(limit, 10), 50) : 10
+        limit ? Math.min(parseInt(limit, 10), 50) : 10,
+        skip  ? Math.max(parseInt(skip,  10), 0)  : 0
       );
 
       await UsageService.record(String(req.user._id), 'analytics', 'search');

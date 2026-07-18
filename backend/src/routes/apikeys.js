@@ -14,9 +14,10 @@ import {
 const router = Router();
 router.use(authenticate);
 
-router.post('/',      validateCreateApiKey,  asyncHandler(ApiKeyController.create));
-router.get('/',                              asyncHandler(ApiKeyController.list));
-router.patch('/:id', validateUpdateApiKey,  asyncHandler(ApiKeyController.update));
-router.delete('/:id',validateApiKeyId,       asyncHandler(ApiKeyController.delete));
+router.post('/',             validateCreateApiKey, asyncHandler(ApiKeyController.create));
+router.get('/',                                    asyncHandler(ApiKeyController.list));
+router.post('/:id/revoke',  validateApiKeyId,      asyncHandler(ApiKeyController.revoke));
+router.patch('/:id',        validateUpdateApiKey,  asyncHandler(ApiKeyController.update));
+router.delete('/:id',       validateApiKeyId,      asyncHandler(ApiKeyController.delete));
 
 export default router;

@@ -16,6 +16,7 @@ import { registerNotificationCreatedListener } from './NotificationCreated.js';
 import { registerPlannerGeneratedListener }   from './PlannerGenerated.js';
 // Phase 14
 import { registerWorkspaceCreatedListener }  from './WorkspaceCreated.js';
+import { registerWorkspaceUpdatedListener }  from './WorkspaceUpdated.js';
 import { registerWorkspaceDeletedListener }  from './WorkspaceDeleted.js';
 import { registerApiKeyCreatedListener }     from './ApiKeyCreated.js';
 import { registerApiKeyRevokedListener }     from './ApiKeyRevoked.js';
@@ -39,6 +40,7 @@ export function initListeners() {
   registerPlannerGeneratedListener();
   // Phase 14
   registerWorkspaceCreatedListener();
+  registerWorkspaceUpdatedListener();
   registerWorkspaceDeletedListener();
   registerApiKeyCreatedListener();
   registerApiKeyRevokedListener();

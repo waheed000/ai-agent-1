@@ -3,7 +3,7 @@
  * Handles API key lifecycle endpoints.
  */
 import ApiKeyService from '../services/ApiKeyService.js';
-import { success, created, badRequest, notFound, serverError } from '../utils/response.js';
+import { success, created, badRequest, notFound, conflict, serverError } from '../utils/response.js';
 import { validationResult } from 'express-validator';
 import logger from '../utils/logger.js';
 
@@ -49,6 +49,22 @@ const ApiKeyController = {
       if (err.isOperational && err.statusCode === 404) return notFound(res, err.message);
       logger.error('ApiKeyController.update failed', { error: err.message });
       return serverError(res, 'Failed to update API key');
+    }
+  },
+
+  /** POST /api/v1/apikeys/:id/revoke */
+  async revoke(req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return badRequest(res, 'Validation failed', errors.array());
+
+    try {
+      const apiKey = await ApiKeyService.revoke(String(req.user._id), req.params.id);
+      return success(res, apiKey, 'API key revoked');
+    } catch (err) {
+      if (err.isOperational && err.statusCode === 404) return notFound(res, err.message);
+      if (err.isOperational && err.statusCode === 409) return conflict(res, err.message);
+      logger.error('ApiKeyController.revoke failed', { error: err.message });
+      return serverError(res, 'Failed to revoke API key');
     }
   },
 

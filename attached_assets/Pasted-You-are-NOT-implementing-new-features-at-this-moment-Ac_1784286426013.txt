@@ -1,0 +1,555 @@
+You are NOT implementing new features at this moment. 
+
+
+
+Act as a Senior QA Engineer and Senior Backend Engineer.
+
+
+
+Your task is to thoroughly verify the existing Phase 14 implementation.
+
+
+
+Do NOT write new business logic unless a bug is discovered.
+
+
+
+If a bug is found:
+
+
+
+1. Explain the root cause.
+
+2. Fix it.
+
+3. Add or update tests.
+
+4. Verify the fix.
+
+5. Continue testing.
+
+
+
+=========================================================
+
+
+
+Verify the following complete user workflow end-to-end.
+
+
+
+=========================================================
+
+
+
+WORKFLOW
+
+
+
+1. Register a new user.
+
+
+
+2. Login.
+
+
+
+3. Create a new Workspace.
+
+
+
+Verify
+
+
+
+- Workspace stored correctly.
+
+- Owner assigned correctly.
+
+- WorkspaceCreated event emitted.
+
+- Audit log created.
+
+
+
+---------------------------------------------------------
+
+
+
+4. Invite another user.
+
+
+
+Verify
+
+
+
+- Invitation created.
+
+- Correct role assigned.
+
+- Member appears in workspace.
+
+- MemberInvited event emitted.
+
+- Audit log created.
+
+
+
+---------------------------------------------------------
+
+
+
+5. Login as invited member.
+
+
+
+Verify
+
+
+
+- Authentication succeeds.
+
+- Member belongs only to assigned workspace.
+
+- Workspace context is correct.
+
+
+
+---------------------------------------------------------
+
+
+
+6. Permission checks.
+
+
+
+Verify every role.
+
+
+
+Owner
+
+
+
+Admin
+
+
+
+Editor
+
+
+
+Viewer
+
+
+
+Confirm permissions are enforced correctly.
+
+
+
+Viewer cannot perform admin operations.
+
+
+
+Editor cannot manage members.
+
+
+
+Admin cannot perform owner-only actions.
+
+
+
+Unauthorized requests must return correct HTTP status codes.
+
+
+
+---------------------------------------------------------
+
+
+
+7. Generate API Key.
+
+
+
+Verify
+
+
+
+- Raw API key returned only once.
+
+- Hashed key stored in database.
+
+- API key authentication works.
+
+- API key revocation works.
+
+- Expired keys are rejected.
+
+- lastUsed updates correctly.
+
+
+
+---------------------------------------------------------
+
+
+
+8. Global Search.
+
+
+
+Verify search across
+
+
+
+Reports
+
+
+
+Planner
+
+
+
+Competitors
+
+
+
+Notifications
+
+
+
+Ideas
+
+
+
+Search must
+
+
+
+support pagination
+
+
+
+support limits
+
+
+
+return grouped results
+
+
+
+never return another workspace's data
+
+
+
+---------------------------------------------------------
+
+
+
+9. Audit Logs.
+
+
+
+Verify audit logs are created for
+
+
+
+Login
+
+
+
+Logout
+
+
+
+Workspace Created
+
+
+
+Member Invited
+
+
+
+API Key Created
+
+
+
+API Key Revoked
+
+
+
+Settings Updated
+
+
+
+Search
+
+
+
+Permission Changes
+
+
+
+Report Generation
+
+
+
+Planner Generation
+
+
+
+Every log should contain
+
+
+
+timestamp
+
+
+
+user
+
+
+
+workspace
+
+
+
+action
+
+
+
+metadata
+
+
+
+---------------------------------------------------------
+
+
+
+10. Settings.
+
+
+
+Verify
+
+
+
+User Settings
+
+
+
+Workspace Settings
+
+
+
+Notification Settings
+
+
+
+AI Settings
+
+
+
+Theme
+
+
+
+Language
+
+
+
+Timezone
+
+
+
+Persist correctly.
+
+
+
+SettingsUpdated event must be emitted.
+
+
+
+---------------------------------------------------------
+
+
+
+11. Delete Workspace.
+
+
+
+Verify
+
+
+
+Only owner can delete.
+
+
+
+Soft delete works correctly.
+
+
+
+WorkspaceDeleted event emitted.
+
+
+
+Audit log created.
+
+
+
+Associated resources handled correctly.
+
+
+
+=========================================================
+
+
+
+SECURITY VERIFICATION
+
+
+
+Verify
+
+
+
+Workspace isolation
+
+
+
+Permission middleware
+
+
+
+API key security
+
+
+
+JWT authentication
+
+
+
+Role enforcement
+
+
+
+No privilege escalation
+
+
+
+No unauthorized access
+
+
+
+=========================================================
+
+
+
+DATABASE VERIFICATION
+
+
+
+Verify
+
+
+
+Relationships
+
+
+
+Indexes
+
+
+
+Soft deletes
+
+
+
+Foreign references
+
+
+
+No orphaned records
+
+
+
+=========================================================
+
+
+
+EVENT VERIFICATION
+
+
+
+Verify every expected EventBus event fires exactly once.
+
+
+
+=========================================================
+
+
+
+TESTING
+
+
+
+Run the complete regression suite.
+
+
+
+If any test fails
+
+
+
+find the root cause
+
+
+
+fix it
+
+
+
+update tests
+
+
+
+rerun all tests
+
+
+
+Repeat until every test passes.
+
+
+
+=========================================================
+
+
+
+FINAL REPORT
+
+
+
+At the end provide a verification report including
+
+
+
+- Total workflows tested
+
+- Bugs found
+
+- Bugs fixed
+
+- Remaining issues (if any)
+
+- Security observations
+
+- Production readiness score out of 10
+
+
+
+Do NOT implement Phase 15.
+
+
+
+Only verify, fix discovered bugs, and make Phase 14 production-ready.

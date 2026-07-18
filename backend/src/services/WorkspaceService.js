@@ -85,7 +85,7 @@ const WorkspaceService = {
       metadata: { fields: Object.keys(data) },
     });
 
-    eventBus.emit(EVENT_TYPES.SETTINGS_UPDATED, { userId: String(userId), workspaceId: String(workspaceId) });
+    eventBus.emit(EVENT_TYPES.WORKSPACE_UPDATED, { userId: String(userId), workspaceId: String(workspaceId) });
     return updated;
   },
 

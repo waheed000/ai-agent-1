@@ -7,7 +7,7 @@ import AuditService from './AuditService.js';
 import CacheService from './CacheService.js';
 import eventBus from '../events/eventBus.js';
 import { EVENT_TYPES } from '../events/eventTypes.js';
-import { ConflictError, NotFoundError, AuthorizationError } from '../utils/errors.js';
+import { ConflictError, NotFoundError, AuthorizationError, ValidationError } from '../utils/errors.js';
 import logger from '../utils/logger.js';
 
 const WORKSPACE_ROLES = ['owner', 'admin', 'editor', 'viewer'];
@@ -70,7 +70,7 @@ const TeamService = {
 
   async updateMember(workspaceId, requesterId, userId, role) {
     if (!WORKSPACE_ROLES.includes(role) || role === 'owner') {
-      throw new ConflictError('Invalid role — allowed: admin, editor, viewer');
+      throw new ValidationError('Invalid role — allowed: admin, editor, viewer');
     }
 
     const workspace = await WorkspaceRepository.findById(workspaceId);

@@ -7,5 +7,7 @@ export const validateSearch = [
     .isLength({ min: 1, max: 200 }).withMessage('q must be between 1 and 200 characters'),
   query('limit')
     .optional().isInt({ min: 1, max: 50 }).withMessage('limit must be 1–50'),
+  query('skip')
+    .optional().isInt({ min: 0 }).withMessage('skip must be a non-negative integer'),
   handleValidationErrors,
 ];

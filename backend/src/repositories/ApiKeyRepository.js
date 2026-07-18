@@ -37,6 +37,7 @@ class ApiKeyRepository {
   async findAllByUser(userId) {
     try {
       return await ApiKey.find({ user: userId, isDeleted: false })
+        .select('-keyHash')   // never expose the raw hash to callers
         .sort({ createdAt: -1 })
         .lean();
     } catch (err) {
