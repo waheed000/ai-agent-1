@@ -1,0 +1,33 @@
+version: "3.9"
+
+# Development compose — extends the production compose with hot-reload and
+# bind-mounted source so code changes are reflected immediately without rebuilds.
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./src:/app/src:ro        # bind-mount source (read-only inside container)
+      - ./package.json:/app/package.json:ro
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+      SUPPRESS_CONFIG_WARNINGS: "true"
+    # Override health check — dev container starts faster without production delays
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:${PORT:-3000}/api/v1/health"]
+      interval: 15s
+      start_period: 15s
+
+  mongo:
+    ports:
+      - "27017:27017"   # expose for local tools (Compass, mongosh)
+
+  redis:
+    ports:
+      - "6379:6379"     # expose for local tools (redis-cli, RedisInsight)

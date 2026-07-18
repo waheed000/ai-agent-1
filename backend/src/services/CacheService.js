@@ -1,31 +1,22 @@
 /**
  * CacheService
  * Redis-backed cache with graceful degradation.
- * When Redis is unavailable the service operates in pass-through mode
- * (all gets return null, sets are no-ops) so callers never need to
- * check availability.
  *
- * Namespaced key format: <namespace>:<key>
- * Default TTLs are defined per namespace but can be overridden per call.
+ * When Redis is unavailable the service operates in pass-through mode:
+ * all gets return null and sets are no-ops — callers never check availability.
+ *
+ * Namespaced key format: creatorOS:<namespace>:<key>
+ * TTLs are driven by config.cache.ttl and can be overridden per call.
  */
 
 import Redis from 'ioredis';
 import config from '../config/index.js';
 import logger from '../utils/logger.js';
 
-// Default TTLs in seconds per cache namespace
-const DEFAULT_TTL = {
-  analytics: 3600,     // 1 hour
-  trends: 1800,        // 30 minutes
-  competitors: 1800,   // 30 minutes
-  ai: 86400,           // 24 hours (AI responses are expensive)
-  general: 300,        // 5 minutes
-};
-
 class CacheService {
   constructor() {
     /** @type {Redis|null} */
-    this.client = null;
+    this.client  = null;
     this.enabled = false;
   }
 
@@ -34,13 +25,13 @@ class CacheService {
   async init() {
     try {
       this.client = new Redis({
-        host: config.redis.host,
-        port: config.redis.port,
-        password: config.redis.password,
-        db: config.redis.db,
+        host:               config.redis.host,
+        port:               config.redis.port,
+        password:           config.redis.password,
+        db:                 config.redis.db,
         maxRetriesPerRequest: 1,
-        enableReadyCheck: false,
-        lazyConnect: true,
+        enableReadyCheck:   false,
+        lazyConnect:        true,
       });
 
       await this.client.connect();
@@ -48,20 +39,16 @@ class CacheService {
       this.enabled = true;
       logger.info('CacheService: Redis connected');
     } catch (err) {
-      logger.warn('CacheService: Redis unavailable — caching disabled', {
-        error: err.message,
-      });
-      this.client = null;
+      logger.warn('CacheService: Redis unavailable — caching disabled', { error: err.message });
+      this.client  = null;
       this.enabled = false;
     }
   }
 
   async disconnect() {
     if (this.client) {
-      try {
-        this.client.disconnect();
-      } catch { /* ignore */ }
-      this.client = null;
+      try { this.client.disconnect(); } catch { /* ignore */ }
+      this.client  = null;
       this.enabled = false;
     }
   }
@@ -78,8 +65,7 @@ class CacheService {
     if (!this.enabled) return null;
     try {
       const raw = await this.client.get(this._key(namespace, key));
-      if (!raw) return null;
-      return JSON.parse(raw);
+      return raw ? JSON.parse(raw) : null;
     } catch (err) {
       logger.warn('CacheService.get error', { namespace, key, error: err.message });
       return null;
@@ -90,13 +76,13 @@ class CacheService {
    * Store a value in the cache.
    * @param {string} namespace
    * @param {string} key
-   * @param {any} value
-   * @param {number} [ttl]  seconds; defaults to namespace TTL
+   * @param {any}    value
+   * @param {number} [ttl]  Seconds; falls back to config.cache.ttl[namespace] or general.
    */
   async set(namespace, key, value, ttl) {
     if (!this.enabled) return;
     try {
-      const seconds = ttl ?? DEFAULT_TTL[namespace] ?? DEFAULT_TTL.general;
+      const seconds = ttl ?? config.cache.ttl[namespace] ?? config.cache.ttl.general;
       await this.client.setex(this._key(namespace, key), seconds, JSON.stringify(value));
     } catch (err) {
       logger.warn('CacheService.set error', { namespace, key, error: err.message });
@@ -122,26 +108,23 @@ class CacheService {
   async delPattern(namespace, pattern) {
     if (!this.enabled) return;
     try {
-      const keys = await this.client.keys(this._key(namespace, pattern + '*'));
-      if (keys.length > 0) {
-        await this.client.del(...keys);
-      }
+      const keys = await this.client.keys(this._key(namespace, `${pattern}*`));
+      if (keys.length > 0) await this.client.del(...keys);
     } catch (err) {
       logger.warn('CacheService.delPattern error', { namespace, pattern, error: err.message });
     }
   }
 
   /**
-   * Get a value or compute it if missing (cache-aside).
-   * @param {string} namespace
-   * @param {string} key
+   * Get a value or compute it if missing (cache-aside pattern).
+   * @param {string}   namespace
+   * @param {string}   key
    * @param {Function} computeFn  async () => value
-   * @param {number} [ttl]
+   * @param {number}   [ttl]
    */
   async getOrSet(namespace, key, computeFn, ttl) {
     const cached = await this.get(namespace, key);
     if (cached !== null) return cached;
-
     const value = await computeFn();
     await this.set(namespace, key, value, ttl);
     return value;

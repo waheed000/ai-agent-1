@@ -16,26 +16,18 @@ import logger from './utils/logger.js';
 let server;
 
 async function start() {
-  // 1. Database
   await connectDatabase();
-
-  // 2. Cache (Redis — non-fatal if unavailable)
   await CacheService.init();
-
-  // 3. Background job system (Redis + BullMQ workers + cron — non-fatal)
   await QueueService.init();
   await initScheduler();
-
-  // 4. Event listeners (must be after QueueService so listeners can enqueue jobs)
   initListeners();
 
-  // 5. HTTP server
   server = app.listen(config.server.port, () => {
-    logger.info(`Server started`, {
-      port: config.server.port,
-      env: config.env,
-      pid: process.pid,
-      cacheEnabled: CacheService.enabled,
+    logger.info('Server started', {
+      port:          config.server.port,
+      env:           config.env,
+      pid:           process.pid,
+      cacheEnabled:  CacheService.enabled,
       queuesEnabled: QueueService.enabled,
     });
   });
@@ -60,15 +52,14 @@ async function shutdown(signal) {
     process.exit(0);
   });
 
-  // Force exit after 15 s if graceful shutdown hangs
   setTimeout(() => {
     logger.error('Forced shutdown after timeout');
     process.exit(1);
-  }, 15_000);
+  }, config.server.shutdownTimeoutMs);
 }
 
 process.on('SIGTERM', () => shutdown('SIGTERM'));
-process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGINT',  () => shutdown('SIGINT'));
 
 process.on('unhandledRejection', (reason) => {
   logger.error('Unhandled promise rejection', { reason: String(reason) });

@@ -1,7 +1,6 @@
 /**
  * Express application factory.
- * This module configures the app but does NOT start the server.
- * Keeping app creation separate makes it easy to test without binding a port.
+ * Configures the app without binding a port — keeps testing straightforward.
  */
 
 import express from 'express';
@@ -25,11 +24,11 @@ app.use(helmet());
 
 app.use(
   cors({
-    origin: config.cors.clientUrl,
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    origin:         config.cors.clientUrl,
+    credentials:    true,
+    methods:        ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-  })
+  }),
 );
 
 // ─── Performance ─────────────────────────────────────────────────────────────
@@ -39,23 +38,20 @@ app.use(compression());
 app.use('/api', generalLimiter);
 
 // ─── Request logging ─────────────────────────────────────────────────────────
-const morganFormat = config.isProduction ? 'combined' : 'dev';
 app.use(
-  morgan(morganFormat, {
-    stream: {
-      write: (message) => logger.info(message.trim()),
-    },
-    skip: (req) => req.url === '/api/v1/health', // suppress noisy health pings
-  })
+  morgan(config.isProduction ? 'combined' : 'dev', {
+    stream: { write: (message) => logger.info(message.trim()) },
+    skip:   (req) => req.url === '/api/v1/health',
+  }),
 );
 
 // ─── Body parsing ─────────────────────────────────────────────────────────────
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: config.server.bodyLimit }));
+app.use(express.urlencoded({ extended: true, limit: config.server.bodyLimit }));
 app.use(cookieParser());
 
-// ─── Trust proxy (needed when deployed behind nginx / load balancer) ──────────
-app.set('trust proxy', 1);
+// ─── Proxy trust ──────────────────────────────────────────────────────────────
+app.set('trust proxy', config.server.trustProxy);
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.use('/api/v1', apiRouter);

@@ -1,0 +1,41 @@
+# Dependencies — installed fresh inside the image
+node_modules
+
+# Test files and coverage reports
+src/tests
+coverage
+.nyc_output
+
+# Development and environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# Build artifacts and caches
+.cache
+dist
+.tmp
+
+# Editor and OS artifacts
+.DS_Store
+Thumbs.db
+.idea
+.vscode
+*.swp
+*.swo
+
+# Version control
+.git
+.gitignore
+
+# Documentation
+*.md
+!README.md
+
+# Docker files themselves (not needed in image)
+Dockerfile*
+docker-compose*

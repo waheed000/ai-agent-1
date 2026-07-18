@@ -1,61 +1,58 @@
 /**
  * NotificationDispatcher
- * Routes a notification to the appropriate channel(s) based on user preferences.
+ * Routes a notification to the appropriate delivery channel(s) based on user preferences.
  *
- * Interface-only — no real provider is integrated.
- * Swap in a real provider by implementing the channel methods below.
+ * Channels:
+ *   inApp     — always available; the notification is already persisted to DB
+ *   email     — stub; integrate a transactional provider (SendGrid, Resend, AWS SES) here
+ *   websocket — stub; integrate a WebSocket server (Socket.IO, ws) here
+ *   push      — stub; integrate a push provider (Firebase FCM, OneSignal) here
  */
+
 import logger from '../utils/logger.js';
 
-/** In-App channel (always available — stored in DB, polled by frontend) */
+/** In-App channel — notification is already in DB; frontend polls GET /api/v1/notifications. */
 const InAppChannel = {
   name: 'inApp',
   async send(notification) {
-    // Already persisted to DB by NotificationRepository.create.
-    // The frontend reads from GET /api/v1/notifications.
     logger.debug('Dispatcher[InApp]: notification available in-app', {
-      id: String(notification._id),
+      id:   String(notification._id),
       type: notification.type,
     });
     return { channel: 'inApp', status: 'delivered' };
   },
 };
 
-/** Email channel — interface stub */
+/** Email channel — integrate a transactional email provider to activate. */
 const EmailChannel = {
   name: 'email',
   async send(notification) {
-    // TODO: integrate transactional email provider (e.g. SendGrid, Resend, AWS SES).
-    // Payload: notification.user, notification.title, notification.body, notification.actionUrl
-    logger.debug('Dispatcher[Email]: stub — notification would be emailed', {
-      id: String(notification._id),
+    logger.debug('Dispatcher[Email]: stub — no email provider configured', {
+      id:   String(notification._id),
       type: notification.type,
     });
     return { channel: 'email', status: 'stub' };
   },
 };
 
-/** WebSocket channel — interface stub */
+/** WebSocket channel — integrate a WebSocket server to activate. */
 const WebSocketChannel = {
   name: 'websocket',
   async send(notification) {
-    // TODO: integrate WebSocket server (e.g. Socket.IO, ws).
-    // Emit to room `user:<userId>` with event 'notification'.
-    logger.debug('Dispatcher[WebSocket]: stub — notification would be pushed via WS', {
-      id: String(notification._id),
+    logger.debug('Dispatcher[WebSocket]: stub — no WebSocket server configured', {
+      id:   String(notification._id),
       type: notification.type,
     });
     return { channel: 'websocket', status: 'stub' };
   },
 };
 
-/** Push channel — interface stub */
+/** Push channel — integrate a push notification provider to activate. */
 const PushChannel = {
   name: 'push',
   async send(notification) {
-    // TODO: integrate push notification provider (e.g. Firebase FCM, OneSignal).
-    logger.debug('Dispatcher[Push]: stub — notification would be pushed', {
-      id: String(notification._id),
+    logger.debug('Dispatcher[Push]: stub — no push provider configured', {
+      id:   String(notification._id),
       type: notification.type,
     });
     return { channel: 'push', status: 'stub' };
@@ -72,8 +69,8 @@ const CHANNELS = {
 const NotificationDispatcher = {
   /**
    * Dispatch a notification to all enabled channels in parallel.
-   * @param {object} notification  - Mongoose document / plain object
-   * @param {object} channelPrefs  - { inApp: bool, email: bool, websocket: bool, push: bool }
+   * @param {object} notification  Mongoose document or plain object
+   * @param {object} channelPrefs  e.g. { inApp: true, email: false, websocket: false, push: false }
    */
   async dispatch(notification, channelPrefs = { inApp: true }) {
     const tasks = [];
@@ -84,20 +81,16 @@ const NotificationDispatcher = {
           channel.send(notification).catch((err) => {
             logger.error(`Dispatcher[${channelName}]: dispatch error`, { error: err.message });
             return { channel: channelName, status: 'error', error: err.message };
-          })
+          }),
         );
       }
     }
 
     const results = await Promise.all(tasks);
-    logger.debug('Dispatcher: dispatch complete', {
-      id: String(notification._id),
-      results,
-    });
+    logger.debug('Dispatcher: dispatch complete', { id: String(notification._id), results });
     return results;
   },
 
-  /** Expose channel registry for testing */
   channels: CHANNELS,
 };
 

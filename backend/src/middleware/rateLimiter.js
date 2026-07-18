@@ -1,34 +1,49 @@
 /**
  * Rate-limiting middleware presets.
- * Import the appropriate limiter for each route group.
+ *
+ * Window sizes and request caps are driven by config so they can be tuned
+ * per-environment without code changes.
  */
 
 import rateLimit from 'express-rate-limit';
+import config from '../config/index.js';
 
 const makeOptions = (windowMs, max, message) => ({
   windowMs,
   max,
   standardHeaders: true,  // Return rate-limit info in `RateLimit-*` headers
-  legacyHeaders: false,
+  legacyHeaders:   false,
   message: {
     success: false,
     message,
     code: 'RATE_LIMIT_EXCEEDED',
   },
-  skip: (req) => req.ip === '::1' || req.ip === '127.0.0.1', // skip localhost in dev
+  skip: (req) => req.ip === '::1' || req.ip === '127.0.0.1',
 });
 
-/** General API rate limiter — 100 req / 15 min per IP. */
+/** General API rate limiter (default: 100 req / 15 min per IP). */
 export const generalLimiter = rateLimit(
-  makeOptions(15 * 60 * 1000, 100, 'Too many requests. Please try again in 15 minutes.')
+  makeOptions(
+    config.rateLimit.general.windowMs,
+    config.rateLimit.general.max,
+    'Too many requests. Please try again later.',
+  ),
 );
 
-/** Auth endpoints — stricter: 10 req / 15 min per IP. */
+/** Auth endpoints (default: 10 req / 15 min per IP). */
 export const authLimiter = rateLimit(
-  makeOptions(15 * 60 * 1000, 10, 'Too many authentication attempts. Please try again in 15 minutes.')
+  makeOptions(
+    config.rateLimit.auth.windowMs,
+    config.rateLimit.auth.max,
+    'Too many authentication attempts. Please try again later.',
+  ),
 );
 
-/** AI endpoints — 20 req / 1 min per IP (expensive operations). */
+/** AI endpoints — expensive operations (default: 20 req / 1 min per IP). */
 export const aiLimiter = rateLimit(
-  makeOptions(60 * 1000, 20, 'AI request limit reached. Please wait before making more requests.')
+  makeOptions(
+    config.rateLimit.ai.windowMs,
+    config.rateLimit.ai.max,
+    'AI request limit reached. Please wait before making more requests.',
+  ),
 );
