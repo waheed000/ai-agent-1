@@ -49,7 +49,7 @@ describe('WorkspaceRepository', () => {
   let Workspace;
 
   before(async () => {
-    ({ default: repo }      = await import('../repositories/WorkspaceRepository.js'));
+    ({ default: repo }      = await import('../modules/workspaces/WorkspaceRepository.js'));
     ({ default: Workspace } = await import('../models/Workspace.js'));
   });
 
@@ -115,7 +115,7 @@ describe('ApiKeyRepository', () => {
   let ApiKey;
 
   before(async () => {
-    ({ default: repo }   = await import('../repositories/ApiKeyRepository.js'));
+    ({ default: repo }   = await import('../modules/apikeys/ApiKeyRepository.js'));
     ({ default: ApiKey } = await import('../models/ApiKey.js'));
   });
 
@@ -172,7 +172,7 @@ describe('AuditRepository', () => {
   let AuditLog;
 
   before(async () => {
-    ({ default: repo }     = await import('../repositories/AuditRepository.js'));
+    ({ default: repo }     = await import('../modules/audit/AuditRepository.js'));
     ({ default: AuditLog } = await import('../models/AuditLog.js'));
   });
 
@@ -220,7 +220,7 @@ describe('UsageRepository', () => {
   let UsageRecord;
 
   before(async () => {
-    ({ default: repo }        = await import('../repositories/UsageRepository.js'));
+    ({ default: repo }        = await import('../modules/usage/UsageRepository.js'));
     ({ default: UsageRecord } = await import('../models/UsageRecord.js'));
   });
 
@@ -271,7 +271,7 @@ describe('FeatureRepository', () => {
   let FeatureFlag;
 
   before(async () => {
-    ({ default: repo }        = await import('../repositories/FeatureRepository.js'));
+    ({ default: repo }        = await import('../modules/features/FeatureRepository.js'));
     ({ default: FeatureFlag } = await import('../models/FeatureFlag.js'));
   });
 
@@ -306,7 +306,7 @@ describe('SettingsRepository', () => {
   let Settings;
 
   before(async () => {
-    ({ default: repo }     = await import('../repositories/SettingsRepository.js'));
+    ({ default: repo }     = await import('../modules/settings/SettingsRepository.js'));
     ({ default: Settings } = await import('../models/Settings.js'));
   });
 
@@ -354,7 +354,7 @@ describe('ApiKeyService', () => {
   let AuditLog;
 
   before(async () => {
-    ({ default: svc }      = await import('../services/ApiKeyService.js'));
+    ({ default: svc }      = await import('../modules/apikeys/ApiKeyService.js'));
     ({ default: ApiKey }   = await import('../models/ApiKey.js'));
     ({ default: AuditLog } = await import('../models/AuditLog.js'));
   });
@@ -407,7 +407,7 @@ describe('AuditService', () => {
   let AuditLog;
 
   before(async () => {
-    ({ default: svc }      = await import('../services/AuditService.js'));
+    ({ default: svc }      = await import('../modules/audit/AuditService.js'));
     ({ default: AuditLog } = await import('../models/AuditLog.js'));
   });
 
@@ -444,7 +444,7 @@ describe('UsageService', () => {
   let UsageRecord;
 
   before(async () => {
-    ({ default: svc }         = await import('../services/UsageService.js'));
+    ({ default: svc }         = await import('../modules/usage/UsageService.js'));
     ({ default: UsageRecord } = await import('../models/UsageRecord.js'));
   });
 
@@ -489,8 +489,8 @@ describe('PermissionService', () => {
   let Workspace;
 
   before(async () => {
-    ({ default: svc }       = await import('../services/PermissionService.js'));
-    ({ default: wsRepo }    = await import('../repositories/WorkspaceRepository.js'));
+    ({ default: svc }       = await import('../modules/workspaces/PermissionService.js'));
+    ({ default: wsRepo }    = await import('../modules/workspaces/WorkspaceRepository.js'));
     ({ default: Workspace } = await import('../models/Workspace.js'));
     await clearCollections(Workspace);
     const ws = await wsRepo.create(ownerId, { name: 'Perms WS', slug: 'perms-ws-' + Date.now() });
@@ -539,7 +539,7 @@ describe('WorkspaceService', () => {
   let AuditLog;
 
   before(async () => {
-    ({ default: svc }      = await import('../services/WorkspaceService.js'));
+    ({ default: svc }      = await import('../modules/workspaces/WorkspaceService.js'));
     ({ default: Workspace }= await import('../models/Workspace.js'));
     ({ default: AuditLog } = await import('../models/AuditLog.js'));
   });
@@ -596,8 +596,8 @@ describe('TeamService', () => {
   let AuditLog;
 
   before(async () => {
-    ({ default: svc }      = await import('../services/TeamService.js'));
-    ({ default: wsRepo }   = await import('../repositories/WorkspaceRepository.js'));
+    ({ default: svc }      = await import('../modules/workspaces/TeamService.js'));
+    ({ default: wsRepo }   = await import('../modules/workspaces/WorkspaceRepository.js'));
     ({ default: Workspace }= await import('../models/Workspace.js'));
     ({ default: AuditLog } = await import('../models/AuditLog.js'));
   });
@@ -663,7 +663,7 @@ describe('FeatureService', () => {
   let FeatureFlag;
 
   before(async () => {
-    ({ default: svc }         = await import('../services/FeatureService.js'));
+    ({ default: svc }         = await import('../modules/features/FeatureService.js'));
     ({ default: FeatureFlag } = await import('../models/FeatureFlag.js'));
   });
 
@@ -697,7 +697,7 @@ describe('SettingsService', () => {
   let AuditLog;
 
   before(async () => {
-    ({ default: svc }      = await import('../services/SettingsService.js'));
+    ({ default: svc }      = await import('../modules/settings/SettingsService.js'));
     ({ default: Settings } = await import('../models/Settings.js'));
     ({ default: AuditLog } = await import('../models/AuditLog.js'));
   });
@@ -734,7 +734,7 @@ describe('SearchService', () => {
   let svc;
 
   before(async () => {
-    ({ default: svc } = await import('../services/SearchService.js'));
+    ({ default: svc } = await import('../modules/search/SearchService.js'));
   });
 
   it('returns grouped results structure', async () => {
@@ -776,7 +776,7 @@ describe('HTTP /api/v1/workspaces', () => {
     ({ default: Workspace } = await import('../models/Workspace.js'));
     ({ default: AuditLog }  = await import('../models/AuditLog.js'));
     const { default: bcrypt }       = await import('bcryptjs');
-    const { default: TokenService } = await import('../services/TokenService.js');
+    const { default: TokenService } = await import('../modules/auth/TokenService.js');
     await clearCollections(User, Workspace, AuditLog);
     const hash = await bcrypt.hash('Password1!', 10);
     const user = await User.create({ name: 'WS Tester', email: 'ws-test@example.com', password: hash, username: 'ws_tester', status: 'active' });
@@ -888,7 +888,7 @@ describe('HTTP /api/v1/apikeys', () => {
     ({ default: AuditLog } = await import('../models/AuditLog.js'));
     const { default: User }         = await import('../models/User.js');
     const { default: bcrypt }       = await import('bcryptjs');
-    const { default: TokenService } = await import('../services/TokenService.js');
+    const { default: TokenService } = await import('../modules/auth/TokenService.js');
     const hash = await bcrypt.hash('Password1!', 10);
     const user = await User.create({ name: 'ApiKey Tester', email: 'apikey-test@example.com', password: hash, username: 'apikey_tester', status: 'active' });
     token = TokenService.generateAccessToken({ sub: String(user._id) });
@@ -936,7 +936,7 @@ describe('HTTP /api/v1/search', () => {
   before(async () => {
     const { default: User }         = await import('../models/User.js');
     const { default: bcrypt }       = await import('bcryptjs');
-    const { default: TokenService } = await import('../services/TokenService.js');
+    const { default: TokenService } = await import('../modules/auth/TokenService.js');
     const hash = await bcrypt.hash('Password1!', 10);
     const user = await User.create({ name: 'Search Tester', email: 'search-test@example.com', password: hash, username: 'search_tester', status: 'active' });
     token = TokenService.generateAccessToken({ sub: String(user._id) });

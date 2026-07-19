@@ -6,9 +6,9 @@
 
 import app from './app.js';
 import config from './config/index.js';
-import { connectDatabase, disconnectDatabase } from './database/index.js';
-import QueueService from './services/QueueService.js';
-import CacheService from './services/CacheService.js';
+import { connectDatabase, disconnectDatabase } from './infrastructure/database/index.js';
+import QueueService from './infrastructure/queue/index.js';
+import CacheService from './infrastructure/cache/index.js';
 import { initScheduler } from './queues/scheduler.js';
 import { initListeners } from './events/listeners/index.js';
 import logger from './utils/logger.js';

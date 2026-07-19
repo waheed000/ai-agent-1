@@ -36,7 +36,7 @@ describe('ReportRepository', () => {
   });
 
   it('creates a report', async () => {
-    const { default: repo } = await import('../repositories/ReportRepository.js');
+    const { default: repo } = await import('../modules/reports/ReportRepository.js');
     const report = await repo.create(userId, {
       type: 'weekly',
       title: 'Weekly Report — 2025-01-01',
@@ -48,7 +48,7 @@ describe('ReportRepository', () => {
   });
 
   it('findAllByUser returns only user reports', async () => {
-    const { default: repo } = await import('../repositories/ReportRepository.js');
+    const { default: repo } = await import('../modules/reports/ReportRepository.js');
     const otherId = new mongoose.Types.ObjectId();
     await repo.create(userId, { type: 'weekly', title: 'R1', period: { startDate: new Date(), endDate: new Date() } });
     await repo.create(userId, { type: 'monthly', title: 'R2', period: { startDate: new Date(), endDate: new Date() } });
@@ -59,7 +59,7 @@ describe('ReportRepository', () => {
   });
 
   it('findLatest returns most recent ready report', async () => {
-    const { default: repo } = await import('../repositories/ReportRepository.js');
+    const { default: repo } = await import('../modules/reports/ReportRepository.js');
     await repo.create(userId, {
       type: 'weekly', title: 'Old', status: 'ready', generatedAt: new Date('2025-01-01'),
       period: { startDate: new Date(), endDate: new Date() },
@@ -73,7 +73,7 @@ describe('ReportRepository', () => {
   });
 
   it('updateStatus marks report as ready', async () => {
-    const { default: repo } = await import('../repositories/ReportRepository.js');
+    const { default: repo } = await import('../modules/reports/ReportRepository.js');
     const r = await repo.create(userId, {
       type: 'weekly', title: 'R', status: 'generating',
       period: { startDate: new Date(), endDate: new Date() },
@@ -83,7 +83,7 @@ describe('ReportRepository', () => {
   });
 
   it('softDelete removes report from listing', async () => {
-    const { default: repo } = await import('../repositories/ReportRepository.js');
+    const { default: repo } = await import('../modules/reports/ReportRepository.js');
     const r = await repo.create(userId, {
       type: 'weekly', title: 'Del', period: { startDate: new Date(), endDate: new Date() },
     });
@@ -93,7 +93,7 @@ describe('ReportRepository', () => {
   });
 
   it('findById throws NotFoundError for wrong user', async () => {
-    const { default: repo } = await import('../repositories/ReportRepository.js');
+    const { default: repo } = await import('../modules/reports/ReportRepository.js');
     const r = await repo.create(userId, {
       type: 'monthly', title: 'R', period: { startDate: new Date(), endDate: new Date() },
     });
@@ -116,7 +116,7 @@ describe('StrategyRepository', () => {
   });
 
   it('creates a strategy', async () => {
-    const { default: repo } = await import('../repositories/StrategyRepository.js');
+    const { default: repo } = await import('../modules/strategy/StrategyRepository.js');
     const s = await repo.create(userId, {
       planType: '7day',
       title: '7-Day Growth Strategy',
@@ -127,7 +127,7 @@ describe('StrategyRepository', () => {
   });
 
   it('findLatest returns ready strategy', async () => {
-    const { default: repo } = await import('../repositories/StrategyRepository.js');
+    const { default: repo } = await import('../modules/strategy/StrategyRepository.js');
     await repo.create(userId, { planType: '7day', title: 'S1', status: 'ready', generatedAt: new Date() });
     const latest = await repo.findLatest(userId, '7day');
     assert.ok(latest !== null);
@@ -135,7 +135,7 @@ describe('StrategyRepository', () => {
   });
 
   it('updateStatus transitions to ready', async () => {
-    const { default: repo } = await import('../repositories/StrategyRepository.js');
+    const { default: repo } = await import('../modules/strategy/StrategyRepository.js');
     const s = await repo.create(userId, { planType: '30day', title: 'S', status: 'generating' });
     const updated = await repo.updateStatus(s._id, 'ready', { generatedAt: new Date() });
     assert.equal(updated.status, 'ready');
@@ -156,7 +156,7 @@ describe('ReportService', () => {
   });
 
   it('initiateGeneration creates a pending report', async () => {
-    const { default: service } = await import('../services/ReportService.js');
+    const { default: service } = await import('../modules/reports/ReportService.js');
     const report = await service.initiateGeneration(userId, { type: 'weekly' });
     assert.equal(report.status, 'generating');
     assert.equal(report.type, 'weekly');
@@ -164,7 +164,7 @@ describe('ReportService', () => {
   });
 
   it('initiateGeneration builds correct period for weekly', async () => {
-    const { default: service } = await import('../services/ReportService.js');
+    const { default: service } = await import('../modules/reports/ReportService.js');
     const report = await service.initiateGeneration(userId, { type: 'weekly' });
     const diff = report.period.endDate - report.period.startDate;
     const days = diff / (1000 * 60 * 60 * 24);
@@ -172,7 +172,7 @@ describe('ReportService', () => {
   });
 
   it('initiateGeneration supports all report types', async () => {
-    const { default: service } = await import('../services/ReportService.js');
+    const { default: service } = await import('../modules/reports/ReportService.js');
     for (const type of ['weekly', 'monthly', 'quarterly', 'yearly']) {
       const r = await service.initiateGeneration(userId, { type });
       assert.equal(r.type, type);
@@ -180,7 +180,7 @@ describe('ReportService', () => {
   });
 
   it('generate completes the report pipeline', async () => {
-    const { default: service } = await import('../services/ReportService.js');
+    const { default: service } = await import('../modules/reports/ReportService.js');
     const report = await service.initiateGeneration(userId, { type: 'weekly' });
     const result = await service.generate(userId, report._id.toString());
     assert.equal(result.status, 'ready');
@@ -191,7 +191,7 @@ describe('ReportService', () => {
   });
 
   it('generate fills all required sections', async () => {
-    const { default: service } = await import('../services/ReportService.js');
+    const { default: service } = await import('../modules/reports/ReportService.js');
     const r = await service.initiateGeneration(userId, { type: 'monthly' });
     const result = await service.generate(userId, r._id.toString());
     assert.ok(result.growthMetrics);
@@ -203,13 +203,13 @@ describe('ReportService', () => {
   });
 
   it('getLatest returns null when no reports exist', async () => {
-    const { default: service } = await import('../services/ReportService.js');
+    const { default: service } = await import('../modules/reports/ReportService.js');
     const result = await service.getLatest(new mongoose.Types.ObjectId(), 'weekly');
     assert.equal(result, null);
   });
 
   it('deleteReport soft-deletes the report', async () => {
-    const { default: service } = await import('../services/ReportService.js');
+    const { default: service } = await import('../modules/reports/ReportService.js');
     const r = await service.initiateGeneration(userId, { type: 'weekly' });
     await service.deleteReport(userId, r._id.toString());
     const list = await service.getAll(userId);
@@ -231,7 +231,7 @@ describe('StrategyService', () => {
   });
 
   it('initiateGeneration creates pending strategy', async () => {
-    const { default: service } = await import('../services/StrategyService.js');
+    const { default: service } = await import('../modules/strategy/StrategyService.js');
     const s = await service.initiateGeneration(userId, { planType: '7day' });
     assert.equal(s.planType, '7day');
     assert.equal(s.status, 'generating');
@@ -239,7 +239,7 @@ describe('StrategyService', () => {
   });
 
   it('generate produces a 7-day plan', async () => {
-    const { default: service } = await import('../services/StrategyService.js');
+    const { default: service } = await import('../modules/strategy/StrategyService.js');
     const s = await service.initiateGeneration(userId, { planType: '7day' });
     const result = await service.generate(userId, s._id.toString());
     assert.equal(result.status, 'ready');
@@ -251,7 +251,7 @@ describe('StrategyService', () => {
   });
 
   it('generate produces a 30-day plan', async () => {
-    const { default: service } = await import('../services/StrategyService.js');
+    const { default: service } = await import('../modules/strategy/StrategyService.js');
     const s = await service.initiateGeneration(userId, { planType: '30day' });
     const result = await service.generate(userId, s._id.toString());
     assert.equal(result.dayPlan.length, 30);
@@ -259,7 +259,7 @@ describe('StrategyService', () => {
   });
 
   it('generate produces a 90-day plan', async () => {
-    const { default: service } = await import('../services/StrategyService.js');
+    const { default: service } = await import('../modules/strategy/StrategyService.js');
     const s = await service.initiateGeneration(userId, { planType: '90day' });
     const result = await service.generate(userId, s._id.toString());
     assert.equal(result.dayPlan.length, 90);
@@ -267,7 +267,7 @@ describe('StrategyService', () => {
   });
 
   it('getLatest returns null when none exist', async () => {
-    const { default: service } = await import('../services/StrategyService.js');
+    const { default: service } = await import('../modules/strategy/StrategyService.js');
     const result = await service.getLatest(new mongoose.Types.ObjectId(), '7day');
     assert.equal(result, null);
   });

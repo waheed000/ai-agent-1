@@ -14,11 +14,11 @@
  * 2. GrowthCoachAgent — depends on outputs from step 1
  */
 
-import { GeminiProvider } from './providers/GeminiProvider.js';
-import { OpenAIProvider } from './providers/OpenAIProvider.js';
+import { GeminiProvider } from '../providers/GeminiProvider.js';
+import { OpenAIProvider } from '../providers/OpenAIProvider.js';
 import { AgentRegistry } from './AgentRegistry.js';
 import ContextBuilder from './ContextBuilder.js';
-import MemoryService from '../services/MemoryService.js';
+import MemoryService from './MemoryService.js';
 import eventBus from '../events/eventBus.js';
 import { EVENT_TYPES } from '../events/eventTypes.js';
 import logger from '../utils/logger.js';
@@ -33,7 +33,7 @@ class AgentOrchestrator {
 
   /**
    * Pick the first available provider.
-   * @returns {import('./providers/AIProvider.js').AIProvider}
+   * @returns {import('../providers/AIProvider.js').AIProvider}
    */
   _selectProvider() {
     const available = this._providers.filter((p) => p.isAvailable());
@@ -179,7 +179,7 @@ class AgentOrchestrator {
 
   async _buildPerformanceSummary(userId, { platform } = {}) {
     try {
-      const overview = await (await import('../services/AnalyticsService.js')).default
+      const overview = await (await import('../modules/analytics/AnalyticsService.js')).default
         .getOverview(userId, { platform });
       return {
         totalPosts: overview.engagement?.totalPosts || 0,

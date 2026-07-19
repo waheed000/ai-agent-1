@@ -2,8 +2,8 @@
  * plannerWorker
  * Processes async content planner generation jobs.
  */
-import QueueService from '../../services/QueueService.js';
-import PlannerService from '../../services/PlannerService.js';
+import QueueService from '../../infrastructure/queue/index.js';
+import PlannerService from '../../modules/content/PlannerService.js';
 import { QUEUE_NAMES, JOB_NAMES } from '../queues.js';
 import logger from '../../utils/logger.js';
 

@@ -7,7 +7,7 @@
  *  - { type: 'all' }                – recalculate for all users (scheduled)
  */
 
-import QueueService from '../../services/QueueService.js';
+import QueueService from '../../infrastructure/queue/index.js';
 import JobExecution from '../../models/JobExecution.js';
 import User from '../../models/User.js';
 import { QUEUE_NAMES, JOB_NAMES } from '../queues.js';

@@ -12,9 +12,9 @@ import cookieParser from 'cookie-parser';
 
 import config from './config/index.js';
 import logger from './utils/logger.js';
-import { generalLimiter } from './middleware/rateLimiter.js';
-import notFound from './middleware/notFound.js';
-import errorHandler from './middleware/errorHandler.js';
+import { generalLimiter } from './shared/middleware/rateLimiter.js';
+import notFound from './shared/middleware/notFound.js';
+import errorHandler from './shared/middleware/errorHandler.js';
 import apiRouter from './routes/index.js';
 
 const app = express();

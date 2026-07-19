@@ -12,12 +12,12 @@ import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import supertest from 'supertest';
 
-import { connectDatabase, disconnectDatabase } from '../database/index.js';
+import { connectDatabase, disconnectDatabase } from '../infrastructure/database/index.js';
 import app from '../app.js';
 import { encrypt, decrypt } from '../utils/encryption.js';
 import { parseUserAgent } from '../utils/uaParser.js';
-import OAuthProviderFactory from '../services/oauth/OAuthProviderFactory.js';
-import BaseOAuthProvider from '../services/oauth/BaseOAuthProvider.js';
+import OAuthProviderFactory from '../modules/integrations/oauth/OAuthProviderFactory.js';
+import BaseOAuthProvider from '../modules/integrations/oauth/BaseOAuthProvider.js';
 import ConnectedAccount from '../models/ConnectedAccount.js';
 import User from '../models/User.js';
 import RefreshToken from '../models/RefreshToken.js';

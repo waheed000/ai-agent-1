@@ -33,7 +33,7 @@ describe('TrendRepository', () => {
   });
 
   it('upserts a trend', async () => {
-    const { default: repo } = await import('../repositories/TrendRepository.js');
+    const { default: repo } = await import('../modules/trends/TrendRepository.js');
     const trend = await repo.upsert({
       category: 'hashtag',
       name: '#viral',
@@ -47,7 +47,7 @@ describe('TrendRepository', () => {
   });
 
   it('does not duplicate same trend on same day', async () => {
-    const { default: repo } = await import('../repositories/TrendRepository.js');
+    const { default: repo } = await import('../modules/trends/TrendRepository.js');
     await repo.upsert({ category: 'topic', name: 'AI tools', trendScore: 80, platform: 'all' });
     await repo.upsert({ category: 'topic', name: 'AI tools', trendScore: 85, platform: 'all' });
 
@@ -57,7 +57,7 @@ describe('TrendRepository', () => {
   });
 
   it('bulkUpsert stores multiple trends', async () => {
-    const { default: repo } = await import('../repositories/TrendRepository.js');
+    const { default: repo } = await import('../modules/trends/TrendRepository.js');
     const trends = ['#one', '#two', '#three'].map((name) => ({
       category: 'hashtag',
       name,
@@ -69,7 +69,7 @@ describe('TrendRepository', () => {
   });
 
   it('findHashtags returns only hashtag category', async () => {
-    const { default: repo } = await import('../repositories/TrendRepository.js');
+    const { default: repo } = await import('../modules/trends/TrendRepository.js');
     await repo.upsert({ category: 'hashtag', name: '#test', trendScore: 60, platform: 'all' });
     await repo.upsert({ category: 'topic', name: 'Test Topic', trendScore: 70, platform: 'all' });
     const hashtags = await repo.findHashtags({ limit: 10 });
@@ -77,14 +77,14 @@ describe('TrendRepository', () => {
   });
 
   it('findTopics returns only topic category', async () => {
-    const { default: repo } = await import('../repositories/TrendRepository.js');
+    const { default: repo } = await import('../modules/trends/TrendRepository.js');
     await repo.upsert({ category: 'topic', name: 'My Topic', trendScore: 75, platform: 'all' });
     const topics = await repo.findTopics({ limit: 10 });
     assert.ok(topics.every((t) => t.category === 'topic'));
   });
 
   it('markExpired updates expired trends', async () => {
-    const { default: repo } = await import('../repositories/TrendRepository.js');
+    const { default: repo } = await import('../modules/trends/TrendRepository.js');
     await repo.upsert({
       category: 'hashtag',
       name: '#expiredone',
@@ -98,7 +98,7 @@ describe('TrendRepository', () => {
   });
 
   it('findHighVelocity returns trends sorted by growthRate', async () => {
-    const { default: repo } = await import('../repositories/TrendRepository.js');
+    const { default: repo } = await import('../modules/trends/TrendRepository.js');
     await repo.upsert({ category: 'keyword', name: 'fast', growthRate: 80, trendScore: 70, platform: 'all' });
     await repo.upsert({ category: 'keyword', name: 'slow', growthRate: 5, trendScore: 60, platform: 'all' });
     const velocity = await repo.findHighVelocity({ limit: 5 });
@@ -121,20 +121,20 @@ describe('TrendCollector', () => {
   });
 
   it('collects trends for a single platform', async () => {
-    const { default: collector } = await import('../services/trends/TrendCollector.js');
+    const { default: collector } = await import('../modules/trends/TrendCollector.js');
     const result = await collector.collect('instagram', null);
     assert.equal(result.platform, 'instagram');
     assert.ok(result.stored >= 0);
   });
 
   it('collects trends for all platforms', async () => {
-    const { default: collector } = await import('../services/trends/TrendCollector.js');
+    const { default: collector } = await import('../modules/trends/TrendCollector.js');
     const result = await collector.collect('all');
     assert.ok(result.stored > 0);
   });
 
   it('collects only hashtag category when specified', async () => {
-    const { default: collector } = await import('../services/trends/TrendCollector.js');
+    const { default: collector } = await import('../modules/trends/TrendCollector.js');
     await collector.collect('youtube', 'hashtag');
     const { default: TrendData } = await import('../models/TrendData.js');
     const nonHashtags = await TrendData.countDocuments({ category: { $ne: 'hashtag' } });
@@ -146,49 +146,49 @@ describe('TrendCollector', () => {
 
 describe('TrendAnalyzer', () => {
   it('calcVelocity: zero previous volume returns 100', async () => {
-    const { default: analyzer } = await import('../services/trends/TrendAnalyzer.js');
+    const { default: analyzer } = await import('../modules/trends/TrendAnalyzer.js');
     assert.equal(analyzer.calcVelocity(1000, 0), 100);
   });
 
   it('calcVelocity: same volumes return 0', async () => {
-    const { default: analyzer } = await import('../services/trends/TrendAnalyzer.js');
+    const { default: analyzer } = await import('../modules/trends/TrendAnalyzer.js');
     assert.equal(analyzer.calcVelocity(1000, 1000), 0);
   });
 
   it('calcTrendScore: returns 0-100', async () => {
-    const { default: analyzer } = await import('../services/trends/TrendAnalyzer.js');
+    const { default: analyzer } = await import('../modules/trends/TrendAnalyzer.js');
     const score = analyzer.calcTrendScore({ volume: 500_000, growthRate: 50, velocity: 30, recencyDays: 2 });
     assert.ok(score >= 0 && score <= 100, `Score ${score} out of range`);
   });
 
   it('calcConfidence: increases with more data signals', async () => {
-    const { default: analyzer } = await import('../services/trends/TrendAnalyzer.js');
+    const { default: analyzer } = await import('../modules/trends/TrendAnalyzer.js');
     const low = analyzer.calcConfidence({ volume: 0, growthRate: 0, relatedTags: [] });
     const high = analyzer.calcConfidence({ volume: 50_000, growthRate: 30, relatedTags: ['a', 'b', 'c', 'd'] });
     assert.ok(high > low);
   });
 
   it('estimateLifespan: hashtag lifespan shorter than format', async () => {
-    const { default: analyzer } = await import('../services/trends/TrendAnalyzer.js');
+    const { default: analyzer } = await import('../modules/trends/TrendAnalyzer.js');
     const hashtag = analyzer.estimateLifespan('hashtag');
     const format = analyzer.estimateLifespan('format');
     assert.ok(hashtag < format);
   });
 
   it('classifyTrend: high growth + high score = viral', async () => {
-    const { default: analyzer } = await import('../services/trends/TrendAnalyzer.js');
+    const { default: analyzer } = await import('../modules/trends/TrendAnalyzer.js');
     const cls = analyzer.classifyTrend({ category: 'hashtag', trendScore: 85, growthRate: 60 });
     assert.equal(cls, 'viral');
   });
 
   it('classifyTrend: format = evergreen', async () => {
-    const { default: analyzer } = await import('../services/trends/TrendAnalyzer.js');
+    const { default: analyzer } = await import('../modules/trends/TrendAnalyzer.js');
     const cls = analyzer.classifyTrend({ category: 'format', trendScore: 70, growthRate: 10 });
     assert.equal(cls, 'evergreen');
   });
 
   it('summariseTrendLandscape: counts categories and statuses', async () => {
-    const { default: analyzer } = await import('../services/trends/TrendAnalyzer.js');
+    const { default: analyzer } = await import('../modules/trends/TrendAnalyzer.js');
     const trends = [
       { category: 'hashtag', status: 'rising', trendScore: 80 },
       { category: 'hashtag', status: 'peak', trendScore: 90 },
@@ -210,7 +210,7 @@ describe('TrendService', () => {
   it('refreshTrends returns collected and enriched counts', async () => {
     const { default: TrendData } = await import('../models/TrendData.js');
     await TrendData.deleteMany({});
-    const { default: service } = await import('../services/TrendService.js');
+    const { default: service } = await import('../modules/trends/TrendService.js');
     const result = await service.refreshTrends({ platform: 'instagram' });
     assert.equal(result.success, true);
     assert.ok(result.collected >= 0);
@@ -218,19 +218,19 @@ describe('TrendService', () => {
   });
 
   it('getTrends returns stored trends after refresh', async () => {
-    const { default: service } = await import('../services/TrendService.js');
+    const { default: service } = await import('../modules/trends/TrendService.js');
     const trends = await service.getTrends({ limit: 10 });
     assert.ok(Array.isArray(trends));
   });
 
   it('getTopics returns only topic category', async () => {
-    const { default: service } = await import('../services/TrendService.js');
+    const { default: service } = await import('../modules/trends/TrendService.js');
     const topics = await service.getTopics({ limit: 5 });
     assert.ok(topics.every((t) => t.category === 'topic'));
   });
 
   it('getHashtags returns only hashtag category', async () => {
-    const { default: service } = await import('../services/TrendService.js');
+    const { default: service } = await import('../modules/trends/TrendService.js');
     const hashtags = await service.getHashtags({ limit: 5 });
     assert.ok(hashtags.every((h) => h.category === 'hashtag'));
   });

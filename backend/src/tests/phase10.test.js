@@ -23,25 +23,25 @@ async function disconnectDB() {
 
 describe('AIProvider interface', () => {
   it('throws on un-overridden providerName', async () => {
-    const { AIProvider } = await import('../ai/providers/AIProvider.js');
+    const { AIProvider } = await import('../providers/AIProvider.js');
     const p = new AIProvider();
     assert.throws(() => p.providerName, /must be overridden/);
   });
 
   it('throws on un-overridden modelName', async () => {
-    const { AIProvider } = await import('../ai/providers/AIProvider.js');
+    const { AIProvider } = await import('../providers/AIProvider.js');
     const p = new AIProvider();
     assert.throws(() => p.modelName, /must be overridden/);
   });
 
   it('throws on un-overridden isAvailable', async () => {
-    const { AIProvider } = await import('../ai/providers/AIProvider.js');
+    const { AIProvider } = await import('../providers/AIProvider.js');
     const p = new AIProvider();
     assert.throws(() => p.isAvailable(), /must be overridden/);
   });
 
   it('estimateTokens approximates token count', async () => {
-    const { AIProvider } = await import('../ai/providers/AIProvider.js');
+    const { AIProvider } = await import('../providers/AIProvider.js');
     const p = new AIProvider();
     const tokens = p.estimateTokens('Hello, world!'); // 13 chars → ~4 tokens
     assert.ok(tokens > 0 && tokens < 10);
@@ -53,13 +53,13 @@ describe('AIProvider interface', () => {
 describe('GeminiProvider', () => {
   it('reports unavailable when no API key set', async () => {
     delete process.env.GEMINI_API_KEY;
-    const { GeminiProvider } = await import('../ai/providers/GeminiProvider.js');
+    const { GeminiProvider } = await import('../providers/GeminiProvider.js');
     const p = new GeminiProvider();
     assert.equal(p.isAvailable(), false);
   });
 
   it('has correct providerName and modelName', async () => {
-    const { GeminiProvider } = await import('../ai/providers/GeminiProvider.js');
+    const { GeminiProvider } = await import('../providers/GeminiProvider.js');
     const p = new GeminiProvider();
     assert.equal(p.providerName, 'gemini');
     assert.ok(p.modelName.length > 0);
@@ -67,7 +67,7 @@ describe('GeminiProvider', () => {
 
   it('throws when generate called without API key', async () => {
     delete process.env.GEMINI_API_KEY;
-    const { GeminiProvider } = await import('../ai/providers/GeminiProvider.js');
+    const { GeminiProvider } = await import('../providers/GeminiProvider.js');
     const p = new GeminiProvider();
     await assert.rejects(() => p.generate('test'), /GEMINI_API_KEY/i);
   });
@@ -76,13 +76,13 @@ describe('GeminiProvider', () => {
 describe('OpenAIProvider', () => {
   it('reports unavailable when no API key set', async () => {
     delete process.env.OPENAI_API_KEY;
-    const { OpenAIProvider } = await import('../ai/providers/OpenAIProvider.js');
+    const { OpenAIProvider } = await import('../providers/OpenAIProvider.js');
     const p = new OpenAIProvider();
     assert.equal(p.isAvailable(), false);
   });
 
   it('has correct providerName and modelName', async () => {
-    const { OpenAIProvider } = await import('../ai/providers/OpenAIProvider.js');
+    const { OpenAIProvider } = await import('../providers/OpenAIProvider.js');
     const p = new OpenAIProvider();
     assert.equal(p.providerName, 'openai');
     assert.ok(p.modelName.length > 0);
@@ -90,7 +90,7 @@ describe('OpenAIProvider', () => {
 
   it('throws when generate called without API key', async () => {
     delete process.env.OPENAI_API_KEY;
-    const { OpenAIProvider } = await import('../ai/providers/OpenAIProvider.js');
+    const { OpenAIProvider } = await import('../providers/OpenAIProvider.js');
     const p = new OpenAIProvider();
     await assert.rejects(() => p.generate('test'), /OPENAI_API_KEY/i);
   });
@@ -98,9 +98,9 @@ describe('OpenAIProvider', () => {
 
 describe('Provider switching', () => {
   it('providers are interchangeable — same interface', async () => {
-    const { GeminiProvider } = await import('../ai/providers/GeminiProvider.js');
-    const { OpenAIProvider } = await import('../ai/providers/OpenAIProvider.js');
-    const { AIProvider } = await import('../ai/providers/AIProvider.js');
+    const { GeminiProvider } = await import('../providers/GeminiProvider.js');
+    const { OpenAIProvider } = await import('../providers/OpenAIProvider.js');
+    const { AIProvider } = await import('../providers/AIProvider.js');
 
     const gemini = new GeminiProvider();
     const openai = new OpenAIProvider();
@@ -363,7 +363,7 @@ describe('MemoryService', () => {
   after(disconnectDB);
 
   it('runWithMemory records execution in AiExecution', async () => {
-    const { default: MemoryService } = await import('../services/MemoryService.js');
+    const { default: MemoryService } = await import('../ai/MemoryService.js');
     const { default: AiExecution } = await import('../models/AiExecution.js');
 
     const userId = new mongoose.Types.ObjectId();
@@ -389,14 +389,14 @@ describe('MemoryService', () => {
   });
 
   it('getHistory returns recent executions', async () => {
-    const { default: MemoryService } = await import('../services/MemoryService.js');
+    const { default: MemoryService } = await import('../ai/MemoryService.js');
     const userId = new mongoose.Types.ObjectId();
     const history = await MemoryService.getHistory(userId, { limit: 10 });
     assert.ok(Array.isArray(history));
   });
 
   it('getUsage returns token totals', async () => {
-    const { default: MemoryService } = await import('../services/MemoryService.js');
+    const { default: MemoryService } = await import('../ai/MemoryService.js');
     const userId = new mongoose.Types.ObjectId();
     const usage = await MemoryService.getUsage(userId);
     assert.ok(typeof usage.totalTokens === 'number');
@@ -408,20 +408,20 @@ describe('MemoryService', () => {
 
 describe('CacheService', () => {
   it('get returns null when disabled', async () => {
-    const { default: cache } = await import('../services/CacheService.js');
+    const { default: cache } = await import('../infrastructure/cache/index.js');
     cache.enabled = false;
     const val = await cache.get('analytics', 'test-key');
     assert.equal(val, null);
   });
 
   it('set is a no-op when disabled', async () => {
-    const { default: cache } = await import('../services/CacheService.js');
+    const { default: cache } = await import('../infrastructure/cache/index.js');
     cache.enabled = false;
     await assert.doesNotReject(() => cache.set('analytics', 'test-key', { foo: 'bar' }));
   });
 
   it('getOrSet calls computeFn when disabled', async () => {
-    const { default: cache } = await import('../services/CacheService.js');
+    const { default: cache } = await import('../infrastructure/cache/index.js');
     cache.enabled = false;
     let called = false;
     const result = await cache.getOrSet('analytics', 'miss-key', async () => {
@@ -433,7 +433,7 @@ describe('CacheService', () => {
   });
 
   it('ping returns false when disabled', async () => {
-    const { default: cache } = await import('../services/CacheService.js');
+    const { default: cache } = await import('../infrastructure/cache/index.js');
     cache.enabled = false;
     const ok = await cache.ping();
     assert.equal(ok, false);
@@ -476,7 +476,7 @@ describe('AgentExecutionRepository', () => {
   after(disconnectDB);
 
   it('createPending → markCompleted flow', async () => {
-    const { default: repo } = await import('../repositories/AgentExecutionRepository.js');
+    const { default: repo } = await import('../modules/jobs/AgentExecutionRepository.js');
     const userId = new mongoose.Types.ObjectId();
 
     const execution = await repo.createPending(userId, {
@@ -502,7 +502,7 @@ describe('AgentExecutionRepository', () => {
   });
 
   it('markFailed records error message', async () => {
-    const { default: repo } = await import('../repositories/AgentExecutionRepository.js');
+    const { default: repo } = await import('../modules/jobs/AgentExecutionRepository.js');
     const userId = new mongoose.Types.ObjectId();
     const execution = await repo.createPending(userId, {
       agentName: 'content',
@@ -514,7 +514,7 @@ describe('AgentExecutionRepository', () => {
   });
 
   it('aggregateUsage returns zero for new user', async () => {
-    const { default: repo } = await import('../repositories/AgentExecutionRepository.js');
+    const { default: repo } = await import('../modules/jobs/AgentExecutionRepository.js');
     const userId = new mongoose.Types.ObjectId();
     const usage = await repo.aggregateUsage(userId);
     assert.equal(usage.totalTokens, 0);

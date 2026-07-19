@@ -18,12 +18,12 @@ import { describe, it, before, after, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import supertest from 'supertest';
 
-import { connectDatabase, disconnectDatabase } from '../database/index.js';
+import { connectDatabase, disconnectDatabase } from '../infrastructure/database/index.js';
 import app from '../app.js';
 
-import { BasePlatformService } from '../services/platforms/BasePlatformService.js';
-import PlatformFactory from '../services/platforms/PlatformFactory.js';
-import PlatformManager from '../services/platforms/PlatformManager.js';
+import { BasePlatformService } from '../modules/platforms/providers/BasePlatformService.js';
+import PlatformFactory from '../modules/platforms/providers/PlatformFactory.js';
+import PlatformManager from '../modules/platforms/providers/PlatformManager.js';
 import ConnectedAccount from '../models/ConnectedAccount.js';
 import Post from '../models/Post.js';
 import PostAnalytics from '../models/PostAnalytics.js';

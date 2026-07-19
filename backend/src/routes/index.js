@@ -3,32 +3,28 @@
  */
 
 import { Router } from 'express';
-import healthRouter        from './health.js';
-import authRouter          from './auth.js';
-import accountRouter       from './account.js';
-import integrationsRouter  from './integrations.js';
-import platformsRouter     from './platforms.js';
-import jobsRouter          from './jobs.js';
-import analyticsRouter     from './analytics.js';
-import competitorsRouter   from './competitors.js';
-import trendsRouter        from './trends.js';
-// Phase 11
-import reportsRouter       from './reports.js';
-import strategyRouter      from './strategy.js';
-// Phase 12
-import notificationsRouter from './notifications.js';
-// Phase 13
-import plannerRouter       from './planner.js';
-import calendarRouter      from './calendar.js';
-import draftsRouter        from './drafts.js';
-// Phase 14
-import workspacesRouter    from './workspaces.js';
-import apikeysRouter       from './apikeys.js';
-import searchRouter        from './search.js';
-import settingsRouter      from './settings.js';
-import usageRouter         from './usage.js';
-import auditRouter         from './audit.js';
-import featuresRouter      from './features.js';
+import healthRouter        from '../modules/health/health.routes.js';
+import authRouter          from '../modules/auth/auth.routes.js';
+import accountRouter       from '../modules/account/account.routes.js';
+import integrationsRouter  from '../modules/integrations/integrations.routes.js';
+import platformsRouter     from '../modules/platforms/platforms.routes.js';
+import jobsRouter          from '../modules/jobs/jobs.routes.js';
+import analyticsRouter     from '../modules/analytics/analytics.routes.js';
+import competitorsRouter   from '../modules/competitors/competitors.routes.js';
+import trendsRouter        from '../modules/trends/trends.routes.js';
+import reportsRouter       from '../modules/reports/reports.routes.js';
+import strategyRouter      from '../modules/strategy/strategy.routes.js';
+import notificationsRouter from '../modules/notifications/notifications.routes.js';
+import plannerRouter       from '../modules/content/planner.routes.js';
+import calendarRouter      from '../modules/content/calendar.routes.js';
+import draftsRouter        from '../modules/content/drafts.routes.js';
+import workspacesRouter    from '../modules/workspaces/workspaces.routes.js';
+import apikeysRouter       from '../modules/apikeys/apikeys.routes.js';
+import searchRouter        from '../modules/search/search.routes.js';
+import settingsRouter      from '../modules/settings/settings.routes.js';
+import usageRouter         from '../modules/usage/usage.routes.js';
+import auditRouter         from '../modules/audit/audit.routes.js';
+import featuresRouter      from '../modules/features/features.routes.js';
 
 const router = Router();
 
@@ -47,7 +43,6 @@ router.use('/notifications', notificationsRouter);
 router.use('/planner',       plannerRouter);
 router.use('/calendar',      calendarRouter);
 router.use('/drafts',        draftsRouter);
-// Phase 14
 router.use('/workspaces',    workspacesRouter);
 router.use('/apikeys',       apikeysRouter);
 router.use('/search',        searchRouter);

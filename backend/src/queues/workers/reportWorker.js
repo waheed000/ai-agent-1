@@ -2,9 +2,9 @@
  * reportWorker
  * Processes report and strategy generation jobs from the REPORT queue.
  */
-import QueueService from '../../services/QueueService.js';
-import ReportService from '../../services/ReportService.js';
-import StrategyService from '../../services/StrategyService.js';
+import QueueService from '../../infrastructure/queue/index.js';
+import ReportService from '../../modules/reports/ReportService.js';
+import StrategyService from '../../modules/strategy/StrategyService.js';
 import JobExecution from '../../models/JobExecution.js';
 import { QUEUE_NAMES, JOB_NAMES } from '../queues.js';
 import logger from '../../utils/logger.js';

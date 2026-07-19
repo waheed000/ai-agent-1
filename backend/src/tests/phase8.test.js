@@ -37,7 +37,7 @@ describe('CompetitorRepository', () => {
   });
 
   it('creates a competitor', async () => {
-    const { default: repo } = await import('../repositories/CompetitorRepository.js');
+    const { default: repo } = await import('../modules/competitors/CompetitorRepository.js');
     const comp = await repo.create(userId, {
       username: 'testuser',
       platform: 'instagram',
@@ -48,7 +48,7 @@ describe('CompetitorRepository', () => {
   });
 
   it('throws ConflictError for duplicate username+platform', async () => {
-    const { default: repo } = await import('../repositories/CompetitorRepository.js');
+    const { default: repo } = await import('../modules/competitors/CompetitorRepository.js');
     await repo.create(userId, { username: 'dupuser', platform: 'youtube' });
     await assert.rejects(
       () => repo.create(userId, { username: 'dupuser', platform: 'youtube' }),
@@ -57,7 +57,7 @@ describe('CompetitorRepository', () => {
   });
 
   it('lists competitors for a user', async () => {
-    const { default: repo } = await import('../repositories/CompetitorRepository.js');
+    const { default: repo } = await import('../modules/competitors/CompetitorRepository.js');
     await repo.create(userId, { username: 'alice', platform: 'instagram' });
     await repo.create(userId, { username: 'bob', platform: 'tiktok' });
     const list = await repo.findAllByUser(userId);
@@ -65,7 +65,7 @@ describe('CompetitorRepository', () => {
   });
 
   it('soft-deletes a competitor', async () => {
-    const { default: repo } = await import('../repositories/CompetitorRepository.js');
+    const { default: repo } = await import('../modules/competitors/CompetitorRepository.js');
     const comp = await repo.create(userId, { username: 'delme', platform: 'instagram' });
     await repo.softDelete(comp._id, userId);
     const list = await repo.findAllByUser(userId);
@@ -73,7 +73,7 @@ describe('CompetitorRepository', () => {
   });
 
   it('countByUser excludes deleted competitors', async () => {
-    const { default: repo } = await import('../repositories/CompetitorRepository.js');
+    const { default: repo } = await import('../modules/competitors/CompetitorRepository.js');
     const comp = await repo.create(userId, { username: 'countme', platform: 'instagram' });
     assert.equal(await repo.countByUser(userId), 1);
     await repo.softDelete(comp._id, userId);
@@ -98,7 +98,7 @@ describe('CompetitorPostRepository', () => {
   });
 
   it('upserts a competitor post', async () => {
-    const { default: repo } = await import('../repositories/CompetitorPostRepository.js');
+    const { default: repo } = await import('../modules/competitors/CompetitorPostRepository.js');
     const post = await repo.upsert(competitorId, userId, {
       platformPostId: 'ig_post_001',
       format: 'reel',
@@ -111,7 +111,7 @@ describe('CompetitorPostRepository', () => {
   });
 
   it('does not duplicate on second upsert with same platformPostId', async () => {
-    const { default: repo } = await import('../repositories/CompetitorPostRepository.js');
+    const { default: repo } = await import('../modules/competitors/CompetitorPostRepository.js');
     await repo.upsert(competitorId, userId, {
       platformPostId: 'ig_post_dup',
       format: 'image',
@@ -130,7 +130,7 @@ describe('CompetitorPostRepository', () => {
   });
 
   it('bulkUpsert stores multiple posts', async () => {
-    const { default: repo } = await import('../repositories/CompetitorPostRepository.js');
+    const { default: repo } = await import('../modules/competitors/CompetitorPostRepository.js');
     const posts = Array.from({ length: 5 }, (_, i) => ({
       platformPostId: `bulk_post_${i}`,
       format: 'short_video',
@@ -142,7 +142,7 @@ describe('CompetitorPostRepository', () => {
   });
 
   it('aggregateHashtags counts tags', async () => {
-    const { default: repo } = await import('../repositories/CompetitorPostRepository.js');
+    const { default: repo } = await import('../modules/competitors/CompetitorPostRepository.js');
     await repo.upsert(competitorId, userId, {
       platformPostId: 'hashtag_post_1',
       hashtags: ['travel', 'lifestyle'],
@@ -172,7 +172,7 @@ describe('CompetitorAnalyticsRepository', () => {
   });
 
   it('creates a snapshot', async () => {
-    const { default: repo } = await import('../repositories/CompetitorAnalyticsRepository.js');
+    const { default: repo } = await import('../modules/competitors/CompetitorAnalyticsRepository.js');
     const snap = await repo.createSnapshot(competitorId, userId, {
       followerCount: 10000,
       avgEngagementRate: 4.5,
@@ -183,7 +183,7 @@ describe('CompetitorAnalyticsRepository', () => {
   });
 
   it('findLatest returns most recent snapshot', async () => {
-    const { default: repo } = await import('../repositories/CompetitorAnalyticsRepository.js');
+    const { default: repo } = await import('../modules/competitors/CompetitorAnalyticsRepository.js');
     // Second snapshot with higher followers
     await repo.createSnapshot(competitorId, userId, {
       followerCount: 12000,
@@ -195,7 +195,7 @@ describe('CompetitorAnalyticsRepository', () => {
   });
 
   it('history never overwrites old snapshots', async () => {
-    const { default: repo } = await import('../repositories/CompetitorAnalyticsRepository.js');
+    const { default: repo } = await import('../modules/competitors/CompetitorAnalyticsRepository.js');
     const history = await repo.findHistory(competitorId);
     // Should have at least the 2 snapshots created above (same day → 1 due to upsert)
     assert.ok(history.length >= 1);
@@ -217,7 +217,7 @@ describe('CompetitorService', () => {
   });
 
   it('adds a competitor', async () => {
-    const { default: service } = await import('../services/CompetitorService.js');
+    const { default: service } = await import('../modules/competitors/CompetitorService.js');
     const comp = await service.addCompetitor(userId, {
       username: 'mrcompetitor',
       platform: 'youtube',
@@ -227,7 +227,7 @@ describe('CompetitorService', () => {
   });
 
   it('lists competitors for a user', async () => {
-    const { default: service } = await import('../services/CompetitorService.js');
+    const { default: service } = await import('../modules/competitors/CompetitorService.js');
     await service.addCompetitor(userId, { username: 'one', platform: 'instagram' });
     await service.addCompetitor(userId, { username: 'two', platform: 'tiktok' });
     const list = await service.listCompetitors(userId);
@@ -235,7 +235,7 @@ describe('CompetitorService', () => {
   });
 
   it('syncs a competitor and returns scores', async () => {
-    const { default: service } = await import('../services/CompetitorService.js');
+    const { default: service } = await import('../modules/competitors/CompetitorService.js');
     const comp = await service.addCompetitor(userId, {
       username: 'syncme',
       platform: 'instagram',
@@ -248,7 +248,7 @@ describe('CompetitorService', () => {
   });
 
   it('deletes a competitor', async () => {
-    const { default: service } = await import('../services/CompetitorService.js');
+    const { default: service } = await import('../modules/competitors/CompetitorService.js');
     const comp = await service.addCompetitor(userId, { username: 'delme2', platform: 'tiktok' });
     await service.deleteCompetitor(userId, comp._id.toString());
     const list = await service.listCompetitors(userId);

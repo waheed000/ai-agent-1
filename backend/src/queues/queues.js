@@ -4,7 +4,7 @@
  * Import these instead of calling QueueService.getQueue() directly.
  */
 
-import QueueService from '../services/QueueService.js';
+import QueueService from '../infrastructure/queue/index.js';
 
 export const QUEUE_NAMES = {
   SOCIAL_SYNC:  'socialSync',

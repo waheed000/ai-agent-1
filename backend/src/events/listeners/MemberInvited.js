@@ -4,7 +4,7 @@
  */
 import eventBus from '../eventBus.js';
 import { EVENT_TYPES } from '../eventTypes.js';
-import QueueService from '../../services/QueueService.js';
+import QueueService from '../../infrastructure/queue/index.js';
 import { QUEUE_NAMES } from '../../queues/queues.js';
 import logger from '../../utils/logger.js';
 

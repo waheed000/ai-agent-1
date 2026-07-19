@@ -2,8 +2,8 @@
  * notificationWorker
  * Processes notification dispatch jobs from the NOTIFICATION queue.
  */
-import QueueService from '../../services/QueueService.js';
-import NotificationService from '../../services/NotificationService.js';
+import QueueService from '../../infrastructure/queue/index.js';
+import NotificationService from '../../modules/notifications/NotificationService.js';
 import { QUEUE_NAMES } from '../queues.js';
 import logger from '../../utils/logger.js';
 

@@ -5,7 +5,7 @@
 
 import eventBus from '../eventBus.js';
 import { EVENT_TYPES } from '../eventTypes.js';
-import CacheService from '../../services/CacheService.js';
+import CacheService from '../../infrastructure/cache/index.js';
 import logger from '../../utils/logger.js';
 
 export function registerCompetitorUpdatedListener() {

@@ -4,7 +4,7 @@
  * Call initScheduler() once at server startup after QueueService.init().
  */
 
-import QueueService from '../services/QueueService.js';
+import QueueService from '../infrastructure/queue/index.js';
 import { QUEUE_NAMES, JOB_NAMES } from './queues.js';
 import { registerSocialSyncWorker }  from './workers/socialSyncWorker.js';
 import { registerAnalyticsWorker }   from './workers/analyticsWorker.js';

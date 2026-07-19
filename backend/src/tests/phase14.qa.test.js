@@ -552,14 +552,14 @@ describe('Step 7: API Key Management', () => {
   });
 
   it('API key authentication works via validate', async () => {
-    const { default: ApiKeyService } = await import('../services/ApiKeyService.js');
+    const { default: ApiKeyService } = await import('../modules/apikeys/ApiKeyService.js');
     const doc = await ApiKeyService.validate(rawKey);
     assert.ok(doc, 'validate should return key document');
     assert.equal(doc.description, 'QA Test Key');
   });
 
   it('lastUsedAt is updated after validate', async () => {
-    const { default: ApiKeyService } = await import('../services/ApiKeyService.js');
+    const { default: ApiKeyService } = await import('../modules/apikeys/ApiKeyService.js');
     await ApiKeyService.validate(rawKey);
     const { default: ApiKey } = await import('../models/ApiKey.js');
     const key = await ApiKey.findById(apiKeyId).lean();
@@ -575,7 +575,7 @@ describe('Step 7: API Key Management', () => {
     assert.equal(res.status, 201);
     expiredKeyRaw = res.body.data.rawKey;
 
-    const { default: ApiKeyService } = await import('../services/ApiKeyService.js');
+    const { default: ApiKeyService } = await import('../modules/apikeys/ApiKeyService.js');
     const doc = await ApiKeyService.validate(expiredKeyRaw);
     assert.equal(doc, null, 'Expired key must be rejected');
   });
@@ -592,7 +592,7 @@ describe('Step 7: API Key Management', () => {
   });
 
   it('validate returns null after revocation', async () => {
-    const { default: ApiKeyService } = await import('../services/ApiKeyService.js');
+    const { default: ApiKeyService } = await import('../modules/apikeys/ApiKeyService.js');
     const doc = await ApiKeyService.validate(rawKey);
     assert.equal(doc, null, 'Revoked key must not validate');
   });
@@ -1104,7 +1104,7 @@ describe('Security: API Key Security', () => {
   });
 
   it('garbage key string returns null from validate', async () => {
-    const { default: ApiKeyService } = await import('../services/ApiKeyService.js');
+    const { default: ApiKeyService } = await import('../modules/apikeys/ApiKeyService.js');
     assert.equal(await ApiKeyService.validate('not-a-key'), null);
     assert.equal(await ApiKeyService.validate('cos_fakekey'), null);
     assert.equal(await ApiKeyService.validate(''), null);
@@ -1218,7 +1218,7 @@ describe('Usage Tracking: getSummary and getCount with ObjectId casting', () => 
   });
 
   it('getSummary returns non-empty results when records exist (HTTP path)', async () => {
-    const { default: UsageService } = await import('../services/UsageService.js');
+    const { default: UsageService } = await import('../modules/usage/UsageService.js');
     // Record via service (uses string userId — same as HTTP path)
     await UsageService.record(trackUserId, 'ai_request', 'chat', { count: 3 });
     await UsageService.record(trackUserId, 'report',     'gen',  { count: 2 });
@@ -1232,7 +1232,7 @@ describe('Usage Tracking: getSummary and getCount with ObjectId casting', () => 
   });
 
   it('getCount returns correct total for a category (HTTP path with string userId)', async () => {
-    const { default: UsageService } = await import('../services/UsageService.js');
+    const { default: UsageService } = await import('../modules/usage/UsageService.js');
     const count = await UsageService.getCount(trackUserId, 'ai_request');
     assert.equal(count, 3, `Expected 3, got ${count}`);
   });

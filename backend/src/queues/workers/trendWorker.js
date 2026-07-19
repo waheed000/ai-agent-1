@@ -5,7 +5,7 @@
  * Job payload: { platform? }  — omit to refresh all platforms
  */
 
-import QueueService from '../../services/QueueService.js';
+import QueueService from '../../infrastructure/queue/index.js';
 import JobExecution from '../../models/JobExecution.js';
 import TrendData from '../../models/TrendData.js';
 import { QUEUE_NAMES } from '../queues.js';

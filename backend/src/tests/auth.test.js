@@ -9,10 +9,10 @@ import { describe, it, before, after, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import request from 'supertest';
 import app from '../app.js';
-import { connectDatabase, disconnectDatabase } from '../database/index.js';
+import { connectDatabase, disconnectDatabase } from '../infrastructure/database/index.js';
 import User from '../models/User.js';
 import RefreshToken from '../models/RefreshToken.js';
-import TokenService from '../services/TokenService.js';
+import TokenService from '../modules/auth/TokenService.js';
 
 // ─── Setup / Teardown ─────────────────────────────────────────────────────────
 

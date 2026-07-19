@@ -36,7 +36,7 @@ describe('NotificationRepository', () => {
   });
 
   it('creates a notification', async () => {
-    const { default: repo } = await import('../repositories/NotificationRepository.js');
+    const { default: repo } = await import('../modules/notifications/NotificationRepository.js');
     const n = await repo.create(userId, {
       type: 'growth_milestone',
       title: 'Milestone reached!',
@@ -47,7 +47,7 @@ describe('NotificationRepository', () => {
   });
 
   it('findAllByUser returns user notifications', async () => {
-    const { default: repo } = await import('../repositories/NotificationRepository.js');
+    const { default: repo } = await import('../modules/notifications/NotificationRepository.js');
     await repo.create(userId, { type: 'trend_alert', title: 'Trend' });
     await repo.create(userId, { type: 'system', title: 'System' });
     const list = await repo.findAllByUser(userId);
@@ -55,7 +55,7 @@ describe('NotificationRepository', () => {
   });
 
   it('markRead sets isRead to true', async () => {
-    const { default: repo } = await import('../repositories/NotificationRepository.js');
+    const { default: repo } = await import('../modules/notifications/NotificationRepository.js');
     const n = await repo.create(userId, { type: 'system', title: 'Test' });
     const updated = await repo.markRead(n._id, userId);
     assert.equal(updated.isRead, true);
@@ -63,7 +63,7 @@ describe('NotificationRepository', () => {
   });
 
   it('markAllRead marks every unread notification', async () => {
-    const { default: repo } = await import('../repositories/NotificationRepository.js');
+    const { default: repo } = await import('../modules/notifications/NotificationRepository.js');
     await repo.create(userId, { type: 'trend_alert', title: 'T1' });
     await repo.create(userId, { type: 'growth_milestone', title: 'T2' });
     const count = await repo.markAllRead(userId);
@@ -73,7 +73,7 @@ describe('NotificationRepository', () => {
   });
 
   it('countUnread returns correct count', async () => {
-    const { default: repo } = await import('../repositories/NotificationRepository.js');
+    const { default: repo } = await import('../modules/notifications/NotificationRepository.js');
     await repo.create(userId, { type: 'system', title: 'A' });
     await repo.create(userId, { type: 'system', title: 'B' });
     assert.equal(await repo.countUnread(userId), 2);
@@ -82,7 +82,7 @@ describe('NotificationRepository', () => {
   });
 
   it('deleteById removes the notification', async () => {
-    const { default: repo } = await import('../repositories/NotificationRepository.js');
+    const { default: repo } = await import('../modules/notifications/NotificationRepository.js');
     const n = await repo.create(userId, { type: 'system', title: 'Del' });
     await repo.deleteById(n._id, userId);
     const list = await repo.findAllByUser(userId);
@@ -90,7 +90,7 @@ describe('NotificationRepository', () => {
   });
 
   it('deleteById throws NotFoundError for wrong user', async () => {
-    const { default: repo } = await import('../repositories/NotificationRepository.js');
+    const { default: repo } = await import('../modules/notifications/NotificationRepository.js');
     const n = await repo.create(userId, { type: 'system', title: 'X' });
     const wrongId = new mongoose.Types.ObjectId();
     await assert.rejects(() => repo.deleteById(n._id, wrongId), /not found/i);
@@ -111,26 +111,26 @@ describe('NotificationPreferences', () => {
   });
 
   it('upsertPreferences creates preferences', async () => {
-    const { default: repo } = await import('../repositories/NotificationRepository.js');
+    const { default: repo } = await import('../modules/notifications/NotificationRepository.js');
     const prefs = await repo.upsertPreferences(userId, { enabled: true });
     assert.equal(prefs.enabled, true);
   });
 
   it('upsertPreferences updates existing preferences', async () => {
-    const { default: repo } = await import('../repositories/NotificationRepository.js');
+    const { default: repo } = await import('../modules/notifications/NotificationRepository.js');
     await repo.upsertPreferences(userId, { enabled: true });
     const updated = await repo.upsertPreferences(userId, { enabled: false });
     assert.equal(updated.enabled, false);
   });
 
   it('getPreferences returns null when none set', async () => {
-    const { default: repo } = await import('../repositories/NotificationRepository.js');
+    const { default: repo } = await import('../modules/notifications/NotificationRepository.js');
     const prefs = await repo.getPreferences(new mongoose.Types.ObjectId());
     assert.equal(prefs, null);
   });
 
   it('quiet hours can be configured', async () => {
-    const { default: repo } = await import('../repositories/NotificationRepository.js');
+    const { default: repo } = await import('../modules/notifications/NotificationRepository.js');
     const prefs = await repo.upsertPreferences(userId, {
       quietHoursEnabled: true,
       quietHoursStart: 22,
@@ -158,7 +158,7 @@ describe('NotificationService', () => {
   });
 
   it('create stores a notification in DB', async () => {
-    const { default: service } = await import('../services/NotificationService.js');
+    const { default: service } = await import('../modules/notifications/NotificationService.js');
     const n = await service.create(userId, {
       type: 'growth_milestone',
       body: 'You hit 1000 followers!',
@@ -169,20 +169,20 @@ describe('NotificationService', () => {
   });
 
   it('create uses type default title when none provided', async () => {
-    const { default: service } = await import('../services/NotificationService.js');
+    const { default: service } = await import('../modules/notifications/NotificationService.js');
     const n = await service.create(userId, { type: 'trend_alert' });
     assert.equal(n.title, 'Trend Alert');
   });
 
   it('create returns null when user has disabled notifications', async () => {
-    const { default: service } = await import('../services/NotificationService.js');
+    const { default: service } = await import('../modules/notifications/NotificationService.js');
     await service.updatePreferences(userId, { enabled: false });
     const n = await service.create(userId, { type: 'system', body: 'Should be suppressed' });
     assert.equal(n, null);
   });
 
   it('getAll returns notifications with unreadCount', async () => {
-    const { default: service } = await import('../services/NotificationService.js');
+    const { default: service } = await import('../modules/notifications/NotificationService.js');
     await service.create(userId, { type: 'system', body: 'A' });
     await service.create(userId, { type: 'trend_alert', body: 'B' });
     const result = await service.getAll(userId);
@@ -191,14 +191,14 @@ describe('NotificationService', () => {
   });
 
   it('markRead marks a single notification', async () => {
-    const { default: service } = await import('../services/NotificationService.js');
+    const { default: service } = await import('../modules/notifications/NotificationService.js');
     const n = await service.create(userId, { type: 'system', body: 'X' });
     const updated = await service.markRead(userId, n._id.toString());
     assert.equal(updated.isRead, true);
   });
 
   it('markAllRead clears all unread', async () => {
-    const { default: service } = await import('../services/NotificationService.js');
+    const { default: service } = await import('../modules/notifications/NotificationService.js');
     await service.create(userId, { type: 'system', body: 'A' });
     await service.create(userId, { type: 'system', body: 'B' });
     const result = await service.markAllRead(userId);
@@ -206,7 +206,7 @@ describe('NotificationService', () => {
   });
 
   it('delete removes a notification', async () => {
-    const { default: service } = await import('../services/NotificationService.js');
+    const { default: service } = await import('../modules/notifications/NotificationService.js');
     const n = await service.create(userId, { type: 'system', body: 'Del' });
     await service.delete(userId, n._id.toString());
     const list = await service.getAll(userId);
@@ -214,7 +214,7 @@ describe('NotificationService', () => {
   });
 
   it('all 10 Phase 12 notification types are supported', async () => {
-    const { default: service } = await import('../services/NotificationService.js');
+    const { default: service } = await import('../modules/notifications/NotificationService.js');
     const types = [
       'growth_drop', 'growth_milestone', 'trend_alert', 'competitor_alert',
       'weekly_report_ready', 'monthly_report_ready', 'ai_recommendation',
@@ -232,7 +232,7 @@ describe('NotificationService', () => {
 
 describe('NotificationDispatcher', () => {
   it('dispatches to inApp channel by default', async () => {
-    const { default: dispatcher } = await import('../services/NotificationDispatcher.js');
+    const { default: dispatcher } = await import('../modules/notifications/NotificationDispatcher.js');
     const fakeNotification = { _id: new mongoose.Types.ObjectId(), type: 'system', title: 'T', body: 'B' };
     const results = await dispatcher.dispatch(fakeNotification, { inApp: true });
     assert.equal(results.length, 1);
@@ -241,7 +241,7 @@ describe('NotificationDispatcher', () => {
   });
 
   it('dispatches to multiple channels', async () => {
-    const { default: dispatcher } = await import('../services/NotificationDispatcher.js');
+    const { default: dispatcher } = await import('../modules/notifications/NotificationDispatcher.js');
     const fakeNotification = { _id: new mongoose.Types.ObjectId(), type: 'trend_alert', title: 'T', body: 'B' };
     const results = await dispatcher.dispatch(fakeNotification, {
       inApp: true, email: true, websocket: true, push: true,
@@ -255,20 +255,20 @@ describe('NotificationDispatcher', () => {
   });
 
   it('stub channels return stub status', async () => {
-    const { default: dispatcher } = await import('../services/NotificationDispatcher.js');
+    const { default: dispatcher } = await import('../modules/notifications/NotificationDispatcher.js');
     const fakeNotification = { _id: new mongoose.Types.ObjectId(), type: 'system', title: 'T', body: 'B' };
     const results = await dispatcher.dispatch(fakeNotification, { email: true });
     assert.equal(results[0].status, 'stub');
   });
 
   it('dispatch does not throw on empty preferences', async () => {
-    const { default: dispatcher } = await import('../services/NotificationDispatcher.js');
+    const { default: dispatcher } = await import('../modules/notifications/NotificationDispatcher.js');
     const fakeNotification = { _id: new mongoose.Types.ObjectId(), type: 'system', title: 'T', body: 'B' };
     await assert.doesNotReject(() => dispatcher.dispatch(fakeNotification, {}));
   });
 
   it('all four channels are registered', async () => {
-    const { default: dispatcher } = await import('../services/NotificationDispatcher.js');
+    const { default: dispatcher } = await import('../modules/notifications/NotificationDispatcher.js');
     assert.ok(dispatcher.channels.inApp);
     assert.ok(dispatcher.channels.email);
     assert.ok(dispatcher.channels.websocket);

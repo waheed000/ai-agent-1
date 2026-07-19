@@ -12,10 +12,10 @@
  *  - Prevent duplicate active jobs for the same user+platform
  */
 
-import QueueService from '../../services/QueueService.js';
-import SyncService from '../../services/SyncService.js';
+import QueueService from '../../infrastructure/queue/index.js';
+import SyncService from '../../modules/platforms/SyncService.js';
 import JobExecution from '../../models/JobExecution.js';
-import ConnectedAccountRepository from '../../repositories/ConnectedAccountRepository.js';
+import ConnectedAccountRepository from '../../modules/integrations/ConnectedAccountRepository.js';
 import { QUEUE_NAMES, JOB_NAMES } from '../queues.js';
 import logger from '../../utils/logger.js';
 

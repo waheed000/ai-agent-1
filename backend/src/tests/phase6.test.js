@@ -35,7 +35,7 @@ describe('QueueService', () => {
     // Import a fresh QueueService-like object configured to fail
     // We test the behaviour by inspecting the `enabled` flag after
     // attempting to connect to a port that won't respond.
-    const { default: QueueService } = await import('../services/QueueService.js');
+    const { default: QueueService } = await import('../infrastructure/queue/index.js');
 
     // If Redis is not available the service should remain disabled / not crash
     // (the real init() is called in server.js — here we just assert the contract)
@@ -50,7 +50,7 @@ describe('QueueService', () => {
   });
 
   it('getQueue returns null when disabled', async () => {
-    const { default: QueueService } = await import('../services/QueueService.js');
+    const { default: QueueService } = await import('../infrastructure/queue/index.js');
     // Force disabled state
     QueueService.enabled = false;
     const q = QueueService.getQueue('test');
@@ -58,21 +58,21 @@ describe('QueueService', () => {
   });
 
   it('addJob returns null when disabled', async () => {
-    const { default: QueueService } = await import('../services/QueueService.js');
+    const { default: QueueService } = await import('../infrastructure/queue/index.js');
     QueueService.enabled = false;
     const result = await QueueService.addJob('test', 'myJob', {});
     assert.equal(result, null);
   });
 
   it('createWorker returns null when disabled', async () => {
-    const { default: QueueService } = await import('../services/QueueService.js');
+    const { default: QueueService } = await import('../infrastructure/queue/index.js');
     QueueService.enabled = false;
     const w = QueueService.createWorker('test', async () => {});
     assert.equal(w, null);
   });
 
   it('getHealth returns degraded status when disabled', async () => {
-    const { default: QueueService } = await import('../services/QueueService.js');
+    const { default: QueueService } = await import('../infrastructure/queue/index.js');
     QueueService.enabled = false;
     const health = await QueueService.getHealth();
     assert.equal(health.status, 'degraded');
@@ -80,7 +80,7 @@ describe('QueueService', () => {
   });
 
   it('getQueueStats returns empty array when disabled', async () => {
-    const { default: QueueService } = await import('../services/QueueService.js');
+    const { default: QueueService } = await import('../infrastructure/queue/index.js');
     QueueService.enabled = false;
     const stats = await QueueService.getQueueStats();
     assert.deepEqual(stats, []);
@@ -253,7 +253,7 @@ describe('Scheduler', () => {
   });
 
   it('skips scheduling when QueueService is disabled', async () => {
-    const { default: QueueService } = await import('../services/QueueService.js');
+    const { default: QueueService } = await import('../infrastructure/queue/index.js');
     QueueService.enabled = false;
 
     const { initScheduler } = await import('../queues/scheduler.js');

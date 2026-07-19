@@ -12,10 +12,10 @@
  *  - Historical reports (GrowthReport)
  */
 
-import AnalyticsService from '../services/AnalyticsService.js';
-import CompetitorAnalyticsRepository from '../repositories/CompetitorAnalyticsRepository.js';
-import TrendRepository from '../repositories/TrendRepository.js';
-import AnalyticsRepository from '../repositories/AnalyticsRepository.js';
+import AnalyticsService from '../modules/analytics/AnalyticsService.js';
+import CompetitorAnalyticsRepository from '../modules/competitors/CompetitorAnalyticsRepository.js';
+import TrendRepository from '../modules/trends/TrendRepository.js';
+import AnalyticsRepository from '../modules/analytics/AnalyticsRepository.js';
 import logger from '../utils/logger.js';
 
 class ContextBuilder {
