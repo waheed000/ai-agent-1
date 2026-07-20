@@ -1,0 +1,167 @@
+You are continuing the existing CreatorOS AI backend.
+
+Implement ONLY Phase 15C.
+
+This is the final production polish.
+
+No new business features.
+
+=========================================================
+
+PHASE 15C
+
+Documentation & Final Review
+
+=========================================================
+
+Swagger
+
+=========================================================
+
+Complete OpenAPI documentation.
+
+Document every endpoint.
+
+Include
+
+Schemas
+
+Examples
+
+Responses
+
+Error responses
+
+Authentication
+
+=========================================================
+
+Documentation
+
+=========================================================
+
+Create
+
+README.md
+
+ARCHITECTURE.md
+
+API.md
+
+DEPLOYMENT.md
+
+SECURITY.md
+
+CONTRIBUTING.md
+
+DOCUMENTATION must explain
+
+Architecture
+
+Folder Structure
+
+Environment Variables
+
+Installation
+
+Deployment
+
+Queue System
+
+AI Architecture
+
+Analytics Engine
+
+Event Bus
+
+Repository Pattern
+
+=========================================================
+
+Code Quality
+
+=========================================================
+
+Review entire project.
+
+Remove
+
+Dead code
+
+Duplicate logic
+
+Unused files
+
+Unused imports
+
+Unused packages
+
+Magic strings
+
+Magic numbers
+
+Inconsistent naming
+
+=========================================================
+
+Final Review
+
+=========================================================
+
+Verify
+
+No dummy data
+
+No mock implementations
+
+No placeholder code
+
+No TODO comments
+
+No hardcoded secrets
+
+No development-only files
+
+No Replit-specific files
+
+No AI-generated prompt artifacts
+
+No generated session files
+
+No temporary build files
+
+Repository must appear as a professionally developed backend.
+
+=========================================================
+
+Regression Testing
+
+=========================================================
+
+Run the complete regression suite.
+
+Fix any failures.
+
+Verify every API.
+
+=========================================================
+
+Deployment Readiness
+
+=========================================================
+
+Verify
+
+Docker builds successfully
+
+Environment variables documented
+
+Health endpoints working
+
+Swagger working
+
+Server starts without warnings
+
+Application is production-ready.
+
+Only implement Phase 15C.

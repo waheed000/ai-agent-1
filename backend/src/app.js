@@ -1,22 +1,22 @@
 /**
- * Express application factory — Phase 15B
+ * Express application factory.
  * Configures the app without binding a port (keeps testing clean).
  *
  * Middleware order:
- *   1. requestTrace      — attach requestId / correlationId (must be first)
- *   2. helmet            — security headers
- *   3. cors              — cross-origin policy
- *   4. prototypePollution — reject __proto__ / constructor / prototype keys
- *   5. noSqlInjection    — strip MongoDB operator keys from body/query/params
- *   6. hpp               — collapse duplicate query-string keys
- *   7. massAssignment    — strip privileged fields from body
- *   8. compression       — gzip response bodies
- *   9. rate limiting     — IP-based caps
- *  10. request logging   — structured HTTP access log via logger
- *  11. body parsing      — JSON + urlencoded
- *  12. cookie parser
- *  13. routes
- *  14. notFound / errorHandler
+ *   1.  requestTrace      — attach requestId / correlationId (must be first)
+ *   2.  helmet            — security headers
+ *   3.  cors              — cross-origin policy
+ *   4.  hpp               — collapse duplicate query-string keys (query parsed by Express before body)
+ *   5.  compression       — gzip response bodies
+ *   6.  rate limiting     — IP-based caps
+ *   7.  metrics counter   — in-process HTTP request counter
+ *   8.  body parsing      — JSON + urlencoded
+ *   9.  cookie parser
+ *   10. prototypePollution — reject __proto__ / constructor / prototype (needs parsed body)
+ *   11. noSqlInjection    — strip MongoDB operator keys (needs parsed body)
+ *   12. proxy trust
+ *   13. routes
+ *   14. notFound / errorHandler
  */
 
 import express     from 'express';

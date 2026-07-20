@@ -1,3 +1,4 @@
 - [Phase 14 QA findings](phase14-qa.md) — 8 bugs fixed; aggregate ObjectId cast, wrong event, missing revoke route, conflict status, feature flag guard, search skip, ValidationError type, workspace audit endpoint.
 - [Phase 15A structure](phase15a-structure.md) — enterprise folder layout: infrastructure/, providers/, shared/middleware/, modules/<domain>/; all 557 tests pass.
 - [Phase 15B structure](phase15b-structure.md) — production engineering: structured logging, request tracing, security middleware, MetricsService, enhanced cache, health endpoints; 616 tests pass.
+- [Phase 15C structure](phase15c-structure.md) — docs & final polish: OpenAPI spec (74 paths, 23 tags), Swagger UI at /api/v1/docs, 6 doc files, morgan removed; 616 tests pass.

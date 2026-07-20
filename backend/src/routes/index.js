@@ -3,6 +3,7 @@
  */
 
 import { Router } from 'express';
+import docsRouter          from '../docs/docs.routes.js';
 import healthRouter        from '../modules/health/health.routes.js';
 import authRouter          from '../modules/auth/auth.routes.js';
 import accountRouter       from '../modules/account/account.routes.js';
@@ -28,6 +29,7 @@ import featuresRouter      from '../modules/features/features.routes.js';
 
 const router = Router();
 
+router.use('/docs',          docsRouter);
 router.use('/health',        healthRouter);
 router.use('/auth',          authRouter);
 router.use('/account',       accountRouter);
