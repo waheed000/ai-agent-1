@@ -1,44 +1,45 @@
-# CreatorOS AI
+# CreatorOS
 
-A SaaS dashboard for content creators featuring growth analytics, AI recommendations, competitor tracking, trends, and content strategy.
+A SaaS creator intelligence platform with a React dashboard frontend and Express API backend.
 
-## Stack
+## Project Structure
 
-- **Frontend** (`artifacts/creator-os`): React 19 + Vite + Tailwind CSS v4 + shadcn/ui + Wouter (routing) + TanStack Query
-- **API Server** (`artifacts/api-server`): TypeScript + Express 5 + Drizzle ORM — serves `/api` on port 8080
-- **Backend (legacy)** (`backend/`): Node.js + Express + Mongoose + BullMQ + Redis — standalone, not wired into the monorepo workflows
-- **Shared libraries** (`lib/`): `api-client-react`, `api-spec`, `api-zod`, `db`
+This is a pnpm monorepo (`pnpm-workspace.yaml`) with the following packages:
 
-## How to run
+- **`artifacts/creator-os`** — React + Vite frontend dashboard (Tailwind, shadcn/ui, Wouter, TanStack Query)
+- **`artifacts/api-server`** — TypeScript/Express API backend (pino logging, esbuild bundled)
+- **`backend/`** — Full-featured Node.js/Express/MongoDB/Redis backend (AI agents, OAuth, BullMQ queues, 600+ tests). Not currently wired into the Replit workflow.
+- **`lib/`** — Shared libraries (db, api-zod schemas, etc.)
 
-Both services start automatically via the configured workflows:
+## How to Run
 
-| Workflow | Command | Port |
-|---|---|---|
-| `creator-os` | `pnpm --filter @workspace/creator-os run dev` | 5173 |
-| `api-server` | `pnpm --filter @workspace/api-server run dev` | 8080 |
+Both services start automatically via the **Project** workflow (run button):
 
-The frontend proxies all `/api` requests to the api-server on port 8080.
+| Service | Port | Workflow name |
+|---------|------|---------------|
+| Frontend (creator-os) | 5173 | `creator-os` |
+| API server | 8080 | `api-server` |
 
-## Package management
+The frontend proxies `/api` requests to `http://localhost:8080`.
 
-This is a **pnpm workspace** monorepo. Always use `pnpm` (not npm) for the workspace packages:
+## Key Commands
 
 ```bash
-pnpm install                        # install all workspace deps
-pnpm --filter @workspace/creator-os add <pkg>   # add to frontend
-pnpm --filter @workspace/api-server add <pkg>   # add to api-server
+# Install dependencies (from workspace root)
+pnpm install
+
+# Run a specific package
+pnpm --filter @workspace/creator-os run dev
+pnpm --filter @workspace/api-server run dev
+
+# Typecheck everything
+pnpm run typecheck
 ```
 
-The `backend/` folder uses plain npm and has its own `node_modules`.
+## Backend Notes
 
-## Environment
+The `backend/` directory has a separate, more fully-featured backend with MongoDB, Redis, and BullMQ. It is not connected to the Replit workflows — it would need MongoDB and Redis services plus environment variables (`JWT_SECRET`, `MONGODB_URI`, `REDIS_HOST`, etc.) to run. See `backend/.env.example` for the full list.
 
-- No secrets required for development — JWT secrets and MongoDB URI have safe dev defaults
-- Set `MONGODB_URI` env var to use a real MongoDB instance (omit to use in-memory)
-- Set `REDIS_HOST` / `REDIS_PORT` for BullMQ job queues (optional in dev)
+## User Preferences
 
-## User preferences
-
-- Use in-memory MongoDB for local development
-- Do not alter existing code structure unless explicitly asked
+<!-- Add remembered preferences here -->
