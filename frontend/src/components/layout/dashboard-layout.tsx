@@ -1,7 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { useGetMe } from "@workspace/api-client-react";
 import { 
   BarChart, 
   LayoutDashboard, 
@@ -23,10 +22,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CommandPalette } from "./command-palette";
 
 export function DashboardLayout({ children }: { children: ReactNode }) {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const [location] = useLocation();
   const { theme, setTheme } = useTheme();
-  const { data: user } = useGetMe();
 
   const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
