@@ -116,10 +116,24 @@ export const authApi = {
    * POST /api/v1/auth/refresh-token
    * Exchanges the HttpOnly refresh token cookie for a new access token.
    * Called on every app mount to restore a persisted session.
+   *
+   * IMPORTANT: uses plain fetch (not apiClient) to avoid the
+   * 401→tryRefreshToken→_onUnauthenticated→redirect loop that would
+   * incorrectly send users to /login on a fresh page load with no session.
    */
   refreshToken: async (): Promise<AuthResponse | null> => {
     try {
-      const raw = await apiClient.post<BackendAuthResponse>('/auth/refresh-token');
+      const res = await fetch('/api/v1/auth/refresh-token', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!res.ok) {
+        setAccessToken(null);
+        return null;
+      }
+      const json = await res.json() as { data?: BackendAuthResponse };
+      const raw = json.data ?? (json as unknown as BackendAuthResponse);
       const result = mapAuthResponse(raw);
       setAccessToken(result.accessToken);
       return result;
