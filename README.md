@@ -2,14 +2,14 @@
 
 A production-grade creator intelligence platform — analytics, AI agents, competitor tracking, content planning, and team collaboration for content creators.
 
-## Project Structure
+## Structure
 
 ```
 CreatorOS-AI/
 ├── frontend/          # React + Vite dashboard (TypeScript, Tailwind, shadcn/ui)
 ├── backend/           # Node.js + Express REST API (MongoDB, Redis, BullMQ)
 ├── lib/               # Shared workspace libraries
-│   ├── api-client-react/   # React Query hooks
+│   ├── api-client-react/   # React Query hooks generated from OpenAPI spec
 │   ├── api-spec/           # OpenAPI specification
 │   ├── api-zod/            # Zod validation schemas
 │   └── db/                 # Shared database utilities
@@ -17,44 +17,42 @@ CreatorOS-AI/
 └── artifacts/         # Replit platform artifacts (api-server stub, mockup sandbox)
 ```
 
-## How to Run (Replit)
+## Quick Start
 
-The **`frontend: web`** managed workflow starts the React dashboard.  
-The **`api-server`** workflow starts the lightweight Replit API stub on port 8080.
+**Prerequisites:** Node.js ≥ 18, pnpm, MongoDB, Redis
 
-Both start automatically when you press Run.
+```bash
+# Install all workspace dependencies
+pnpm install
+
+# Start the backend (port 3000 by default)
+cd backend && npm run dev
+
+# Start the frontend (port 5173)
+PORT=5173 BASE_PATH=/ pnpm --filter @workspace/creator-os run dev
+```
 
 ## Backend
 
-The production backend lives in `backend/`. It is a standalone npm project (not a pnpm workspace package) with its own `node_modules`.
-
-```bash
-cd backend
-npm install   # first time only
-npm run dev   # starts on PORT (default 3000)
-npm test      # runs 616 tests
-```
-
-Key env vars (see `backend/.env.example`):
+The backend is a production-ready REST API. See [`backend/README.md`](backend/README.md) for full documentation.
 
 | Variable | Required | Description |
 |---|---|---|
-| `MONGODB_URI` | Prod | MongoDB connection string (auto in-memory in dev) |
+| `MONGODB_URI` | Prod | MongoDB connection string (in-memory in dev) |
 | `JWT_SECRET` | Yes | Access token signing key (≥64 chars in prod) |
 | `JWT_REFRESH_SECRET` | Yes | Refresh token signing key |
 | `REDIS_HOST` | No | Redis host (default `127.0.0.1`) |
 | `GEMINI_API_KEY` | No | Google Gemini for AI features |
 
+See [`backend/.env.example`](backend/.env.example) for the full list.
+
 ## Frontend
 
-React 19 + Vite 7 SPA in `frontend/`. Part of the pnpm workspace.
+React 19 + Vite 7 SPA. Proxies `/api` requests to the backend.
 
 ```bash
-pnpm install                                          # workspace root
-pnpm --filter @workspace/creator-os run dev           # or use the Replit workflow
+PORT=5173 BASE_PATH=/ pnpm --filter @workspace/creator-os run dev
 ```
-
-The frontend proxies `/api` → `http://localhost:8080`.
 
 ## Documentation
 
@@ -66,6 +64,17 @@ The frontend proxies `/api` → `http://localhost:8080`.
 | [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) | Contribution guidelines |
 | [`docs/SECURITY.md`](docs/SECURITY.md) | Security policies |
 
-## User Preferences
+## Tests
 
-<!-- Add remembered preferences here -->
+```bash
+# Run backend test suite (616 tests)
+cd backend && npm test
+```
+
+## Tech Stack
+
+**Frontend:** React 19, Vite 7, TypeScript, Tailwind CSS, shadcn/ui, TanStack Query, Wouter, Recharts, Framer Motion
+
+**Backend:** Node.js 18+, Express 4, MongoDB (Mongoose), Redis (ioredis), BullMQ, JWT, Helmet, Winston/Pino
+
+**AI:** Google Gemini, OpenAI (configurable provider), multi-agent orchestration

@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "CreatorOS AI"
+version = "1.0.0"
+id = "artifacts/creator-os"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18152
+
+[services.development]
+run = "pnpm --filter @workspace/creator-os run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/creator-os", "run", "build" ]
+serve = "static"
+publicDir = "frontend/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18152"
+BASE_PATH = "/"

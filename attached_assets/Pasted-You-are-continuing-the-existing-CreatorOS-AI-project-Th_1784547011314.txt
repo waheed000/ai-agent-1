@@ -1,0 +1,506 @@
+You are continuing the existing CreatorOS AI project.
+
+The backend is COMPLETE.
+
+Backend Version:
+v1.0
+
+DO NOT modify backend.
+
+DO NOT create backend files.
+
+DO NOT create dummy APIs.
+
+DO NOT hardcode responses.
+
+DO NOT generate mock data.
+
+The objective is to fully integrate the existing frontend with the production-ready backend.
+
+=========================================================
+
+PROJECT RULES
+
+=========================================================
+
+Maintain the existing UI and design system.
+
+Do not redesign pages.
+
+Do not change layouts unless required to support backend integration.
+
+Preserve reusable components.
+
+Follow existing project architecture.
+
+Write production-quality React code.
+
+Use proper hooks.
+
+Keep components modular.
+
+Do not introduce duplicate logic.
+
+=========================================================
+
+API LAYER
+
+=========================================================
+
+Create a professional API layer.
+
+Centralize all API calls.
+
+Use a single API client.
+
+Implement
+
+• Request interceptor
+
+• Response interceptor
+
+• Automatic access-token refresh
+
+• Retry only safe requests when appropriate
+
+• Global API error handler
+
+• Request cancellation
+
+• Timeout handling
+
+• Proper error mapping
+
+=========================================================
+
+AUTHENTICATION
+
+=========================================================
+
+Integrate
+
+Register
+
+Login
+
+Logout
+
+Refresh Token
+
+Current User
+
+Profile
+
+Change Password
+
+Session Persistence
+
+Protected Routes
+
+Unauthorized Redirect
+
+Expired Session Handling
+
+=========================================================
+
+WORKSPACES
+
+=========================================================
+
+Integrate
+
+Create Workspace
+
+Edit Workspace
+
+Delete Workspace
+
+Workspace Switching
+
+Workspace Settings
+
+Workspace Members
+
+=========================================================
+
+TEAM MANAGEMENT
+
+=========================================================
+
+Integrate
+
+Invite Member
+
+Accept Invitation
+
+Remove Member
+
+Change Role
+
+Permission-based UI
+
+=========================================================
+
+CONNECTED ACCOUNTS
+
+=========================================================
+
+Integrate
+
+Instagram
+
+LinkedIn
+
+YouTube
+
+TikTok
+
+X
+
+Connection Status
+
+Reconnect
+
+Disconnect
+
+=========================================================
+
+DASHBOARD
+
+=========================================================
+
+Replace every placeholder with backend data.
+
+Integrate
+
+Overview
+
+Recent Activity
+
+Growth Summary
+
+Quick Actions
+
+Charts
+
+Statistics
+
+=========================================================
+
+ANALYTICS
+
+=========================================================
+
+Integrate
+
+Overview
+
+Growth
+
+Audience
+
+Content Performance
+
+Best Posting Time
+
+Platform Comparison
+
+Date Range Filters
+
+=========================================================
+
+AI AGENTS
+
+=========================================================
+
+Integrate every AI Agent.
+
+Analytics Agent
+
+Content Agent
+
+Trend Agent
+
+Competitor Agent
+
+Growth Coach Agent
+
+Show
+
+Loading
+
+Generation Progress
+
+Errors
+
+Retry
+
+Generated Results
+
+=========================================================
+
+COMPETITORS
+
+=========================================================
+
+Integrate
+
+CRUD
+
+Overview
+
+Sync
+
+Performance
+
+Charts
+
+=========================================================
+
+TRENDS
+
+=========================================================
+
+Integrate
+
+Trending Topics
+
+Hashtags
+
+Creators
+
+Refresh
+
+Filtering
+
+=========================================================
+
+REPORTS
+
+=========================================================
+
+Integrate
+
+Generate
+
+History
+
+View
+
+Delete
+
+=========================================================
+
+CONTENT PLANNER
+
+=========================================================
+
+Integrate
+
+Calendar
+
+Weekly Plan
+
+Generate
+
+Edit
+
+Delete
+
+=========================================================
+
+NOTIFICATIONS
+
+=========================================================
+
+Integrate
+
+Read
+
+Unread
+
+Delete
+
+Mark All Read
+
+=========================================================
+
+SEARCH
+
+=========================================================
+
+Integrate
+
+Global Search
+
+Pagination
+
+Filters
+
+Grouped Results
+
+=========================================================
+
+SETTINGS
+
+=========================================================
+
+Integrate
+
+User Settings
+
+Workspace Settings
+
+Notification Settings
+
+AI Settings
+
+=========================================================
+
+API KEYS
+
+=========================================================
+
+Integrate
+
+Generate
+
+Copy
+
+List
+
+Revoke
+
+=========================================================
+
+AUDIT LOGS
+
+=========================================================
+
+Integrate
+
+User Logs
+
+Workspace Logs
+
+=========================================================
+
+FORMS
+
+=========================================================
+
+Every form must support
+
+Validation
+
+Loading
+
+Disabled State
+
+Server Validation Errors
+
+Success State
+
+=========================================================
+
+LOADING
+
+=========================================================
+
+Every page must have
+
+Loading State
+
+Empty State
+
+Error State
+
+Retry State
+
+=========================================================
+
+ERROR HANDLING
+
+=========================================================
+
+Handle
+
+400
+
+401
+
+403
+
+404
+
+409
+
+422
+
+429
+
+500
+
+Show meaningful UI.
+
+=========================================================
+
+PERMISSIONS
+
+=========================================================
+
+Hide or disable UI according to user role.
+
+Do not rely only on backend.
+
+Respect permissions in the frontend.
+
+=========================================================
+
+CODE QUALITY
+
+=========================================================
+
+Remove every remaining
+
+Mock Data
+
+Fake API
+
+Dummy JSON
+
+Unused Hooks
+
+Unused Components
+
+Console Logs
+
+Dead Code
+
+Duplicate Logic
+
+=========================================================
+
+FINAL VERIFICATION
+
+=========================================================
+
+After implementation,
+
+verify every page.
+
+Verify every API call.
+
+Verify every navigation flow.
+
+Verify authentication.
+
+Verify permissions.
+
+Verify loading states.
+
+Verify error states.
+
+Verify no page still depends on dummy data.
+
+Do not stop until the complete frontend communicates only with the production backend.
