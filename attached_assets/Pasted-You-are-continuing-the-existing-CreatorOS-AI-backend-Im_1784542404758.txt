@@ -1,0 +1,171 @@
+You are continuing the existing CreatorOS AI backend.
+
+Implement ONLY Phase 15A.
+
+This is an infrastructure refactor.
+
+DO NOT modify business logic.
+
+DO NOT change API contracts.
+
+DO NOT change database schemas unless required.
+
+=========================================================
+
+PHASE 15A
+
+Infrastructure & Professional Project Structure
+
+=========================================================
+
+Refactor the backend into a professional enterprise structure.
+
+Organize
+
+Modules
+
+Infrastructure
+
+Providers
+
+Events
+
+Queues
+
+Shared
+
+Configuration
+
+Tests
+
+Utilities
+
+Remove duplicate code.
+
+Remove circular dependencies.
+
+Improve imports.
+
+Standardize naming.
+
+=========================================================
+
+Environment
+
+=========================================================
+
+Create centralized environment validation.
+
+Validate
+
+MongoDB
+
+Redis
+
+JWT
+
+Encryption
+
+OAuth
+
+Gemini
+
+OpenAI
+
+Application settings
+
+Server must fail fast if configuration is invalid.
+
+=========================================================
+
+Docker
+
+=========================================================
+
+Create
+
+Dockerfile
+
+Dockerfile.dev
+
+docker-compose.yml
+
+docker-compose.dev.yml
+
+.dockerignore
+
+Support
+
+Backend
+
+MongoDB
+
+Redis
+
+Health checks
+
+Development
+
+Production
+
+=========================================================
+
+Configuration
+
+=========================================================
+
+Centralize all configuration.
+
+Remove hardcoded values.
+
+Move constants into configuration.
+
+=========================================================
+
+Cleanup
+
+=========================================================
+
+Remove
+
+.replit
+
+replit.nix
+
+Replit deployment files
+
+AI generated prompt files
+
+temporary files
+
+cache files
+
+unused utilities
+
+unused packages
+
+unused folders
+
+unused imports
+
+TODO comments
+
+placeholder code
+
+console.log statements
+
+unused dependencies
+
+The repository should look like a professionally maintained GitHub project.
+
+=========================================================
+
+Testing
+
+=========================================================
+
+Run regression tests.
+
+Everything must continue passing.
+
+Only implement Phase 15A.
