@@ -16,6 +16,7 @@ import {
   AuthorizationError,
 } from '../../utils/errors.js';
 import logger from '../../utils/logger.js';
+import { enrichRequestContext } from './requestTrace.js';
 
 // ─── Token extraction ─────────────────────────────────────────────────────────
 
@@ -67,6 +68,7 @@ const resolveUser = async (req) => {
 export const authenticate = async (req, res, next) => {
   try {
     req.user = await resolveUser(req);
+    enrichRequestContext(req); // propagate user identity into structured logs
     next();
   } catch (err) {
     next(err);

@@ -1,0 +1,203 @@
+You are continuing the existing CreatorOS AI backend.
+
+Implement ONLY Phase 15B.
+
+No new business features.
+
+=========================================================
+
+PHASE 15B
+
+Production Engineering
+
+=========================================================
+
+Logging
+
+=========================================================
+
+Implement structured logging.
+
+Log
+
+Request ID
+
+Correlation ID
+
+User
+
+Workspace
+
+HTTP Method
+
+Route
+
+Status
+
+Response Time
+
+Errors
+
+Queue Jobs
+
+AI Requests
+
+=========================================================
+
+Request Tracing
+
+=========================================================
+
+Generate
+
+requestId
+
+correlationId
+
+Expose IDs in responses.
+
+=========================================================
+
+Security
+
+=========================================================
+
+Review entire backend.
+
+Improve
+
+Helmet
+
+Rate Limits
+
+Input Validation
+
+Sanitization
+
+CORS
+
+JWT
+
+API Keys
+
+Cookies
+
+Encryption
+
+Secret handling
+
+Prevent
+
+NoSQL Injection
+
+Prototype Pollution
+
+Mass Assignment
+
+Parameter Pollution
+
+=========================================================
+
+Cache
+
+=========================================================
+
+Improve CacheService.
+
+Implement
+
+TTL
+
+Invalidation
+
+Statistics
+
+Cache
+
+Analytics
+
+Reports
+
+Planner
+
+Competitors
+
+Search
+
+=========================================================
+
+Performance
+
+=========================================================
+
+Optimize
+
+MongoDB indexes
+
+Aggregation pipelines
+
+Pagination
+
+Bulk writes
+
+Lean queries
+
+Projection
+
+Prevent N+1 queries.
+
+=========================================================
+
+Monitoring
+
+=========================================================
+
+Create MetricsService.
+
+Track
+
+API Requests
+
+Response Times
+
+Memory
+
+CPU
+
+Queue Jobs
+
+AI Calls
+
+Cache Hit Rate
+
+Redis
+
+MongoDB
+
+=========================================================
+
+Health
+
+=========================================================
+
+Endpoints
+
+/health
+
+/health/live
+
+/health/ready
+
+/health/dependencies
+
+=========================================================
+
+Testing
+
+=========================================================
+
+Regression testing.
+
+No functionality should break.
+
+Only implement Phase 15B.

@@ -14,6 +14,7 @@
 import AgentExecutionRepository from '../modules/jobs/AgentExecutionRepository.js';
 import { AgentRegistry } from '../ai/AgentRegistry.js';
 import CacheService from '../infrastructure/cache/index.js';
+import MetricsService from '../infrastructure/metrics/index.js';
 import logger from '../utils/logger.js';
 
 const CACHE_TTL_AI = 86_400; // 24 hours for AI response caching
@@ -85,6 +86,13 @@ class MemoryService {
         await CacheService.set('ai', cacheKey, output, CACHE_TTL_AI);
       }
 
+      MetricsService.recordAiCall({
+        agent:      agentName,
+        provider:   provider.modelName ?? provider.constructor?.name ?? 'unknown',
+        durationMs: latencyMs,
+        error:      false,
+      });
+
       logger.info('MemoryService: agent run complete', {
         agentName,
         userId,
@@ -95,6 +103,12 @@ class MemoryService {
 
       return output;
     } catch (err) {
+      MetricsService.recordAiCall({
+        agent:      agentName,
+        provider:   provider.modelName ?? provider.constructor?.name ?? 'unknown',
+        durationMs: Date.now() - startMs,
+        error:      true,
+      });
       if (execution) {
         await AgentExecutionRepository.markFailed(execution._id, err.message);
       }
