@@ -4,7 +4,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
 import NotFound from '@/pages/not-found';
-import { Route, Switch, Router as WouterRouter, useLocation } from 'wouter';
+import { Route, Switch, useLocation } from 'wouter';
 import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider, useAuthContext } from '@/context/auth-context';
 import { BrainCircuit } from 'lucide-react';
@@ -32,7 +32,7 @@ const queryClient = new QueryClient({
   },
 });
 
-// ─── Loading screen shown during initial session restore ──────────────────────
+// ─── Loading screen ───────────────────────────────────────────────────────────
 
 function AuthLoadingScreen() {
   return (
@@ -54,39 +54,39 @@ function AuthLoadingScreen() {
 
 // ─── Route guards ─────────────────────────────────────────────────────────────
 
-/** Redirects unauthenticated users to /login. Shows loading screen while checking. */
+/** Redirects to /login while the app loads, then shows children if authed. */
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading } = useAuthContext();
-  const [, setLocation] = useLocation();
+  const [, navigate] = useLocation();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      setLocation('/login');
+      navigate('/login');
     }
-  }, [isAuthenticated, isLoading, setLocation]);
+  }, [isAuthenticated, isLoading, navigate]);
 
   if (isLoading) return <AuthLoadingScreen />;
   if (!isAuthenticated) return null;
   return <>{children}</>;
 }
 
-/** Redirects already-authenticated users away from public pages (/login, /register). */
+/** Redirects already-authenticated users away from /login and /register. */
 function PublicOnlyRoute({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading } = useAuthContext();
-  const [, setLocation] = useLocation();
+  const [, navigate] = useLocation();
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      setLocation('/dashboard');
+      navigate('/dashboard');
     }
-  }, [isAuthenticated, isLoading, setLocation]);
+  }, [isAuthenticated, isLoading, navigate]);
 
   if (isLoading) return null;
   if (isAuthenticated) return null;
   return <>{children}</>;
 }
 
-// ─── Routes ───────────────────────────────────────────────────────────────────
+// ─── Dashboard shell ──────────────────────────────────────────────────────────
 
 function ProtectedRoutes() {
   return (
@@ -108,20 +108,25 @@ function ProtectedRoutes() {
   );
 }
 
-function Router() {
+// ─── Top-level routes ─────────────────────────────────────────────────────────
+// NOTE: no <Router> wrapper — Wouter uses window.location by default.
+// The explicit base="" wrapper was causing path="/" not to match in Switch.
+
+function AppRoutes() {
   return (
     <Switch>
+      {/* Public marketing page — always renders, no auth gate */}
       <Route path="/" component={LandingPage} />
+
+      {/* Auth pages — redirect to dashboard if already signed in */}
       <Route path="/login">
-        <PublicOnlyRoute>
-          <Login />
-        </PublicOnlyRoute>
+        <PublicOnlyRoute><Login /></PublicOnlyRoute>
       </Route>
       <Route path="/register">
-        <PublicOnlyRoute>
-          <Register />
-        </PublicOnlyRoute>
+        <PublicOnlyRoute><Register /></PublicOnlyRoute>
       </Route>
+
+      {/* All other paths require auth */}
       <Route path="/:rest*">
         <ProtectedRoutes />
       </Route>
@@ -131,21 +136,17 @@ function Router() {
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
-function App() {
+export default function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="creatoros-theme">
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
-            <AuthProvider>
-              <Router />
-            </AuthProvider>
-          </WouterRouter>
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
           <Toaster />
         </TooltipProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );
 }
-
-export default App;
