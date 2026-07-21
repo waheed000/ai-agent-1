@@ -19,10 +19,15 @@ CreatorOS-AI/
 
 ## How to Run (Replit)
 
-The **`frontend: web`** managed workflow starts the React dashboard.  
-The **`api-server`** workflow starts the lightweight Replit API stub on port 8080.
+Two workflows start automatically when you press Run:
 
-Both start automatically when you press Run.
+| Workflow | Command | Port | Notes |
+|---|---|---|---|
+| `frontend: web` | `pnpm --filter @workspace/creator-os run dev` | 5173 | React + Vite dashboard |
+| `api-server` | `npm --prefix backend run dev` | 8080 | Node.js/Express REST API |
+
+The frontend proxies all `/api` requests to the backend on port 8080.  
+In dev, the backend uses **in-memory MongoDB** (no external DB needed). Redis is optional and degrades gracefully.
 
 ## Backend
 
@@ -31,7 +36,7 @@ The production backend lives in `backend/`. It is a standalone npm project (not 
 ```bash
 cd backend
 npm install   # first time only
-npm run dev   # starts on PORT (default 3000)
+npm run dev   # starts on port 8080 (set by the Replit workflow)
 npm test      # runs 616 tests
 ```
 

@@ -1,0 +1,506 @@
+You are a Senior Frontend Engineer continuing the existing CreatorOS AI project.
+
+IMPORTANT:
+
+Frontend Integration Phase 1 is COMPLETE.
+
+Authentication is already integrated with the real backend.
+
+The repository structure is:
+
+frontend/
+backend/
+
+The backend is production-ready and must NOT be modified unless absolutely required to fix a genuine API contract mismatch.
+
+DO NOT add new backend features.
+
+DO NOT create dummy data.
+
+DO NOT create mock APIs.
+
+DO NOT hardcode API responses.
+
+DO NOT redesign the existing UI.
+
+Your task is to implement FRONTEND INTEGRATION PHASE 2.
+
+========================================================
+OBJECTIVE
+========================================================
+
+Connect the existing CreatorOS AI frontend to the real production backend for:
+
+1. Dashboard
+2. Analytics
+3. Workspaces
+4. Team Management
+5. Connected Social Accounts
+
+All existing frontend pages should now consume real backend data.
+
+========================================================
+1. DASHBOARD INTEGRATION
+========================================================
+
+Replace all dashboard placeholder, mock, or hardcoded data with real API data.
+
+Integrate:
+
+- Overview metrics
+- Growth metrics
+- Engagement metrics
+- Audience summary
+- Content performance summary
+- Recent activity
+- Connected platform status
+- Quick actions
+- Recent reports where applicable
+
+Use the existing backend analytics endpoints.
+
+Support:
+
+- Loading states
+- Skeleton states
+- Empty states
+- Error states
+- Retry functionality
+
+Ensure dashboard widgets do not crash when the backend returns empty datasets.
+
+========================================================
+2. ANALYTICS INTEGRATION
+========================================================
+
+Integrate the existing analytics UI with the real backend.
+
+Connect:
+
+GET /analytics/overview
+
+GET /analytics/growth
+
+GET /analytics/engagement
+
+GET /analytics/content-performance
+
+GET /analytics/best-posting-time
+
+GET /analytics/audience
+
+Support backend query parameters where applicable:
+
+- platform
+- startDate
+- endDate
+- compare
+- limit
+
+Implement:
+
+- Platform filtering
+- Date range filtering
+- Comparison periods
+- Loading states
+- Empty states
+- Error states
+- Retry functionality
+
+Charts must use real API responses.
+
+Do not invent fallback analytics numbers.
+
+If no data exists, show a professional empty state instead of fake numbers.
+
+Ensure chart components safely handle:
+
+- null values
+- missing fields
+- empty arrays
+- zero values
+
+========================================================
+3. WORKSPACE INTEGRATION
+========================================================
+
+Connect the workspace UI to the real backend.
+
+Implement:
+
+- Create workspace
+- List workspaces
+- Get workspace details
+- Update workspace
+- Delete workspace
+- Switch active workspace
+
+Ensure the active workspace is correctly maintained across the application.
+
+When the user switches workspace:
+
+- Update frontend state
+- Update subsequent API requests where required
+- Refresh workspace-specific data
+- Prevent data from the previous workspace leaking into the new workspace
+
+Implement:
+
+- Loading states
+- Empty states
+- Error states
+- Confirmation before destructive actions
+
+========================================================
+4. TEAM MANAGEMENT
+========================================================
+
+Integrate the team management UI with the real backend.
+
+Implement:
+
+- List workspace members
+- Invite member
+- View member details
+- Change member role
+- Remove member
+- Handle invitation-related workflows supported by the backend
+
+Support the backend role hierarchy.
+
+Frontend must respect permissions.
+
+For example:
+
+- Members should not see admin-only controls.
+- Admin-only actions should be hidden or disabled for unauthorized users.
+- Destructive actions should require confirmation.
+
+IMPORTANT:
+
+Frontend permission checks are only for UX.
+
+Backend authorization remains the source of truth.
+
+Handle:
+
+403 Forbidden
+
+400 Validation Errors
+
+409 Conflicts
+
+404 Not Found
+
+========================================================
+5. CONNECTED SOCIAL ACCOUNTS
+========================================================
+
+Integrate the Connected Accounts UI with the backend.
+
+Support:
+
+- List connected accounts
+- Show connection status
+- Connect account where OAuth flow is available
+- Disconnect account
+- Reconnect account where supported
+- Display synchronization status
+- Display last synchronized time
+- Display platform-specific errors
+
+Supported platforms:
+
+- YouTube
+- Instagram
+- LinkedIn
+- TikTok
+- X
+
+IMPORTANT:
+
+Do not create fake OAuth flows.
+
+Only expose connection actions for providers that are actually implemented by the backend.
+
+If a provider is currently a backend stub or unavailable:
+
+- Clearly show "Coming Soon" or "Not Available"
+- Do not pretend the integration works
+- Do not create fake connection success states
+
+========================================================
+6. API ARCHITECTURE
+========================================================
+
+Follow the API architecture created during Phase 1.
+
+Use the existing:
+
+api-client
+
+auth-api
+
+authentication context
+
+Do not create another API client.
+
+Create modular service/API files where appropriate.
+
+For example:
+
+services/
+    dashboard-api.ts
+    analytics-api.ts
+    workspace-api.ts
+    team-api.ts
+    integrations-api.ts
+
+Use consistent error handling.
+
+Do not duplicate authentication logic.
+
+========================================================
+7. STATE MANAGEMENT
+========================================================
+
+Use the project's existing state management approach.
+
+Do not introduce Redux or another state management library unless the project already uses it.
+
+Keep:
+
+- Authentication state
+- Active workspace state
+- Analytics filters
+- API data
+
+properly separated.
+
+Avoid unnecessary global state.
+
+========================================================
+8. REAL DATA ONLY
+========================================================
+
+Search the frontend for:
+
+- mock
+- dummy
+- fake
+- placeholder data
+- hardcoded dashboard numbers
+- hardcoded analytics
+- sample users
+- static social account data
+
+Remove or replace these wherever they belong to the integrated features.
+
+Do not remove legitimate UI placeholder text such as:
+
+"Search..."
+
+"Enter your email..."
+
+Do not remove design-only mockups that are not yet part of this phase unless they interfere with real API integration.
+
+========================================================
+9. ERROR HANDLING
+========================================================
+
+Handle:
+
+400
+
+401
+
+403
+
+404
+
+409
+
+422
+
+429
+
+500
+
+For 401:
+
+Use the existing token refresh flow from Phase 1.
+
+For 403:
+
+Show a permission error.
+
+For 429:
+
+Show a rate-limit message.
+
+For 500:
+
+Show a generic server error with retry.
+
+Never expose internal backend errors or stack traces to users.
+
+========================================================
+10. UX REQUIREMENTS
+========================================================
+
+Every integrated page must have:
+
+Loading state
+
+Empty state
+
+Error state
+
+Retry state
+
+Success feedback
+
+Use existing design components.
+
+Maintain visual consistency.
+
+Do not redesign the application.
+
+Do not introduce unnecessary animations.
+
+========================================================
+11. VERIFICATION
+========================================================
+
+After implementation, verify the following workflows manually:
+
+WORKFLOW 1
+
+Login
+
+↓
+
+Dashboard loads real data
+
+↓
+
+Open Analytics
+
+↓
+
+Change platform filter
+
+↓
+
+Change date range
+
+↓
+
+Charts update
+
+========================================================
+
+WORKFLOW 2
+
+Login
+
+↓
+
+Create Workspace
+
+↓
+
+Switch Workspace
+
+↓
+
+Verify dashboard data refreshes
+
+↓
+
+Verify workspace-specific data isolation
+
+========================================================
+
+WORKFLOW 3
+
+Create Workspace
+
+↓
+
+Invite Member
+
+↓
+
+View Team
+
+↓
+
+Change Member Role
+
+↓
+
+Remove Member
+
+========================================================
+
+WORKFLOW 4
+
+Open Connected Accounts
+
+↓
+
+View connection status
+
+↓
+
+Connect supported provider
+
+↓
+
+Verify connected state
+
+↓
+
+Disconnect
+
+↓
+
+Verify disconnected state
+
+========================================================
+
+FINAL REQUIREMENTS
+
+Before finishing:
+
+1. Run the frontend TypeScript/type-check process.
+
+2. Run the production frontend build.
+
+3. Verify no console errors caused by integration.
+
+4. Verify no broken routes.
+
+5. Verify no API calls still point to the old mock API.
+
+6. Verify no dummy data is used for the integrated features.
+
+7. Verify the backend remains unchanged.
+
+8. Verify the existing authentication from Phase 1 still works.
+
+9. Verify the application starts correctly through the existing Replit workflow.
+
+10. Report all API contract mismatches separately instead of modifying backend business logic automatically.
+
+At the end, provide:
+
+- Files created
+- Files modified
+- APIs integrated
+- Mock data removed
+- Manual workflows tested
+- TypeScript/build results
+- Any backend API mismatches discovered
+- Any remaining limitations

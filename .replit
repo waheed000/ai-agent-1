@@ -36,6 +36,18 @@ waitForPort = 8080
 [workflows.workflow.metadata]
 outputType = "console"
 
+[[workflows.workflow]]
+name = "frontend: web"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "PORT=5173 BASE_PATH=/ pnpm --filter @workspace/creator-os run dev"
+waitForPort = 5173
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
 [agent]
 stack = "PNPM_WORKSPACE"
 expertMode = true
