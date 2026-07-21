@@ -7,6 +7,7 @@ import NotFound from '@/pages/not-found';
 import { Route, Switch, useLocation } from 'wouter';
 import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider, useAuthContext } from '@/context/auth-context';
+import { WorkspaceProvider } from '@/context/workspace-context';
 import { BrainCircuit } from 'lucide-react';
 
 // Layouts & Pages
@@ -22,12 +23,15 @@ import Competitors from '@/pages/competitors';
 import Trends from '@/pages/trends';
 import Reports from '@/pages/reports';
 import Settings from '@/pages/settings';
+import WorkspacesPage from '@/pages/workspaces';
+import TeamPage from '@/pages/team';
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      retry: false,
+      retry: 1,
+      staleTime: 30_000,
     },
   },
 });
@@ -54,7 +58,6 @@ function AuthLoadingScreen() {
 
 // ─── Route guards ─────────────────────────────────────────────────────────────
 
-/** Redirects to /login while the app loads, then shows children if authed. */
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading } = useAuthContext();
   const [, navigate] = useLocation();
@@ -70,7 +73,6 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
-/** Redirects already-authenticated users away from /login and /register. */
 function PublicOnlyRoute({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading } = useAuthContext();
   const [, navigate] = useLocation();
@@ -86,7 +88,7 @@ function PublicOnlyRoute({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
-// ─── Dashboard shell ──────────────────────────────────────────────────────────
+// ─── Protected shell ──────────────────────────────────────────────────────────
 
 function ProtectedRoutes() {
   return (
@@ -101,6 +103,8 @@ function ProtectedRoutes() {
           <Route path="/trends" component={Trends} />
           <Route path="/reports" component={Reports} />
           <Route path="/settings" component={Settings} />
+          <Route path="/workspaces" component={WorkspacesPage} />
+          <Route path="/team" component={TeamPage} />
           <Route component={NotFound} />
         </Switch>
       </DashboardLayout>
@@ -108,45 +112,40 @@ function ProtectedRoutes() {
   );
 }
 
-// ─── Top-level routes ─────────────────────────────────────────────────────────
-// NOTE: no <Router> wrapper — Wouter uses window.location by default.
-// The explicit base="" wrapper was causing path="/" not to match in Switch.
-
-function AppRoutes() {
-  return (
-    <Switch>
-      {/* Public marketing page — always renders, no auth gate */}
-      <Route path="/" component={LandingPage} />
-
-      {/* Auth pages — redirect to dashboard if already signed in */}
-      <Route path="/login">
-        <PublicOnlyRoute><Login /></PublicOnlyRoute>
-      </Route>
-      <Route path="/register">
-        <PublicOnlyRoute><Register /></PublicOnlyRoute>
-      </Route>
-
-      {/* All other paths require auth */}
-      <Route path="/:rest*">
-        <ProtectedRoutes />
-      </Route>
-    </Switch>
-  );
-}
-
-// ─── Root ─────────────────────────────────────────────────────────────────────
+// ─── App ──────────────────────────────────────────────────────────────────────
 
 export default function App() {
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="creatoros-theme">
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider defaultTheme="dark" storageKey="creator-os-theme">
         <TooltipProvider>
           <AuthProvider>
-            <AppRoutes />
+            <WorkspaceProvider>
+              <Switch>
+                <Route path="/">
+                  <PublicOnlyRoute>
+                    <LandingPage />
+                  </PublicOnlyRoute>
+                </Route>
+                <Route path="/login">
+                  <PublicOnlyRoute>
+                    <Login />
+                  </PublicOnlyRoute>
+                </Route>
+                <Route path="/register">
+                  <PublicOnlyRoute>
+                    <Register />
+                  </PublicOnlyRoute>
+                </Route>
+                <Route>
+                  <ProtectedRoutes />
+                </Route>
+              </Switch>
+              <Toaster />
+            </WorkspaceProvider>
           </AuthProvider>
-          <Toaster />
         </TooltipProvider>
-      </QueryClientProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }

@@ -1,45 +1,160 @@
-import { useGetDashboardOverview, useGetGrowthChart, useGetAiSummary, useGetGrowthScore, useGetTopContent } from "@workspace/api-client-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowUpRight, ArrowDownRight, Activity, Users, Eye, MousePointerClick, BrainCircuit, Heart, MessageCircle, Share2, Award, ArrowRight } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+import { useQuery } from '@tanstack/react-query';
+import { analyticsApi, periodToDateRange, type Period } from '@/services/analytics-api';
+import { integrationsApi } from '@/services/integrations-api';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import {
+  ArrowUpRight, ArrowDownRight, Activity, Users, Eye, MousePointerClick,
+  Heart, MessageCircle, Share2, RefreshCw, AlertCircle, CheckCircle2,
+  XCircle, Loader2, BarChart2
+} from 'lucide-react';
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+} from 'recharts';
+import { useState, useMemo } from 'react';
+import { Link } from 'wouter';
+import { ApiError } from '@/lib/api-client';
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function fmt(n: number | null | undefined): string {
+  if (n === null || n === undefined) return '—';
+  if (Math.abs(n) >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+  if (Math.abs(n) >= 1_000) return (n / 1_000).toFixed(1) + 'K';
+  return String(n);
+}
+
+function fmtPct(n: number | null | undefined): string {
+  if (n === null || n === undefined) return '—';
+  return (n > 0 ? '+' : '') + n.toFixed(1) + '%';
+}
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
+function errorMessage(err: unknown): string {
+  if (err instanceof ApiError) return err.message;
+  return 'Something went wrong.';
+}
+
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+function MetricCard({
+  label, value, growth, icon: Icon, loading, error,
+}: {
+  label: string;
+  value: string | null | undefined;
+  growth: number | null | undefined;
+  icon: React.ElementType;
+  loading: boolean;
+  error?: unknown;
+}) {
+  const positive = (growth ?? 0) >= 0;
+  return (
+    <Card className="bg-card border-border shadow-sm">
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-sm font-medium text-muted-foreground">{label}</span>
+          <div className="w-8 h-8 rounded-md bg-secondary flex items-center justify-center text-muted-foreground">
+            <Icon size={16} />
+          </div>
+        </div>
+        {loading ? (
+          <Skeleton className="h-8 w-24 mb-2" />
+        ) : error ? (
+          <span className="text-sm text-destructive">Error</span>
+        ) : (
+          <div className="text-3xl font-bold font-mono tracking-tight mb-2">{value ?? '—'}</div>
+        )}
+        {!loading && !error && growth !== null && growth !== undefined ? (
+          <div className={`flex items-center gap-1 text-xs font-medium ${positive ? 'text-green-500' : 'text-destructive'}`}>
+            {positive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+            {fmtPct(growth)} vs prev period
+          </div>
+        ) : !loading && !error ? (
+          <div className="text-xs text-muted-foreground">No comparison data</div>
+        ) : null}
+      </CardContent>
+    </Card>
+  );
+}
+
+function QueryError({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <Alert variant="destructive" className="flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        <AlertCircle size={16} />
+        <AlertDescription>{message}</AlertDescription>
+      </div>
+      <Button variant="ghost" size="sm" onClick={onRetry} className="ml-4">
+        <RefreshCw size={14} className="mr-1" /> Retry
+      </Button>
+    </Alert>
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function DashboardHome() {
-  const [period, setPeriod] = useState<"7d" | "30d" | "90d">("30d");
-  
-  const { data: overview, isLoading: overviewLoading } = useGetDashboardOverview();
-  const { data: chartData, isLoading: chartLoading } = useGetGrowthChart({ period });
-  const { data: aiSummary, isLoading: aiLoading } = useGetAiSummary();
-  const { data: growthScore, isLoading: scoreLoading } = useGetGrowthScore();
-  const { data: topContent, isLoading: contentLoading } = useGetTopContent();
+  const [period, setPeriod] = useState<Period>('30d');
 
-  const formatNumber = (num: number) => {
-    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-    return num.toString();
-  };
+  const dateRange = useMemo(() => periodToDateRange(period), [period]);
 
-  const chartTransformedData = chartData?.labels.map((label, i) => ({
-    name: label,
-    followers: chartData.followers[i],
-    engagement: chartData.engagement[i],
-    reach: chartData.reach[i]
-  })) || [];
+  const overviewQ = useQuery({
+    queryKey: ['analytics', 'overview', dateRange],
+    queryFn: () => analyticsApi.getOverview({ ...dateRange, compare: 'previous_period' }),
+  });
+
+  const growthQ = useQuery({
+    queryKey: ['analytics', 'growth', dateRange],
+    queryFn: () => analyticsApi.getGrowth({ ...dateRange }),
+  });
+
+  const integrationsQ = useQuery({
+    queryKey: ['integrations'],
+    queryFn: () => integrationsApi.list(),
+  });
+
+  const contentQ = useQuery({
+    queryKey: ['analytics', 'content-performance', dateRange],
+    queryFn: () => analyticsApi.getContentPerformance({ ...dateRange, limit: 4 }),
+  });
+
+  // Transform growth history into chart-friendly format
+  const chartData = useMemo(() => {
+    const history = growthQ.data?.history ?? [];
+    if (!history.length) return [];
+    // Group by date — sum followers across platforms per day
+    const byDate = new Map<string, number>();
+    for (const entry of history) {
+      const d = entry.date.slice(0, 10);
+      byDate.set(d, (byDate.get(d) ?? 0) + (entry.totalFollowers ?? 0));
+    }
+    return Array.from(byDate.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, followers]) => ({ name: formatDate(date), followers }));
+  }, [growthQ.data]);
+
+  const overview = overviewQ.data;
+  const isOverviewLoading = overviewQ.isLoading;
+  const comparison = overview?.comparison;
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard Overview</h1>
           <p className="text-muted-foreground">Your social presence at a glance.</p>
         </div>
         <div className="flex bg-secondary p-1 rounded-md">
-          {(["7d", "30d", "90d"] as const).map(p => (
-            <button 
-              key={p} 
+          {(['7d', '30d', '90d'] as Period[]).map(p => (
+            <button
+              key={p}
               onClick={() => setPeriod(p)}
               className={`px-3 py-1.5 text-sm font-medium rounded-sm transition-colors ${period === p ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
             >
@@ -49,188 +164,199 @@ export default function DashboardHome() {
         </div>
       </div>
 
+      {/* Overview error */}
+      {overviewQ.isError && (
+        <QueryError message={errorMessage(overviewQ.error)} onRetry={() => overviewQ.refetch()} />
+      )}
+
       {/* Metric Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { label: "Total Followers", value: overview?.followers, growth: overview?.followersGrowth, icon: Users },
-          { label: "Total Reach", value: overview?.reach, growth: overview?.reachGrowth, icon: Eye },
-          { label: "Avg Engagement", value: overview?.engagement ? `${overview.engagement}%` : null, growth: overview?.engagementGrowth, icon: MousePointerClick },
-          { label: "Impressions", value: overview?.impressions, growth: overview?.impressionsGrowth, icon: Activity }
-        ].map((metric, i) => (
-          <Card key={i} className="bg-card border-border shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-sm font-medium text-muted-foreground">{metric.label}</span>
-                <div className="w-8 h-8 rounded-md bg-secondary flex items-center justify-center text-muted-foreground">
-                  <metric.icon size={16} />
-                </div>
-              </div>
-              {overviewLoading ? (
-                <Skeleton className="h-8 w-24 mb-2" />
-              ) : (
-                <div className="text-3xl font-bold font-mono tracking-tight mb-2">
-                  {typeof metric.value === 'number' ? formatNumber(metric.value) : metric.value}
-                </div>
-              )}
-              {overviewLoading ? (
-                <Skeleton className="h-4 w-16" />
-              ) : (
-                <div className={`flex items-center text-sm font-medium ${metric.growth && metric.growth >= 0 ? 'text-green-500' : 'text-destructive'}`}>
-                  {metric.growth && metric.growth >= 0 ? <ArrowUpRight size={16} className="mr-1" /> : <ArrowDownRight size={16} className="mr-1" />}
-                  {metric.growth}% from last period
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        ))}
+        <MetricCard
+          label="Follower Growth"
+          value={fmt(overview?.followers?.net)}
+          growth={overview?.followers?.growthRate ?? null}
+          icon={Users}
+          loading={isOverviewLoading}
+          error={overviewQ.error}
+        />
+        <MetricCard
+          label="Total Reach"
+          value={fmt(overview?.reach?.total)}
+          growth={comparison?.reachChange ?? null}
+          icon={Eye}
+          loading={isOverviewLoading}
+          error={overviewQ.error}
+        />
+        <MetricCard
+          label="Avg Engagement"
+          value={overview?.engagement?.avgEngagementRate != null ? `${overview.engagement.avgEngagementRate}%` : null}
+          growth={comparison?.engagementRateChange ?? null}
+          icon={MousePointerClick}
+          loading={isOverviewLoading}
+          error={overviewQ.error}
+        />
+        <MetricCard
+          label="Impressions"
+          value={fmt(overview?.reach?.impressions)}
+          growth={null}
+          icon={Activity}
+          loading={isOverviewLoading}
+          error={overviewQ.error}
+        />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Chart */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Growth Trends</CardTitle>
-            <CardDescription>Followers, Reach, and Engagement over {period}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {chartLoading ? (
-              <Skeleton className="h-[300px] w-full" />
-            ) : (
-              <div className="h-[300px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartTransformedData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="colorFollowers" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                      </linearGradient>
-                      <linearGradient id="colorReach" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="hsl(var(--chart-3))" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="hsl(var(--chart-3))" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                    <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => formatNumber(value)} />
-                    <Tooltip 
-                      contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }}
-                      itemStyle={{ color: 'hsl(var(--foreground))' }}
-                    />
-                    <Area type="monotone" dataKey="followers" stroke="hsl(var(--primary))" strokeWidth={2} fillOpacity={1} fill="url(#colorFollowers)" />
-                    <Area type="monotone" dataKey="reach" stroke="hsl(var(--chart-3))" strokeWidth={2} fillOpacity={1} fill="url(#colorReach)" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
+      {/* Growth Chart */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Follower Growth</CardTitle>
+              <CardDescription>Total followers across all connected platforms</CardDescription>
+            </div>
+            {growthQ.isError && (
+              <Button variant="ghost" size="sm" onClick={() => growthQ.refetch()}>
+                <RefreshCw size={14} className="mr-1" /> Retry
+              </Button>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {growthQ.isLoading ? (
+            <Skeleton className="h-64 w-full" />
+          ) : growthQ.isError ? (
+            <div className="h-64 flex items-center justify-center text-muted-foreground text-sm">
+              Failed to load growth data.
+            </div>
+          ) : chartData.length === 0 ? (
+            <div className="h-64 flex flex-col items-center justify-center gap-2 text-muted-foreground">
+              <BarChart2 size={32} className="opacity-30" />
+              <p className="text-sm">No growth data for this period.</p>
+              <p className="text-xs">Connect a social account to start tracking.</p>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={256}>
+              <AreaChart data={chartData}>
+                <defs>
+                  <linearGradient id="followersGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="name" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
+                <YAxis tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" tickFormatter={v => fmt(v)} />
+                <Tooltip
+                  contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}
+                  formatter={(v: number) => [fmt(v), 'Followers']}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="followers"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={2}
+                  fill="url(#followersGrad)"
+                  dot={false}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          )}
+        </CardContent>
+      </Card>
 
-        <div className="space-y-6">
-          {/* AI Summary Card */}
-          <Card className="border-accent/30 bg-accent/5 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
-            <CardHeader className="pb-2">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="relative">
-                  <BrainCircuit className="text-accent h-5 w-5 relative z-10" />
-                  <div className="absolute inset-0 bg-accent/40 blur-sm rounded-full animate-pulse"></div>
+      {/* Engagement Summary */}
+      {!isOverviewLoading && !overviewQ.isError && overview?.engagement && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { label: 'Total Posts', value: fmt(overview.engagement.totalPosts), icon: Activity },
+            { label: 'Total Likes', value: fmt(overview.engagement.totalLikes), icon: Heart },
+            { label: 'Total Comments', value: fmt(overview.engagement.totalComments), icon: MessageCircle },
+            { label: 'Total Shares', value: fmt(overview.engagement.totalShares), icon: Share2 },
+          ].map(({ label, value, icon: Icon }) => (
+            <Card key={label} className="bg-secondary/30">
+              <CardContent className="p-4 flex items-center gap-3">
+                <Icon size={18} className="text-muted-foreground shrink-0" />
+                <div>
+                  <div className="text-lg font-bold font-mono">{value}</div>
+                  <div className="text-xs text-muted-foreground">{label}</div>
                 </div>
-                <CardTitle className="text-accent text-sm font-mono uppercase tracking-wider">AI Growth Analyst</CardTitle>
-              </div>
-              {aiLoading ? (
-                <Skeleton className="h-6 w-3/4" />
-              ) : (
-                <CardTitle className="text-lg leading-tight">{aiSummary?.headline}</CardTitle>
-              )}
-            </CardHeader>
-            <CardContent>
-              {aiLoading ? (
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-5/6" />
-                </div>
-              ) : (
-                <>
-                  <p className="text-sm text-muted-foreground mb-4">{aiSummary?.detail}</p>
-                  <ul className="space-y-2">
-                    {aiSummary?.highlights.map((highlight, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm">
-                        <div className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 shrink-0"></div>
-                        {highlight}
-                      </li>
-                    ))}
-                  </ul>
-                  <Button variant="link" className="px-0 text-accent h-auto mt-4 font-medium" asChild>
-                    <Link href="/ai-insights">View Full Analysis <ArrowRight size={14} className="ml-1" /></Link>
-                  </Button>
-                </>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Growth Score */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Creator Growth Score</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {scoreLoading ? (
-                <div className="flex flex-col items-center py-4">
-                  <Skeleton className="h-24 w-24 rounded-full" />
-                  <div className="w-full space-y-2 mt-4">
-                    <Skeleton className="h-3 w-full" />
-                    <Skeleton className="h-3 w-full" />
-                    <Skeleton className="h-3 w-full" />
-                  </div>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center">
-                  <div className="relative flex items-center justify-center w-32 h-32 mb-6">
-                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                      <circle cx="50" cy="50" r="45" fill="none" stroke="hsl(var(--secondary))" strokeWidth="8" />
-                      <circle 
-                        cx="50" cy="50" r="45" fill="none" stroke="hsl(var(--primary))" strokeWidth="8"
-                        strokeDasharray={`${(growthScore?.score || 0) * 2.83} 283`}
-                        strokeLinecap="round"
-                        className="transition-all duration-1000 ease-out"
-                      />
-                    </svg>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-4xl font-bold font-mono tracking-tighter">{growthScore?.score}</span>
-                      <span className="text-xs text-muted-foreground">/ 100</span>
-                    </div>
-                  </div>
-                  <div className="w-full space-y-3">
-                    {[
-                      { label: "Consistency", value: growthScore?.consistency },
-                      { label: "Engagement", value: growthScore?.engagement },
-                      { label: "Content Quality", value: growthScore?.contentQuality }
-                    ].map((item, i) => (
-                      <div key={i}>
-                        <div className="flex justify-between text-xs mb-1 text-muted-foreground">
-                          <span>{item.label}</span>
-                          <span className="font-mono">{item.value}/100</span>
-                        </div>
-                        <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
-                          <div className="h-full bg-primary rounded-full" style={{ width: `${item.value}%` }}></div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          ))}
         </div>
-      </div>
+      )}
 
-      {/* Top Content */}
+      {/* Connected Platforms */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Connected Platforms</CardTitle>
+              <CardDescription>Status of your linked social accounts</CardDescription>
+            </div>
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/settings">Manage</Link>
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {integrationsQ.isLoading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map(i => <Skeleton key={i} className="h-12 w-full" />)}
+            </div>
+          ) : integrationsQ.isError ? (
+            <QueryError message={errorMessage(integrationsQ.error)} onRetry={() => integrationsQ.refetch()} />
+          ) : !integrationsQ.data?.integrations?.length ? (
+            <div className="flex flex-col items-center gap-2 py-8 text-muted-foreground">
+              <XCircle size={32} className="opacity-30" />
+              <p className="text-sm">No accounts connected yet.</p>
+              <Button variant="outline" size="sm" asChild className="mt-2">
+                <Link href="/settings">Connect a platform</Link>
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {integrationsQ.data.integrations.map(account => (
+                <div key={account.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 border border-border">
+                  <div className="flex items-center gap-3">
+                    <div className="text-sm font-medium capitalize">{account.platform}</div>
+                    {account.username && <div className="text-xs text-muted-foreground">@{account.username}</div>}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {account.followerCount ? (
+                      <span className="text-xs text-muted-foreground font-mono">{fmt(account.followerCount)} followers</span>
+                    ) : null}
+                    {account.status === 'active' ? (
+                      <Badge variant="outline" className="text-green-500 border-green-500/30 bg-green-500/5 flex items-center gap-1">
+                        <CheckCircle2 size={10} /> Active
+                      </Badge>
+                    ) : account.status === 'error' ? (
+                      <Badge variant="outline" className="text-destructive border-destructive/30 bg-destructive/5 flex items-center gap-1">
+                        <AlertCircle size={10} /> Error
+                      </Badge>
+                    ) : account.status === 'syncing' ? (
+                      <Badge variant="outline" className="text-yellow-500 border-yellow-500/30 bg-yellow-500/5 flex items-center gap-1">
+                        <Loader2 size={10} className="animate-spin" /> Syncing
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="text-muted-foreground flex items-center gap-1">
+                        {account.status}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Top Performing Content */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Top Performing Content</CardTitle>
-              <CardDescription>Posts driving the most growth in this period</CardDescription>
+              <CardDescription>Posts driving the most engagement this period</CardDescription>
             </div>
             <Button variant="outline" size="sm" asChild>
               <Link href="/analytics">View All</Link>
@@ -238,31 +364,40 @@ export default function DashboardHome() {
           </div>
         </CardHeader>
         <CardContent>
-          {contentLoading ? (
+          {contentQ.isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[1,2,3,4].map(i => <Skeleton key={i} className="h-32 w-full rounded-xl" />)}
+              {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-32 w-full rounded-xl" />)}
+            </div>
+          ) : contentQ.isError ? (
+            <QueryError message={errorMessage(contentQ.error)} onRetry={() => contentQ.refetch()} />
+          ) : !contentQ.data?.topContent?.length ? (
+            <div className="flex flex-col items-center gap-2 py-8 text-muted-foreground">
+              <BarChart2 size={32} className="opacity-30" />
+              <p className="text-sm">No content data for this period.</p>
+              <p className="text-xs">Content analytics appear after your accounts start syncing.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {topContent?.slice(0, 4).map((post) => (
-                <div key={post.id} className="flex gap-4 p-3 rounded-xl border border-border bg-secondary/20 hover:bg-secondary/40 transition-colors group cursor-pointer">
-                  <div className="w-20 h-24 bg-card rounded-md overflow-hidden relative shrink-0 border border-border">
-                    {/* Placeholder for thumbnail */}
-                    <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/30">
-                      <Eye size={24} />
-                    </div>
-                    <div className="absolute bottom-1 right-1 bg-black/60 backdrop-blur-md text-[10px] px-1 rounded text-white font-medium">
+              {contentQ.data.topContent.slice(0, 4).map(post => (
+                <div key={String(post.id)} className="flex gap-3 p-3 rounded-xl border border-border bg-secondary/20 hover:bg-secondary/40 transition-colors">
+                  <div className="w-16 h-20 bg-card rounded-md overflow-hidden relative shrink-0 border border-border flex items-center justify-center text-muted-foreground/30">
+                    <Eye size={20} />
+                    <div className="absolute bottom-1 right-1 bg-black/60 text-[10px] px-1 rounded text-white font-medium capitalize">
                       {post.platform}
                     </div>
                   </div>
-                  <div className="flex-1 min-w-0 py-1 flex flex-col justify-between">
+                  <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
                     <div>
-                      <h4 className="text-sm font-medium leading-snug line-clamp-2 mb-1 group-hover:text-primary transition-colors">{post.title}</h4>
-                      <span className="text-xs text-muted-foreground">{post.type}</span>
+                      <h4 className="text-sm font-medium leading-snug line-clamp-2 mb-1">{post.title}</h4>
+                      <span className="text-xs text-muted-foreground capitalize">{post.format ?? 'post'}</span>
                     </div>
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground font-mono mt-2">
-                      <span className="flex items-center gap-1"><Heart size={12} /> {formatNumber(post.likes)}</span>
-                      <span className="flex items-center gap-1"><MessageCircle size={12} /> {formatNumber(post.comments)}</span>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono mt-1">
+                      <span className="flex items-center gap-1">
+                        <Heart size={11} /> {fmt(post.engagement?.likes)}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <MessageCircle size={11} /> {fmt(post.engagement?.comments)}
+                      </span>
                     </div>
                   </div>
                 </div>

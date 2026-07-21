@@ -1,11 +1,392 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { SiInstagram, SiYoutube, SiTiktok } from "react-icons/si";
-import { Linkedin } from "lucide-react";
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel,
+  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+  AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import {
+  AlertCircle, CheckCircle2, XCircle, RefreshCw, Loader2, ExternalLink, Unplug
+} from 'lucide-react';
+import { SiInstagram, SiYoutube, SiTiktok } from 'react-icons/si';
+import { Linkedin, Twitter } from 'lucide-react';
+import { useAuthContext } from '@/context/auth-context';
+import { authApi } from '@/lib/auth-api';
+import { integrationsApi, SUPPORTED_PLATFORMS, type PlatformId, type ConnectedAccount } from '@/services/integrations-api';
+import { ApiError } from '@/lib/api-client';
+import { toast } from '@/hooks/use-toast';
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function errMsg(err: unknown): string {
+  if (err instanceof ApiError) return err.message;
+  return 'Something went wrong.';
+}
+
+const PLATFORM_ICONS: Record<string, React.ElementType> = {
+  instagram: SiInstagram,
+  youtube: SiYoutube,
+  tiktok: SiTiktok,
+  linkedin: Linkedin,
+  x: Twitter,
+};
+
+function fmt(n: number | null | undefined): string {
+  if (n == null) return '—';
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+  if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K';
+  return String(n);
+}
+
+function timeAgo(iso: string | null | undefined): string {
+  if (!iso) return 'Never';
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60_000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
+
+// ─── Profile Tab ─────────────────────────────────────────────────────────────
+
+function ProfileTab() {
+  const { user, updateUser } = useAuthContext();
+  const [name, setName] = useState(user?.name ?? '');
+  const [bio, setBio] = useState(user?.bio ?? '');
+  const [niche, setNiche] = useState(user?.niche ?? '');
+  const [currentPw, setCurrentPw] = useState('');
+  const [newPw, setNewPw] = useState('');
+
+  const profileMutation = useMutation({
+    mutationFn: () => authApi.updateProfile({ name, bio, niche }),
+    onSuccess: (updated) => {
+      updateUser(updated);
+      toast({ title: 'Profile updated', description: 'Your changes have been saved.' });
+    },
+    onError: (err) => {
+      toast({ title: 'Update failed', description: errMsg(err), variant: 'destructive' });
+    },
+  });
+
+  const passwordMutation = useMutation({
+    mutationFn: () => authApi.changePassword(currentPw, newPw),
+    onSuccess: () => {
+      setCurrentPw('');
+      setNewPw('');
+      toast({ title: 'Password changed', description: 'Your password has been updated.' });
+    },
+    onError: (err) => {
+      toast({ title: 'Password change failed', description: errMsg(err), variant: 'destructive' });
+    },
+  });
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Personal Information</CardTitle>
+          <CardDescription>Update your name, bio, and niche.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name</Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                className="bg-secondary/50 border-border"
+                placeholder="Your name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address</Label>
+              <Input
+                id="email"
+                value={user?.email ?? ''}
+                readOnly
+                disabled
+                className="bg-secondary/50 border-border opacity-60"
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="bio">Bio</Label>
+            <Input
+              id="bio"
+              value={bio}
+              onChange={e => setBio(e.target.value)}
+              className="bg-secondary/50 border-border"
+              placeholder="A short bio about you"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="niche">Content Niche</Label>
+            <Input
+              id="niche"
+              value={niche}
+              onChange={e => setNiche(e.target.value)}
+              className="bg-secondary/50 border-border"
+              placeholder="e.g. Tech, Fitness, Cooking…"
+            />
+          </div>
+          <Button
+            onClick={() => profileMutation.mutate()}
+            disabled={profileMutation.isPending}
+            className="mt-2"
+          >
+            {profileMutation.isPending && <Loader2 size={14} className="mr-2 animate-spin" />}
+            Save Changes
+          </Button>
+          {profileMutation.isError && (
+            <Alert variant="destructive">
+              <AlertCircle size={14} />
+              <AlertDescription>{errMsg(profileMutation.error)}</AlertDescription>
+            </Alert>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Change Password</CardTitle>
+          <CardDescription>Choose a strong password you don't use elsewhere.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="currentPw">Current Password</Label>
+            <Input
+              id="currentPw"
+              type="password"
+              value={currentPw}
+              onChange={e => setCurrentPw(e.target.value)}
+              className="bg-secondary/50 border-border"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="newPw">New Password</Label>
+            <Input
+              id="newPw"
+              type="password"
+              value={newPw}
+              onChange={e => setNewPw(e.target.value)}
+              className="bg-secondary/50 border-border"
+            />
+          </div>
+          <Button
+            onClick={() => passwordMutation.mutate()}
+            disabled={passwordMutation.isPending || !currentPw || !newPw}
+            variant="outline"
+          >
+            {passwordMutation.isPending && <Loader2 size={14} className="mr-2 animate-spin" />}
+            Change Password
+          </Button>
+          {passwordMutation.isError && (
+            <Alert variant="destructive">
+              <AlertCircle size={14} />
+              <AlertDescription>{errMsg(passwordMutation.error)}</AlertDescription>
+            </Alert>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// ─── Connected Platforms Tab ──────────────────────────────────────────────────
+
+function ConnectedAccountRow({ account }: { account: ConnectedAccount }) {
+  const queryClient = useQueryClient();
+  const Icon = PLATFORM_ICONS[account.platform] ?? null;
+
+  const disconnectMutation = useMutation({
+    mutationFn: () => integrationsApi.disconnect(account.platform as PlatformId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['integrations'] });
+      toast({ title: `${account.platform} disconnected`, description: 'The account has been unlinked.' });
+    },
+    onError: (err) => {
+      toast({ title: 'Disconnect failed', description: errMsg(err), variant: 'destructive' });
+    },
+  });
+
+  const syncMutation = useMutation({
+    mutationFn: () => integrationsApi.triggerSync(account.platform as PlatformId),
+    onSuccess: () => {
+      toast({ title: 'Sync started', description: `Syncing ${account.platform} data…` });
+    },
+    onError: (err) => {
+      toast({ title: 'Sync failed', description: errMsg(err), variant: 'destructive' });
+    },
+  });
+
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-lg border border-border bg-secondary/20">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-card flex items-center justify-center border border-border">
+          {Icon ? <Icon size={18} /> : <span className="text-xs capitalize">{account.platform[0]}</span>}
+        </div>
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="font-medium capitalize">{account.platform}</span>
+            {account.status === 'active' ? (
+              <Badge variant="outline" className="text-green-500 border-green-500/30 bg-green-500/5 text-xs flex items-center gap-1">
+                <CheckCircle2 size={9} /> Active
+              </Badge>
+            ) : account.status === 'error' ? (
+              <Badge variant="outline" className="text-destructive border-destructive/30 text-xs flex items-center gap-1">
+                <AlertCircle size={9} /> Error
+              </Badge>
+            ) : account.status === 'expired' ? (
+              <Badge variant="outline" className="text-yellow-500 border-yellow-500/30 text-xs">Expired</Badge>
+            ) : (
+              <Badge variant="outline" className="text-muted-foreground text-xs">{account.status}</Badge>
+            )}
+          </div>
+          <div className="text-xs text-muted-foreground mt-0.5 space-x-2">
+            {account.username && <span>@{account.username}</span>}
+            {account.followerCount != null && <span>· {fmt(account.followerCount)} followers</span>}
+            <span>· Synced {timeAgo(account.lastSyncedAt)}</span>
+          </div>
+          {account.syncError && (
+            <p className="text-xs text-destructive mt-1">{account.syncError}</p>
+          )}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 shrink-0">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => syncMutation.mutate()}
+          disabled={syncMutation.isPending}
+        >
+          {syncMutation.isPending ? (
+            <Loader2 size={14} className="animate-spin" />
+          ) : (
+            <RefreshCw size={14} />
+          )}
+          <span className="ml-1.5 hidden sm:inline">Sync</span>
+        </Button>
+
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="outline" size="sm" className="text-destructive border-destructive/30 hover:bg-destructive/10">
+              <Unplug size={14} />
+              <span className="ml-1.5 hidden sm:inline">Disconnect</span>
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Disconnect {account.platform}?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will remove your {account.platform} account from CreatorOS AI. Analytics data
+                already collected will be retained, but new data won't sync until you reconnect.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => disconnectMutation.mutate()}
+                className="bg-destructive hover:bg-destructive/90"
+              >
+                {disconnectMutation.isPending && <Loader2 size={14} className="mr-2 animate-spin" />}
+                Disconnect
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    </div>
+  );
+}
+
+function PlatformRow({ platformId }: { platformId: PlatformId }) {
+  const meta = SUPPORTED_PLATFORMS.find(p => p.id === platformId)!;
+  const Icon = PLATFORM_ICONS[platformId];
+  return (
+    <div className="flex items-center justify-between p-4 rounded-lg border border-border border-dashed opacity-60">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
+          {Icon ? <Icon size={18} /> : null}
+        </div>
+        <div>
+          <div className="font-medium">{meta.label}</div>
+          <div className="text-xs text-muted-foreground">Not connected</div>
+        </div>
+      </div>
+      <Button variant="outline" size="sm" asChild>
+        <a href={meta.connectUrl}>
+          <ExternalLink size={14} className="mr-1.5" />
+          Connect
+        </a>
+      </Button>
+    </div>
+  );
+}
+
+function ConnectedPlatformsTab() {
+  const integrationsQ = useQuery({
+    queryKey: ['integrations'],
+    queryFn: () => integrationsApi.list(),
+  });
+
+  const connectedPlatformIds = new Set(
+    (integrationsQ.data?.integrations ?? []).map(a => a.platform)
+  );
+
+  const unconnectedPlatforms = SUPPORTED_PLATFORMS
+    .filter(p => !connectedPlatformIds.has(p.id))
+    .map(p => p.id);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Social Integrations</CardTitle>
+        <CardDescription>
+          Connect your accounts to enable AI analytics and syncing.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {integrationsQ.isLoading ? (
+          [1, 2, 3].map(i => <Skeleton key={i} className="h-20 w-full rounded-lg" />)
+        ) : integrationsQ.isError ? (
+          <Alert variant="destructive">
+            <AlertCircle size={14} />
+            <AlertDescription>{errMsg(integrationsQ.error)}</AlertDescription>
+          </Alert>
+        ) : (
+          <>
+            {integrationsQ.data?.integrations?.map(account => (
+              <ConnectedAccountRow key={account.id} account={account} />
+            ))}
+            {unconnectedPlatforms.map(id => (
+              <PlatformRow key={id} platformId={id} />
+            ))}
+            {!integrationsQ.data?.integrations?.length && (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                No accounts connected yet. Connect a platform above to start syncing data.
+              </p>
+            )}
+          </>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Settings() {
   return (
@@ -17,135 +398,46 @@ export default function Settings() {
 
       <Tabs defaultValue="profile" className="w-full">
         <TabsList className="flex flex-wrap h-auto gap-2 bg-transparent justify-start p-0 mb-6">
-          <TabsTrigger value="profile" className="data-[state=active]:bg-card border border-transparent data-[state=active]:border-border rounded-md px-4 py-2">Profile</TabsTrigger>
-          <TabsTrigger value="platforms" className="data-[state=active]:bg-card border border-transparent data-[state=active]:border-border rounded-md px-4 py-2">Connected Platforms</TabsTrigger>
-          <TabsTrigger value="notifications" className="data-[state=active]:bg-card border border-transparent data-[state=active]:border-border rounded-md px-4 py-2">Notifications</TabsTrigger>
-          <TabsTrigger value="subscription" className="data-[state=active]:bg-card border border-transparent data-[state=active]:border-border rounded-md px-4 py-2">Subscription</TabsTrigger>
+          {['profile', 'platforms', 'notifications'].map(t => (
+            <TabsTrigger
+              key={t}
+              value={t}
+              className="data-[state=active]:bg-card border border-transparent data-[state=active]:border-border rounded-md px-4 py-2 capitalize"
+            >
+              {t === 'platforms' ? 'Connected Platforms' : t.charAt(0).toUpperCase() + t.slice(1)}
+            </TabsTrigger>
+          ))}
         </TabsList>
 
-        <TabsContent value="profile" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Personal Information</CardTitle>
-              <CardDescription>Update your personal details here.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
-                  <Input id="name" defaultValue="Jane Doe" className="bg-secondary/50 border-border" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input id="email" defaultValue="jane@example.com" className="bg-secondary/50 border-border" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="bio">Creator Bio / Niche</Label>
-                <Input id="bio" defaultValue="Tech Educator & Developer" className="bg-secondary/50 border-border" />
-              </div>
-              <Button className="mt-4">Save Changes</Button>
-            </CardContent>
-          </Card>
+        <TabsContent value="profile">
+          <ProfileTab />
         </TabsContent>
 
-        <TabsContent value="platforms" className="space-y-6">
+        <TabsContent value="platforms">
+          <ConnectedPlatformsTab />
+        </TabsContent>
+
+        <TabsContent value="notifications">
           <Card>
             <CardHeader>
-              <CardTitle>Social Integrations</CardTitle>
-              <CardDescription>Connect your accounts to enable AI analytics.</CardDescription>
+              <CardTitle>Notification Preferences</CardTitle>
+              <CardDescription>Choose what updates you receive.</CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-4">
+            <CardContent className="space-y-4 divide-y divide-border">
               {[
-                { name: "Instagram", icon: SiInstagram, connected: true, username: "@janedoe" },
-                { name: "YouTube", icon: SiYoutube, connected: true, username: "Jane Doe Tech" },
-                { name: "TikTok", icon: SiTiktok, connected: false },
-                { name: "LinkedIn", icon: Linkedin, connected: true, username: "jane-doe" }
-              ].map((platform) => (
-                <div key={platform.name} className="flex items-center justify-between p-4 rounded-lg border border-border bg-secondary/20">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-md bg-card border border-border flex items-center justify-center">
-                      <platform.icon size={20} className={platform.connected ? "text-primary" : "text-muted-foreground"} />
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-sm">{platform.name}</h4>
-                      {platform.connected ? (
-                        <p className="text-xs text-muted-foreground">{platform.username}</p>
-                      ) : (
-                        <p className="text-xs text-muted-foreground">Not connected</p>
-                      )}
-                    </div>
+                { label: 'Weekly Performance Reports', desc: 'A summary of your growth and top content every Monday.', defaultOn: true },
+                { label: 'Viral Trend Alerts', desc: 'Instant notifications when a relevant trend spikes.', defaultOn: true },
+                { label: 'Competitor Activity', desc: 'When tracked accounts post breakout content.', defaultOn: false },
+                { label: 'Sync Errors', desc: 'Notify when a connected account fails to sync.', defaultOn: true },
+              ].map(item => (
+                <div key={item.label} className="flex items-center justify-between pt-4 first:pt-0">
+                  <div className="space-y-0.5 pr-4">
+                    <Label className="text-base font-medium">{item.label}</Label>
+                    <p className="text-sm text-muted-foreground">{item.desc}</p>
                   </div>
-                  <Button variant={platform.connected ? "outline" : "default"} size="sm">
-                    {platform.connected ? "Disconnect" : "Connect"}
-                  </Button>
+                  <Switch defaultChecked={item.defaultOn} />
                 </div>
               ))}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="notifications" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Alert Preferences</CardTitle>
-              <CardDescription>Control when and how AI agents notify you.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Email Notifications</h4>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-base font-medium">Weekly Growth Report</Label>
-                    <p className="text-sm text-muted-foreground">Receive your AI-generated summary every Monday.</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-base font-medium">Viral Trend Alerts</Label>
-                    <p className="text-sm text-muted-foreground">Instant emails when a relevant trend spikes.</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-base font-medium">Competitor Activity</Label>
-                    <p className="text-sm text-muted-foreground">When tracked accounts post breakout content.</p>
-                  </div>
-                  <Switch />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="subscription" className="space-y-6">
-          <Card className="border-primary/50 bg-primary/5 relative overflow-hidden">
-            <CardHeader>
-              <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary text-primary-foreground w-fit mb-2">Pro Plan</div>
-              <CardTitle>Subscription Overview</CardTitle>
-              <CardDescription className="text-foreground/80">You are currently on the Pro tier.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-end gap-2 mb-6">
-                <span className="text-4xl font-bold">$49</span>
-                <span className="text-muted-foreground pb-1">/ month</span>
-              </div>
-              <div className="space-y-2 mb-6">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Next billing date</span>
-                  <span className="font-medium">Oct 1, 2024</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Payment method</span>
-                  <span className="font-medium">Visa ending in 4242</span>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <Button className="bg-primary hover:bg-primary/90">Manage Subscription</Button>
-                <Button variant="outline">View Invoices</Button>
-              </div>
             </CardContent>
           </Card>
         </TabsContent>
