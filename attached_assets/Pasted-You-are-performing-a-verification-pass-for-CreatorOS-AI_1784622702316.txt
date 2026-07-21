@@ -1,0 +1,226 @@
+You are performing a verification pass for CreatorOS AI Frontend Integration Phase 2.
+
+DO NOT add new features.
+
+DO NOT modify backend business logic.
+
+DO NOT redesign the UI.
+
+DO NOT introduce mock or dummy data.
+
+Your task is to verify and fix only genuine Phase 2 integration issues.
+
+==================================================
+VERIFY DASHBOARD
+==================================================
+
+Verify that Dashboard uses real backend APIs.
+
+Test:
+
+- Overview metrics
+- Follower growth
+- Connected accounts
+- Top performing content
+
+Verify:
+
+- Loading state
+- Empty state
+- Error state
+- Retry functionality
+
+Ensure no fake or hardcoded analytics values are displayed.
+
+==================================================
+VERIFY ANALYTICS
+==================================================
+
+Test all analytics sections:
+
+- Overview
+- Growth
+- Engagement
+- Content Performance
+- Audience
+- Best Posting Time
+
+Test:
+
+- Platform filter
+- Date range filter
+- API requests
+- Empty datasets
+- Error responses
+
+Verify charts correctly handle:
+
+- Empty arrays
+- Null values
+- Missing values
+- Zero values
+
+==================================================
+VERIFY WORKSPACES
+==================================================
+
+Test:
+
+Create workspace
+
+↓
+
+List workspace
+
+↓
+
+Switch workspace
+
+↓
+
+Rename workspace
+
+↓
+
+Refresh browser
+
+↓
+
+Verify active workspace persists
+
+↓
+
+Delete workspace
+
+Verify workspace-specific data does not leak between workspaces.
+
+==================================================
+VERIFY TEAM
+==================================================
+
+Test:
+
+- List members
+- Invite member
+- Invalid invitation
+- Duplicate invitation
+- Change role
+- Remove member
+
+Verify role-based UI visibility.
+
+Test unauthorized actions and confirm 403 responses are handled correctly.
+
+==================================================
+VERIFY CONNECTED ACCOUNTS
+==================================================
+
+Verify:
+
+- List connected accounts
+- Connection status
+- Disconnect
+- Sync
+- OAuth connection links
+
+IMPORTANT:
+
+Do not claim unsupported OAuth providers are functional.
+
+Verify the actual backend implementation status for:
+
+- YouTube
+- Instagram
+- LinkedIn
+- TikTok
+- X
+
+Only show "Connect" as functional if the backend provider is actually implemented.
+
+==================================================
+VERIFY SETTINGS
+==================================================
+
+Test:
+
+- Profile loading
+- Profile update
+- Password change
+- Connected platform management
+
+Verify:
+
+- Validation errors
+- Success feedback
+- Server errors
+
+==================================================
+VERIFY API CONTRACTS
+==================================================
+
+Check every Phase 2 API call.
+
+Verify:
+
+- Correct /api/v1/ paths
+- Correct HTTP methods
+- Correct request payloads
+- Correct response parsing
+- Correct error handling
+
+Pay special attention to the previously discovered mismatch between generated API hooks and the real backend API paths.
+
+==================================================
+REMOVE REMAINING MOCK DATA
+==================================================
+
+Search frontend for:
+
+mock
+
+dummy
+
+fake
+
+sample
+
+hardcoded analytics values
+
+placeholder API responses
+
+Remove only mock data that is being used as actual application data.
+
+Do not remove legitimate UI placeholder text.
+
+==================================================
+BUILD VERIFICATION
+==================================================
+
+Run:
+
+- TypeScript check
+- Production build
+
+Verify:
+
+- Zero TypeScript errors
+- Zero build errors
+- No broken routes
+- No runtime errors caused by Phase 2
+
+==================================================
+FINAL REPORT
+==================================================
+
+Report:
+
+1. Tests performed
+2. Issues found
+3. Issues fixed
+4. APIs verified
+5. Remaining limitations
+6. OAuth provider status
+7. TypeScript result
+8. Production build result
+
+Do not implement Phase 3 features.
