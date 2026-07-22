@@ -30,8 +30,8 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "PORT=8080 npm --prefix backend run dev"
-waitForPort = 8080
+args = "PORT=3001 npm --prefix backend run dev"
+waitForPort = 3001
 
 [workflows.workflow.metadata]
 outputType = "console"

@@ -94,12 +94,12 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
               <DropdownMenuSeparator />
               {workspacesQ.data?.map(ws => (
                 <DropdownMenuItem
-                  key={ws._id}
+                  key={ws.id}
                   onClick={() => setActiveWorkspace(ws)}
                   className="flex items-center justify-between"
                 >
                   <span className="truncate">{ws.name}</span>
-                  {activeWorkspace?._id === ws._id && (
+                  {activeWorkspace?.id === ws.id && (
                     <Check size={14} className="text-primary shrink-0 ml-2" />
                   )}
                 </DropdownMenuItem>

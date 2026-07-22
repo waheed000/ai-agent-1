@@ -57,14 +57,18 @@ export interface PlatformMeta {
   id: PlatformId;
   label: string;
   color: string;
-  /** OAuth initiation URL — connects to the backend OAuth flow */
-  connectUrl: string;
+  /**
+   * Whether the backend OAuth flow is actually implemented for this provider.
+   * Currently ALL providers have Class: null in OAuthProviderFactory — none are
+   * implemented. Set to true only when the backend ships a real provider class.
+   */
+  oauthImplemented: false;
 }
 
 export const SUPPORTED_PLATFORMS: PlatformMeta[] = [
-  { id: 'youtube',   label: 'YouTube',   color: '#FF0000', connectUrl: '/api/v1/auth/youtube' },
-  { id: 'instagram', label: 'Instagram', color: '#E1306C', connectUrl: '/api/v1/auth/instagram' },
-  { id: 'linkedin',  label: 'LinkedIn',  color: '#0A66C2', connectUrl: '/api/v1/auth/linkedin' },
-  { id: 'tiktok',    label: 'TikTok',    color: '#010101', connectUrl: '/api/v1/auth/tiktok' },
-  { id: 'x',         label: 'X (Twitter)', color: '#14171A', connectUrl: '/api/v1/auth/x' },
+  { id: 'youtube',   label: 'YouTube',     color: '#FF0000', oauthImplemented: false },
+  { id: 'instagram', label: 'Instagram',   color: '#E1306C', oauthImplemented: false },
+  { id: 'linkedin',  label: 'LinkedIn',    color: '#0A66C2', oauthImplemented: false },
+  { id: 'tiktok',    label: 'TikTok',      color: '#010101', oauthImplemented: false },
+  { id: 'x',         label: 'X (Twitter)', color: '#14171A', oauthImplemented: false },
 ];

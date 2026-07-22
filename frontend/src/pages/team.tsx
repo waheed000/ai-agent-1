@@ -327,8 +327,8 @@ export default function TeamPage() {
   const [showInvite, setShowInvite] = useState(false);
 
   const membersQ = useQuery({
-    queryKey: ['workspace-members', activeWorkspace?._id],
-    queryFn: () => workspaceApi.getMembers(activeWorkspace!._id),
+    queryKey: ['workspace-members', activeWorkspace?.id],
+    queryFn: () => workspaceApi.getMembers(activeWorkspace!.id),
     enabled: !!activeWorkspace,
   });
 
@@ -416,7 +416,7 @@ export default function TeamPage() {
               <MemberRow
                 key={member.user}
                 member={member}
-                workspaceId={activeWorkspace._id}
+                workspaceId={activeWorkspace.id}
                 canManage={canManage}
                 currentUserId={currentUserId}
                 ownerId={activeWorkspace.owner}
@@ -428,7 +428,7 @@ export default function TeamPage() {
 
       {showInvite && (
         <InviteMemberDialog
-          workspaceId={activeWorkspace._id}
+          workspaceId={activeWorkspace.id}
           open={showInvite}
           onClose={() => setShowInvite(false)}
         />

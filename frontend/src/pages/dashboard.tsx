@@ -124,19 +124,14 @@ export default function DashboardHome() {
     queryFn: () => analyticsApi.getContentPerformance({ ...dateRange, limit: 4 }),
   });
 
-  // Transform growth history into chart-friendly format
+  // Transform timeSeries into chart-friendly format
   const chartData = useMemo(() => {
-    const history = growthQ.data?.history ?? [];
-    if (!history.length) return [];
-    // Group by date — sum followers across platforms per day
-    const byDate = new Map<string, number>();
-    for (const entry of history) {
-      const d = entry.date.slice(0, 10);
-      byDate.set(d, (byDate.get(d) ?? 0) + (entry.totalFollowers ?? 0));
-    }
-    return Array.from(byDate.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([date, followers]) => ({ name: formatDate(date), followers }));
+    const series = growthQ.data?.timeSeries ?? [];
+    if (!series.length) return [];
+    return series
+      .slice()
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .map(entry => ({ name: formatDate(entry.date), followers: entry.followers ?? 0 }));
   }, [growthQ.data]);
 
   const overview = overviewQ.data;

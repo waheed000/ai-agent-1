@@ -157,16 +157,12 @@ export default function Analytics() {
   // ── Chart transforms ─────────────────────────────────────────────────────
 
   const growthChartData = useMemo(() => {
-    const history = growthQ.data?.history ?? [];
-    if (!history.length) return [];
-    const byDate = new Map<string, number>();
-    for (const e of history) {
-      const d = e.date.slice(0, 10);
-      byDate.set(d, (byDate.get(d) ?? 0) + (e.totalFollowers ?? 0));
-    }
-    return Array.from(byDate.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([date, followers]) => ({ name: formatDate(date), followers }));
+    const series = growthQ.data?.timeSeries ?? [];
+    if (!series.length) return [];
+    return series
+      .slice()
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .map(entry => ({ name: formatDate(entry.date), followers: entry.followers ?? 0 }));
   }, [growthQ.data]);
 
   const engagementPieData = useMemo(() => {
@@ -315,27 +311,13 @@ export default function Analytics() {
             </CardContent>
           </Card>
 
-          {growthQ.data?.byPlatform && growthQ.data.byPlatform.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Growth by Platform</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {growthQ.data.byPlatform.map(p => (
-                    <div key={p.platform} className="flex items-center justify-between p-3 rounded-lg border border-border">
-                      <span className="capitalize font-medium text-sm">{p.platform}</span>
-                      <div className="flex items-center gap-4 text-sm">
-                        <span className="text-muted-foreground font-mono">{p.net >= 0 ? '+' : ''}{fmt(p.net)}</span>
-                        <span className={p.growthRate >= 0 ? 'text-green-500' : 'text-destructive'}>
-                          {fmtChange(p.growthRate).text}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+          {growthQ.data?.summary && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <MetricCard label="Net Followers" value={growthQ.data.summary.net >= 0 ? `+${fmt(growthQ.data.summary.net)}` : fmt(growthQ.data.summary.net)} loading={false} />
+              <MetricCard label="Growth Rate" value={growthQ.data.summary.growthRate != null ? fmtPct(growthQ.data.summary.growthRate) : '—'} loading={false} />
+              <MetricCard label="Start Followers" value={fmt(growthQ.data.summary.startFollowers)} loading={false} />
+              <MetricCard label="End Followers" value={fmt(growthQ.data.summary.endFollowers)} loading={false} />
+            </div>
           )}
         </TabsContent>
 

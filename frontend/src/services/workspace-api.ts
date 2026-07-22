@@ -11,12 +11,12 @@ export interface WorkspaceMember {
 }
 
 export interface Workspace {
-  _id: string;
+  id: string;
   name: string;
   slug: string;
   owner: string;
   members: WorkspaceMember[];
-  settings?: Record<string, unknown>;
+  plan?: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -54,19 +54,18 @@ export interface AnalyticsOverview {
   };
 }
 
-export interface GrowthHistoryEntry {
+export interface GrowthTimeSeriesEntry {
   date: string;
-  platform: string;
-  totalFollowers: number;
+  followers: number;
+  delta?: number;
 }
 
 export interface AnalyticsGrowth {
   period: { start: string; end: string };
-  history?: GrowthHistoryEntry[];
-  net?: number;
-  growthRate?: number;
-  byPlatform?: Array<{ platform: string; net: number; growthRate: number }>;
-  comparison?: { period: { start: string; end: string }; net?: number; growthRate?: number };
+  summary?: { net: number; growthRate: number | null; startFollowers: number; endFollowers: number };
+  timeSeries?: GrowthTimeSeriesEntry[];
+  movingAverage?: Array<{ date: string; value: number }>;
+  comparison?: { period: { start: string; end: string }; net?: number; growthRate?: number | null };
 }
 
 export interface EngagementByPlatform {

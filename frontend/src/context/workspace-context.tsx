@@ -23,7 +23,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const setActiveWorkspace = useCallback((workspace: Workspace | null) => {
     setActiveWorkspaceState(workspace);
     if (workspace) {
-      sessionStorage.setItem(STORAGE_KEY, workspace._id);
+      sessionStorage.setItem(STORAGE_KEY, workspace.id);
     } else {
       sessionStorage.removeItem(STORAGE_KEY);
     }

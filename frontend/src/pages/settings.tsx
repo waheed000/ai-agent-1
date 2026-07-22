@@ -15,7 +15,7 @@ import {
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import {
-  AlertCircle, CheckCircle2, XCircle, RefreshCw, Loader2, ExternalLink, Unplug
+  AlertCircle, CheckCircle2, XCircle, RefreshCw, Loader2, Unplug
 } from 'lucide-react';
 import { SiInstagram, SiYoutube, SiTiktok } from 'react-icons/si';
 import { Linkedin, Twitter } from 'lucide-react';
@@ -326,12 +326,10 @@ function PlatformRow({ platformId }: { platformId: PlatformId }) {
           <div className="text-xs text-muted-foreground">Not connected</div>
         </div>
       </div>
-      <Button variant="outline" size="sm" asChild>
-        <a href={meta.connectUrl}>
-          <ExternalLink size={14} className="mr-1.5" />
-          Connect
-        </a>
-      </Button>
+      {/* OAuth connection is not yet implemented in the backend for any provider */}
+      <Badge variant="secondary" className="text-xs text-muted-foreground">
+        Coming Soon
+      </Badge>
     </div>
   );
 }

@@ -115,7 +115,7 @@ function EditWorkspaceDialog({
   const [name, setName] = useState(workspace.name);
 
   const updateMutation = useMutation({
-    mutationFn: () => workspaceApi.update(workspace._id, { name: name.trim() }),
+    mutationFn: () => workspaceApi.update(workspace.id, { name: name.trim() }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspaces'] });
       toast({ title: 'Workspace updated' });
@@ -172,11 +172,11 @@ function WorkspaceCard({ workspace }: { workspace: Workspace }) {
   const { activeWorkspace, setActiveWorkspace } = useWorkspace();
   const [showEdit, setShowEdit] = useState(false);
 
-  const isActive = activeWorkspace?._id === workspace._id;
+  const isActive = activeWorkspace?.id === workspace.id;
   const isOwner = workspace.owner === user?.id;
 
   const deleteMutation = useMutation({
-    mutationFn: () => workspaceApi.delete(workspace._id),
+    mutationFn: () => workspaceApi.delete(workspace.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspaces'] });
       if (isActive) setActiveWorkspace(null);
@@ -341,7 +341,7 @@ export default function WorkspacesPage() {
       ) : (
         <div className="grid gap-4">
           {workspaces.map(ws => (
-            <WorkspaceCard key={ws._id} workspace={ws} />
+            <WorkspaceCard key={ws.id} workspace={ws} />
           ))}
         </div>
       )}
