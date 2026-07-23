@@ -2,75 +2,68 @@
 
 A production-grade creator intelligence platform — analytics, AI agents, competitor tracking, content planning, and team collaboration for content creators.
 
-## Project Structure
+## How to run
+
+Two workflows start automatically:
+
+| Workflow | Command | Port |
+|---|---|---|
+| `api-server` | `PORT=3001 npm --prefix backend run dev` | 3001 |
+| `frontend: web` | `PORT=5173 BASE_PATH=/ pnpm --filter @workspace/creator-os run dev` | 5173 |
+
+The frontend proxies `/api` requests to the backend on port 3001.
+
+## First-time setup
+
+Dependencies must be installed before starting:
+
+```bash
+pnpm install          # workspace + frontend deps
+cd backend && npm install   # backend deps
+```
+
+## Stack
+
+- **Frontend:** React 19, Vite 7, TypeScript, Tailwind CSS, shadcn/ui, TanStack Query, Wouter, Recharts, Framer Motion
+- **Backend:** Node.js 18+, Express 4, MongoDB (Mongoose — auto in-memory in dev), Redis/ioredis (optional — queues/cache degrade gracefully without it), BullMQ, JWT, Helmet, Winston/Pino
+- **AI:** Google Gemini, OpenAI (configurable provider), multi-agent orchestration
+
+## Key environment variables (backend)
+
+| Variable | Required | Notes |
+|---|---|---|
+| `JWT_SECRET` | Yes (prod) | Dev default used otherwise |
+| `JWT_REFRESH_SECRET` | Yes (prod) | Dev default used otherwise |
+| `MONGODB_URI` | No | Omit to use auto in-memory MongoDB |
+| `REDIS_HOST` | No | Defaults to 127.0.0.1; Redis is optional |
+| `GEMINI_API_KEY` | No | Enables AI features |
+| `ENCRYPTION_KEY` | Prod | 64-char hex; AES-256-GCM for OAuth tokens |
+
+See `backend/.env.example` for the full list.
+
+## Project structure
 
 ```
 CreatorOS-AI/
-├── frontend/          # React + Vite dashboard (TypeScript, Tailwind, shadcn/ui)
-├── backend/           # Node.js + Express REST API (MongoDB, Redis, BullMQ)
+├── frontend/          # React + Vite dashboard
+├── backend/           # Node.js + Express REST API
+│   └── src/           # Source — modules/<domain>/ layout
 ├── lib/               # Shared workspace libraries
-│   ├── api-client-react/   # React Query hooks
+│   ├── api-client-react/   # React Query hooks (OpenAPI-generated)
 │   ├── api-spec/           # OpenAPI specification
 │   ├── api-zod/            # Zod validation schemas
 │   └── db/                 # Shared database utilities
-├── docs/              # API reference, architecture, deployment, security
-└── artifacts/         # Replit platform artifacts (api-server stub, mockup sandbox)
+└── docs/              # API reference, architecture, deployment, security
 ```
 
-## How to Run (Replit)
-
-Two workflows start automatically when you press Run:
-
-| Workflow | Command | Port | Notes |
-|---|---|---|---|
-| `frontend: web` | `pnpm --filter @workspace/creator-os run dev` | 5173 | React + Vite dashboard |
-| `api-server` | `npm --prefix backend run dev` | 8080 | Node.js/Express REST API |
-
-The frontend proxies all `/api` requests to the backend on port 8080.  
-In dev, the backend uses **in-memory MongoDB** (no external DB needed). Redis is optional and degrades gracefully.
-
-## Backend
-
-The production backend lives in `backend/`. It is a standalone npm project (not a pnpm workspace package) with its own `node_modules`.
+## Tests
 
 ```bash
-cd backend
-npm install   # first time only
-npm run dev   # starts on port 8080 (set by the Replit workflow)
-npm test      # runs 616 tests
+cd backend && npm test   # 616 tests
 ```
 
-Key env vars (see `backend/.env.example`):
+## API docs
 
-| Variable | Required | Description |
-|---|---|---|
-| `MONGODB_URI` | Prod | MongoDB connection string (auto in-memory in dev) |
-| `JWT_SECRET` | Yes | Access token signing key (≥64 chars in prod) |
-| `JWT_REFRESH_SECRET` | Yes | Refresh token signing key |
-| `REDIS_HOST` | No | Redis host (default `127.0.0.1`) |
-| `GEMINI_API_KEY` | No | Google Gemini for AI features |
+Swagger UI is served at `/api/v1/docs` when the backend is running.
 
-## Frontend
-
-React 19 + Vite 7 SPA in `frontend/`. Part of the pnpm workspace.
-
-```bash
-pnpm install                                          # workspace root
-pnpm --filter @workspace/creator-os run dev           # or use the Replit workflow
-```
-
-The frontend proxies `/api` → `http://localhost:8080`.
-
-## Documentation
-
-| Doc | Description |
-|---|---|
-| [`docs/API.md`](docs/API.md) | Full API endpoint reference |
-| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | System architecture overview |
-| [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) | Deployment guide |
-| [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) | Contribution guidelines |
-| [`docs/SECURITY.md`](docs/SECURITY.md) | Security policies |
-
-## User Preferences
-
-<!-- Add remembered preferences here -->
+## User preferences
