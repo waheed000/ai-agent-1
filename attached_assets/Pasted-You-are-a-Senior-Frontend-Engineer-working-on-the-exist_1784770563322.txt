@@ -1,0 +1,384 @@
+You are a Senior Frontend Engineer working on the existing CreatorOS AI production-oriented SaaS application.
+
+IMPORTANT:
+
+Before doing anything, read:
+
+PROJECT_CONTEXT.md
+
+This file is the source of truth for the current project architecture and implementation status.
+
+Do NOT perform a broad repository audit.
+
+Do NOT re-explore the entire backend or frontend.
+
+Do NOT reimplement completed phases.
+
+Only inspect files directly relevant to the current task and verify the exact API contracts you need before implementation.
+
+==================================================
+CURRENT TASK
+==================================================
+
+Implement:
+
+PHASE 3A — CONTENT & INTELLIGENCE
+
+This phase contains ONLY:
+
+1. Content Planner
+2. Competitor Intelligence
+
+Do NOT implement:
+
+- Trend Intelligence
+- AI Insights
+- Reports
+- Notifications
+- Final Dashboard Audit
+- Full Frontend Integration Audit
+
+Those belong to later phases.
+
+==================================================
+CORE REQUIREMENT
+==================================================
+
+Integrate the existing frontend with the EXISTING production-oriented backend.
+
+Use REAL backend APIs and REAL database data.
+
+NO:
+
+- Dummy data
+- Mock data
+- Fake data
+- Hardcoded application data
+- Fake competitors
+- Fake content plans
+- Fake metrics
+- Placeholder API responses
+
+If the backend returns an empty result:
+
+Show a professional empty state.
+
+Do not invent data.
+
+==================================================
+PART 1 — CONTENT PLANNER
+==================================================
+
+Build the Content Planner frontend using the existing backend APIs and existing application architecture.
+
+First identify the existing backend endpoints for:
+
+- Content plans
+- Weekly plans
+- Content ideas
+- Scheduled content
+- Content planner
+- Any related content endpoints
+
+Do not invent endpoint paths.
+
+Use the actual backend route/controller/service implementation as the API contract.
+
+Implement the frontend functionality supported by the existing backend, including where available:
+
+- View content plans
+- View planned content
+- Create content plan items
+- Edit content plan items
+- Delete content plan items
+- Update content status
+- View scheduled/planned content
+- Filter by platform
+- Filter by status
+- Filter by date
+- View content ideas
+- AI-assisted content idea generation if the existing backend supports it
+
+Use the existing:
+
+- apiClient
+- React Query patterns
+- Authentication context
+- Workspace context
+- shadcn/ui components
+- Existing design system
+
+Handle:
+
+- Loading states
+- Skeleton states
+- Empty states
+- Error states
+- Retry actions
+- Success feedback
+- Form validation
+
+The page must work for a newly registered user with no content.
+
+Example empty state:
+
+"No content planned yet"
+
+Provide a useful CTA to create the first content item.
+
+==================================================
+PART 2 — COMPETITOR INTELLIGENCE
+==================================================
+
+Integrate the Competitor Intelligence frontend with the existing backend.
+
+First identify and verify the actual backend endpoints for:
+
+- List competitors
+- Add competitor
+- Remove competitor
+- Competitor overview
+- Competitor metrics
+- Competitor posts
+- Competitor sync
+
+Do not invent API endpoints.
+
+Implement the functionality already supported by the backend, including:
+
+- View tracked competitors
+- Add competitor
+- Remove competitor
+- View competitor overview
+- View competitor metrics
+- View competitor posts where supported
+- Trigger competitor sync where supported
+- Platform information
+- Relevant competitor performance information
+
+Use real backend data only.
+
+If no competitors exist:
+
+Show a professional empty state:
+
+"No competitors tracked yet"
+
+with an Add Competitor CTA.
+
+Handle:
+
+- Loading
+- Empty
+- Error
+- Retry
+- Success
+- Confirmation dialogs for destructive actions
+
+==================================================
+WORKSPACE INTEGRATION
+==================================================
+
+The application supports multiple workspaces.
+
+Respect the existing WorkspaceContext.
+
+Where backend APIs are workspace-scoped:
+
+- Use the active workspace
+- Never mix data between workspaces
+- Ensure queries are invalidated after mutations
+- Ensure switching workspaces refreshes the correct data
+
+Use:
+
+id
+
+NOT:
+
+_id
+
+for frontend entity IDs.
+
+==================================================
+API CLIENT
+==================================================
+
+Use:
+
+frontend/src/lib/api-client.ts
+
+Do not bypass the existing API client unless absolutely necessary.
+
+The API client already handles:
+
+- Access tokens
+- Refresh tokens
+- 401 retry
+- API errors
+
+Backend API base path:
+
+/api/v1
+
+Do not create incorrect paths such as:
+
+/api/dashboard
+
+unless they actually exist in the backend.
+
+==================================================
+UI/UX
+==================================================
+
+Follow the existing CreatorOS AI UI.
+
+Do not redesign the application globally.
+
+Use existing:
+
+- shadcn/ui
+- Cards
+- Tables
+- Dialogs
+- Tabs
+- Dropdowns
+- Badges
+- Skeletons
+- Toasts
+
+The UI must be:
+
+- Professional
+- Responsive
+- Consistent
+- Accessible
+
+Avoid unnecessary visual complexity.
+
+==================================================
+IMPORTANT BACKEND RULE
+==================================================
+
+The backend has already been completed through Phase 15C.
+
+Treat it as stable.
+
+Do NOT rewrite backend architecture.
+
+Do NOT refactor unrelated backend code.
+
+If you discover a genuine missing backend API required by the frontend:
+
+1. Confirm that the functionality is truly missing.
+2. Make the smallest possible backend change.
+3. Preserve existing API compatibility.
+4. Add/update backend tests.
+5. Run affected backend tests.
+6. Document the backend change.
+
+Do not modify backend code simply to make frontend implementation easier.
+
+==================================================
+TESTING
+==================================================
+
+After implementation:
+
+1. Run frontend TypeScript check.
+
+2. Run frontend production build.
+
+3. Test Content Planner APIs.
+
+4. Test Competitor Intelligence APIs.
+
+5. Test authenticated access.
+
+6. Test workspace isolation.
+
+7. Test create/update/delete flows.
+
+8. Test empty states.
+
+9. Test API error states.
+
+10. Test retry behaviour.
+
+11. Verify no dummy/mock/fake application data exists.
+
+12. Verify existing pages still work.
+
+13. Run relevant backend tests if backend code was changed.
+
+Do not ignore errors.
+
+Do not hide errors.
+
+Do not claim completion if the build or tests fail.
+
+==================================================
+IMPORTANT API CONTRACT RULE
+==================================================
+
+Before implementing each page:
+
+1. Inspect the relevant backend route.
+2. Inspect controller.
+3. Inspect service.
+4. Inspect response shape.
+5. Inspect frontend API conventions.
+6. Then implement.
+
+Do not guess API response shapes.
+
+Remember:
+
+Backend IDs are normalized to:
+
+id
+
+not:
+
+_id
+
+==================================================
+COMPLETION REQUIREMENTS
+==================================================
+
+When finished:
+
+1. Content Planner must be integrated with real backend APIs.
+
+2. Competitor Intelligence must be integrated with real backend APIs.
+
+3. No dummy data must be used.
+
+4. TypeScript must pass for the affected frontend code.
+
+5. Production build must succeed.
+
+6. Existing functionality must not regress.
+
+7. Update PROJECT_CONTEXT.md with:
+
+- Phase 3A status
+- Files changed
+- APIs integrated
+- Features implemented
+- Backend changes, if any
+- Known limitations
+- Testing results
+- Build results
+
+8. Provide a final concise report containing:
+
+- What was implemented
+- Files changed
+- API endpoints used
+- Tests run
+- Build result
+- Known limitations
+- Confirmation that no dummy data was introduced
+
+Do not start Phase 3B or Phase 3C.

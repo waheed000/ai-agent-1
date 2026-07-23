@@ -20,13 +20,9 @@ Before making any changes:
 
 The current task is:
 
-PHASE 3A — CONTENT & INTELLIGENCE
+PHASE 3B — TREND INTELLIGENCE & AI INSIGHTS
 
-Implement:
-- Content Planner
-- Competitor Intelligence
-
-Do not start Phase 3B or Phase 3C.
+Do not start Phase 3C.
 
 ---
 
@@ -493,26 +489,85 @@ Workspace-scoped API requests must use the active workspace context where requir
 
 ---
 
-# 11. PHASE 3A TASK
+# 11. PHASE 3A — COMPLETED
+
+STATUS: COMPLETE (implemented 2026-07-23)
+
+### Files Changed
+- `frontend/src/services/content-api.ts` — NEW. Service layer for all content planner, calendar, and draft APIs.
+- `frontend/src/services/competitor-api.ts` — NEW. Service layer for competitor tracking APIs.
+- `frontend/src/pages/content.tsx` — REWRITTEN. Full Content Planner page with Plan, Calendar, and Generate tabs.
+- `frontend/src/pages/competitors.tsx` — REWRITTEN. Full Competitor Intelligence page with list + overview panel.
+
+### APIs Integrated
+- `GET /api/v1/planner` — list content plan items (filters: platform, status, limit, skip)
+- `POST /api/v1/planner/generate` — AI content plan generation (days, platforms, campaignName)
+- `PATCH /api/v1/planner/:id` — update content item status/fields
+- `DELETE /api/v1/planner/:id` — soft-delete content item
+- `GET /api/v1/calendar` — grouped calendar view (startDate, endDate, platform)
+- `POST /api/v1/drafts` — create draft
+- `PATCH /api/v1/drafts/:id` — update draft
+- `DELETE /api/v1/drafts/:id` — delete draft
+- `GET /api/v1/competitors` — list competitors
+- `POST /api/v1/competitors` — add competitor (username, platform, notes, niche)
+- `DELETE /api/v1/competitors/:id` — remove competitor
+- `GET /api/v1/competitors/:id/overview` — competitor overview (posts, metrics, hashtags, scores)
+- `POST /api/v1/competitors/:id/sync` — trigger competitor sync
+
+### Features Implemented
+
+**Content Planner:**
+- Plan tab: list items with platform/status filters, inline status dropdown, delete with confirmation
+- Calendar tab: date-range calendar view grouped by day, platform filter
+- Generate tab: AI content plan form (days 1–90, multi-platform selection, optional campaign name)
+- Loading skeletons, error states with retry, empty states with CTAs
+- React Query cache invalidation after all mutations
+
+**Competitor Intelligence:**
+- Tracked competitors list with platform badge, follower count, engagement rate
+- Add Competitor dialog with username, platform, niche, notes and field-level error display
+- Delete confirmation dialog
+- Per-competitor overview panel: key metrics, follower history line chart, format mix bar chart, top hashtags, top posts by engagement, threat score
+- Manual sync button per competitor
+
+### Backend Changes
+None — the backend is unchanged.
+
+### Known Limitations
+- `GET /api/v1/planner` uses `.lean()` so items return `_id` not `id`; frontend normalizes with `getPlanItemId()` helper.
+- Competitor overview data (topPosts, hashtags, formatMix) is empty until after first sync — a Sync button is provided.
+- Follower history chart only shows data after multiple syncs.
+- AI content generation requires no AI key for the base plan generation (uses trend data + heuristics); AI caption quality improves with GEMINI_API_KEY set.
+
+### Testing Results
+- TypeScript check: 0 errors (`npx tsc --noEmit`)
+- Production build: success (✓ built in ~6s)
+- API tests: all 13 endpoints returning expected shapes (200/201)
+- PATCH planner item status: ✓
+- POST generate (3 days): ✓ generated=3
+- POST competitors + overview + sync + delete: ✓
+- No dummy/mock data introduced — all data comes from real backend APIs
+
+---
+
+# PHASE 3B TASK
 
 CURRENT PHASE:
 
-PHASE 3A — CONTENT & INTELLIGENCE
+PHASE 3B — TREND INTELLIGENCE & AI INSIGHTS
 
 Implement only:
 
-1. Content Planner
-2. Competitor Intelligence
+- Trend Intelligence
+- AI Insights
 
 Do NOT implement:
 
-- Trend Intelligence
-- AI Insights
 - Reports
 - Notifications
 - Final Dashboard Audit
 
-Those belong to later phases.
+Those belong to Phase 3C.
 
 ---
 
