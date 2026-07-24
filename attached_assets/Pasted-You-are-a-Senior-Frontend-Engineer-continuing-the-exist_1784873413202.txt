@@ -1,0 +1,523 @@
+You are a Senior Frontend Engineer continuing the existing CreatorOS AI full-stack MERN project.
+
+IMPORTANT
+=========
+
+This is an EXISTING production-oriented full-stack project.
+
+Frontend:
+- React
+- TypeScript
+- Vite
+- Tailwind/shadcn-style UI
+- TanStack Query / React Query
+- Existing centralized apiClient
+- Existing authentication context
+- Existing workspace context
+
+Backend:
+- Node.js
+- Express.js
+- MongoDB/Mongoose
+- Redis (optional in local development)
+- BullMQ
+- JWT authentication
+- AI multi-agent architecture
+
+Project structure:
+
+frontend/
+backend/
+docs/
+
+Read PROJECT_CONTEXT.md FIRST.
+
+DO NOT rebuild the project.
+DO NOT replace existing architecture.
+DO NOT create duplicate API clients.
+DO NOT create duplicate services.
+DO NOT introduce dummy/mock/fake application data.
+
+Previous completed phases:
+
+Phase 1:
+- Frontend/backend restructuring
+- Authentication integration
+- Login/register
+- Protected routes
+- Real backend authentication
+
+Phase 2:
+- Dashboard
+- Analytics
+- Settings
+- Workspaces
+- Team
+- Social integrations UI
+
+Phase 3A:
+- Content Planner
+- Competitor Intelligence
+
+Phase 3B:
+- Trend Intelligence
+- AI Insights
+- Dashboard Trending Now preview
+- Dashboard AI Strategy preview
+
+Your task now is ONLY:
+
+PHASE 3C-A — REPORTS
+====================
+
+Implement and fully integrate the Reports frontend.
+
+==================================================
+STEP 1 — UNDERSTAND EXISTING BACKEND
+==================================================
+
+Before writing code, inspect the actual backend implementation.
+
+Read:
+
+- Report routes
+- Report controllers
+- Report services
+- Report repositories
+- Report models
+- Report workers
+- Report generation logic
+- AI report generation logic
+- Report event listeners
+- Report-related validators
+
+Identify the exact available endpoints.
+
+Do NOT assume API contracts.
+
+Do NOT create new backend endpoints unless absolutely necessary.
+
+Use the existing backend API exactly as implemented.
+
+Document the exact endpoints and response shapes internally before implementation.
+
+==================================================
+STEP 2 — CREATE REPORT API SERVICE
+==================================================
+
+Create:
+
+frontend/src/services/report-api.ts
+
+Requirements:
+
+- Use the existing apiClient
+- Do NOT create a new HTTP client
+- Use exact /api/v1 backend paths through apiClient
+- Strong TypeScript types
+- Correct request payload types
+- Correct response types
+- Normalize MongoDB IDs consistently
+- Handle API errors consistently
+- Handle pagination if supported
+- Handle asynchronous report generation if supported
+
+Do not add mock data.
+
+Do not hardcode fake reports.
+
+==================================================
+STEP 3 — REPORTS PAGE
+==================================================
+
+Create or rewrite:
+
+frontend/src/pages/reports.tsx
+
+Build a professional Reports dashboard.
+
+The page must use ONLY real backend data.
+
+Implement the following where supported by the backend:
+
+1. REPORT LIST
+
+Display real reports.
+
+Show available information such as:
+
+- Report title
+- Report type
+- Reporting period
+- Status
+- Created date
+- Generated date
+- Platform
+- Summary
+- Metrics preview
+
+Only render fields that actually exist in backend responses.
+
+Do not invent fields.
+
+--------------------------------------------------
+
+2. REPORT DETAILS
+
+Allow users to open/view a report.
+
+Display available:
+
+- Report metadata
+- Reporting period
+- Metrics
+- Growth summary
+- Engagement summary
+- Top-performing content
+- AI-generated narrative
+- Recommendations
+
+Use actual backend data.
+
+If a report does not contain a particular field:
+
+Do not display fake values.
+
+--------------------------------------------------
+
+3. GENERATE REPORT
+
+If the backend supports report generation:
+
+Implement a professional Generate Report flow.
+
+Use only options supported by the backend.
+
+Possible options may include:
+
+- Report type
+- Date range
+- Platform
+
+Do not add unsupported fields.
+
+Show proper states:
+
+- Idle
+- Submitting
+- Queued
+- Processing
+- Completed
+- Failed
+
+Do NOT fake progress percentages.
+
+If the backend uses asynchronous generation:
+
+Implement polling/refetching using TanStack Query or the existing backend status mechanism.
+
+Do not poll aggressively.
+
+Stop polling when the report reaches a terminal state.
+
+--------------------------------------------------
+
+4. REPORT STATUS
+
+If report generation is asynchronous:
+
+Display status clearly.
+
+Use the backend's actual status values.
+
+Example UI states:
+
+- Queued
+- Processing
+- Completed
+- Failed
+
+Do not invent status values.
+
+--------------------------------------------------
+
+5. EMPTY STATE
+
+If the user has no reports:
+
+Show a professional empty state.
+
+Example:
+
+"No reports yet"
+
+Explain that reports can be generated from the user's available analytics and social data.
+
+If report generation is supported:
+
+Provide a "Generate Report" CTA.
+
+Never show fake sample reports.
+
+--------------------------------------------------
+
+6. LOADING STATES
+
+Implement:
+
+- Page loading skeleton
+- Report list skeleton
+- Report details loading
+- Generate button loading state
+- Status polling state
+
+--------------------------------------------------
+
+7. ERROR STATES
+
+Handle:
+
+- 401
+- 403
+- 404
+- 422
+- 429
+- 500
+
+Use the existing apiClient error handling.
+
+Provide retry actions where appropriate.
+
+--------------------------------------------------
+
+8. DELETE / OTHER ACTIONS
+
+If backend supports:
+
+- Delete report
+- Download report
+- Archive report
+- Share report
+
+Integrate them.
+
+Do NOT create frontend controls for unsupported backend functionality.
+
+Destructive actions must use confirmation dialogs.
+
+==================================================
+STEP 4 — DASHBOARD REPORT PREVIEW
+==================================================
+
+Inspect:
+
+frontend/src/pages/dashboard.tsx
+
+If appropriate and supported by backend, add a small Reports preview section.
+
+For example:
+
+- Latest report
+- Report status
+- Last generated date
+- View Report CTA
+- Generate Report CTA
+
+Use real backend data.
+
+Do not duplicate report logic.
+
+Reuse report-api.ts.
+
+Do not add unnecessary dashboard API requests.
+
+If there are no reports:
+
+Show an appropriate empty state.
+
+==================================================
+STEP 5 — ROUTING & NAVIGATION
+==================================================
+
+Verify:
+
+/reports
+
+is correctly routed.
+
+Ensure sidebar/navigation contains:
+
+Reports
+
+Verify navigation works from:
+
+- Dashboard
+- Reports
+- Any relevant AI/Analytics sections
+
+Do not break existing routes:
+
+/dashboard
+/analytics
+/content
+/competitors
+/trends
+/ai-insights
+/settings
+/workspaces
+/team
+
+==================================================
+STEP 6 — REAL DATA ONLY
+==================================================
+
+STRICT REQUIREMENT.
+
+DO NOT add:
+
+- Fake reports
+- Dummy metrics
+- Hardcoded AI narratives
+- Fake dates
+- Fake report statuses
+- Placeholder report data presented as real data
+
+If backend returns:
+
+[]
+
+show an empty state.
+
+If backend returns 404:
+
+Handle it correctly.
+
+If report generation is unavailable:
+
+Clearly communicate that functionality is unavailable.
+
+==================================================
+STEP 7 — TANSTACK QUERY
+==================================================
+
+Use existing TanStack Query patterns.
+
+Use:
+
+- Query caching
+- Query invalidation
+- Mutation invalidation
+- Appropriate staleTime
+- Polling only when required
+
+After generating a report:
+
+Invalidate/refetch the report list.
+
+After deleting a report:
+
+Invalidate/refetch the report list.
+
+Avoid duplicate requests.
+
+==================================================
+STEP 8 — WORKSPACE AWARENESS
+==================================================
+
+Verify reports respect the active workspace if the backend supports workspace-scoped reports.
+
+When workspace changes:
+
+Ensure report queries are correctly invalidated/refetched.
+
+Do not show reports belonging to the previous workspace as if they belong to the current workspace.
+
+==================================================
+STEP 9 — VERIFICATION
+==================================================
+
+After implementation:
+
+1. Run TypeScript check.
+
+2. Run production build.
+
+3. Verify Reports page loads.
+
+4. Verify report list API.
+
+5. Verify report details API.
+
+6. Verify report generation API if available.
+
+7. Verify async status handling if available.
+
+8. Verify empty state.
+
+9. Verify loading state.
+
+10. Verify error state.
+
+11. Verify Dashboard report preview.
+
+12. Verify routing.
+
+13. Verify no dummy/mock/fake application data.
+
+14. Verify no API keys or secrets are exposed.
+
+15. Verify all API calls use existing apiClient.
+
+16. Verify all API paths use the correct /api/v1 backend routes.
+
+17. Verify existing pages still work.
+
+==================================================
+PROJECT_CONTEXT.md
+==================================================
+
+Update PROJECT_CONTEXT.md with:
+
+- Phase 3C-A status
+- Reports implementation
+- Files created
+- Files modified
+- API endpoints integrated
+- Response shapes
+- Async generation behavior
+- Known limitations
+- TypeScript result
+- Production build result
+- API verification results
+
+==================================================
+FINAL REPORT
+==================================================
+
+At the end provide:
+
+1. Reports implementation summary
+2. Files created
+3. Files modified
+4. Backend endpoints integrated
+5. Dashboard integration
+6. TypeScript result
+7. Production build result
+8. API verification results
+9. Known limitations
+10. Any backend functionality unavailable
+
+IMPORTANT:
+
+Do not claim Phase 3C-A is complete unless:
+
+- Implementation is complete
+- TypeScript passes
+- Production build passes
+- Real backend API integration is verified
+- No dummy application data was introduced
+- Existing frontend functionality remains intact
+
+Do not implement Notifications or the Final Frontend Audit in this task.
+
+Those will be handled separately in Phase 3C-B.

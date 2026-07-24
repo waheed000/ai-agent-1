@@ -1,0 +1,812 @@
+You are a Senior Frontend Engineer continuing the existing CreatorOS AI full-stack MERN project.
+
+IMPORTANT
+=========
+
+This is an EXISTING production-oriented full-stack project.
+
+Frontend:
+- React
+- TypeScript
+- Vite
+- Tailwind/shadcn-style UI
+- TanStack Query / React Query
+- Existing centralized apiClient
+- Existing authentication context
+- Existing workspace context
+
+Backend:
+- Node.js
+- Express.js
+- MongoDB/Mongoose
+- Redis (optional in local development)
+- BullMQ
+- JWT authentication
+- AI multi-agent architecture
+- Backend lives in: backend/
+- Frontend lives in: frontend/
+
+The frontend and backend are already substantially integrated.
+
+DO NOT rebuild the project.
+DO NOT replace existing architecture.
+DO NOT create duplicate API clients.
+DO NOT create duplicate services.
+DO NOT introduce dummy/mock/fake application data.
+
+Read PROJECT_CONTEXT.md FIRST.
+
+Previous completed frontend phases:
+
+Phase 1:
+- Frontend/backend project restructuring
+- Professional frontend/ and backend/ folders
+- Authentication integration
+- Login/register
+- Protected routes
+- Real backend authentication
+
+Phase 2:
+- Dashboard
+- Analytics
+- Settings
+- Workspaces
+- Team
+- Social integrations UI
+
+Phase 3A:
+- Content Planner
+- Competitor Intelligence
+
+Phase 3B:
+- Trend Intelligence
+- AI Insights
+- Dashboard Trending Now preview
+- Dashboard AI Strategy preview
+
+Current status:
+- Real backend APIs are being used
+- No dummy application data
+- TypeScript checks have been clean for implemented phases
+- Production builds have succeeded
+- Backend has already implemented Reports and Notifications functionality
+
+Your task is:
+
+PHASE 3C
+========
+
+1. Reports
+2. Notifications
+3. Final Dashboard Audit
+4. Final Frontend Integration Verification
+
+==================================================
+PART 1 — REPORTS
+==================================================
+
+First inspect the existing backend implementation.
+
+DO NOT ASSUME API CONTRACTS.
+
+Read the actual backend:
+
+- Report routes
+- Report controllers
+- Report services
+- Report repositories
+- Report models
+- Report workers
+- AI report generation logic
+- Any report-related event listeners
+
+Identify the exact available endpoints under the appropriate /api/v1 path.
+
+Possible functionality may include:
+
+- List reports
+- Get report by ID
+- Generate report
+- Generate weekly report
+- Generate monthly report
+- Report status
+- Report details
+- Report metrics
+- Report AI narrative
+
+Only implement functionality that actually exists in the backend.
+
+Create or update:
+
+frontend/src/services/report-api.ts
+
+Requirements:
+
+- Use existing apiClient
+- Use exact backend routes
+- Strong TypeScript types
+- Normalize IDs consistently
+- Correctly handle paginated responses if applicable
+- Correctly handle asynchronous report generation
+- Use TanStack Query where appropriate
+- No mock data
+- No fake report content
+
+Rewrite/build:
+
+frontend/src/pages/reports.tsx
+
+Create a professional Reports dashboard.
+
+Required functionality where supported by backend:
+
+1. Report List
+
+Display real reports.
+
+Show available fields such as:
+
+- Report title
+- Report type
+- Period
+- Status
+- Created date
+- Generated date
+- Platform
+- Summary/metrics preview
+
+Only show fields returned by the backend.
+
+2. Report Details
+
+Allow user to open a report.
+
+Display:
+
+- Report metadata
+- Metrics
+- Growth summary
+- Engagement summary
+- Top-performing content
+- AI-generated narrative
+- Recommendations
+
+Only use actual backend response data.
+
+3. Generate Report
+
+If backend supports report generation:
+
+Add a professional generation flow.
+
+Allow supported options such as:
+
+- Report type
+- Date range
+- Platform
+
+Do not add unsupported options.
+
+Show correct states:
+
+- Idle
+- Generating
+- Queued
+- Processing
+- Completed
+- Failed
+
+Do not fake progress.
+
+If report generation is asynchronous, poll or refetch using TanStack Query according to the backend's actual status mechanism.
+
+4. Report Empty State
+
+If no reports exist:
+
+Show a professional empty state.
+
+Provide a CTA to generate the first report if supported.
+
+Do not populate the UI with fake reports.
+
+5. Error Handling
+
+Handle:
+
+- 401
+- 403
+- 404
+- 422
+- 429
+- 500
+
+Reuse the existing apiClient error handling.
+
+==================================================
+PART 2 — NOTIFICATIONS
+==================================================
+
+Inspect the existing backend notification implementation.
+
+Read:
+
+- Notification model
+- Notification routes
+- Notification controller
+- Notification service
+- Notification repository
+- Notification event listeners
+- Any notification workers
+
+Determine the exact API endpoints.
+
+Implement:
+
+frontend/src/services/notification-api.ts
+
+Requirements:
+
+- Existing apiClient
+- Strong TypeScript types
+- Real backend only
+- Correct ID normalization
+- Correct pagination if supported
+- Correct unread count handling
+
+Build/update:
+
+frontend/src/pages/notifications.tsx
+
+Implement:
+
+1. Notification List
+
+Display real notifications.
+
+Each notification should show available:
+
+- Title
+- Message
+- Type
+- Read/unread status
+- Created timestamp
+- Related entity/action if available
+
+2. Mark as Read
+
+Implement real backend mutation.
+
+3. Mark All as Read
+
+Implement if supported.
+
+4. Delete Notification
+
+Implement if supported.
+
+5. Pagination / Infinite Scroll
+
+Implement only if backend supports it.
+
+6. Filtering
+
+Implement only supported filters.
+
+7. Empty State
+
+Show professional empty state when no notifications exist.
+
+8. Loading/Error States
+
+Use proper skeletons and retry actions.
+
+==================================================
+PART 3 — GLOBAL NOTIFICATION UI
+==================================================
+
+Inspect the existing Dashboard Layout / Sidebar / Header.
+
+If backend supports unread notification count:
+
+Add a notification bell/icon to the global authenticated layout.
+
+The notification UI should:
+
+- Show unread count
+- Open notification panel/popover
+- Show recent notifications
+- Link to /notifications
+- Allow marking notifications read where supported
+- Refresh/refetch unread count appropriately
+
+Do not create fake notification counts.
+
+If no notifications exist:
+
+Show:
+
+"No new notifications"
+
+Do not display a fake badge.
+
+Use existing UI components.
+
+Do not introduce unnecessary dependencies.
+
+==================================================
+PART 4 — FINAL DASHBOARD AUDIT
+==================================================
+
+Now perform a full audit of:
+
+frontend/src/pages/dashboard.tsx
+
+Review every section currently displayed.
+
+Verify that every metric/card/chart:
+
+- Uses a real backend API
+- Uses the correct API response shape
+- Has loading state
+- Has empty state
+- Has error state
+- Has retry behavior where appropriate
+- Does not contain dummy data
+- Does not contain stale hardcoded values
+
+Audit all dashboard sections, including where applicable:
+
+- Total followers
+- Growth rate
+- Engagement rate
+- Connected platforms
+- Top-performing content
+- Follower growth chart
+- Recent activity
+- Trending Now
+- AI Strategy
+- Any other existing dashboard cards
+
+For each section:
+
+1. Trace the frontend API call.
+2. Verify the backend endpoint.
+3. Verify the response shape.
+4. Verify TypeScript types.
+5. Verify rendering logic.
+6. Verify empty state.
+7. Verify error state.
+
+Fix any genuine integration mismatches.
+
+Do not rewrite working code unnecessarily.
+
+==================================================
+PART 5 — GLOBAL FRONTEND INTEGRATION AUDIT
+==================================================
+
+Audit ALL major frontend pages:
+
+/dashboard
+/analytics
+/content
+/competitors
+/trends
+/ai-insights
+/reports
+/notifications
+/settings
+/workspaces
+/team
+
+For every page verify:
+
+- Correct backend API path
+- Correct /api/v1 prefix through apiClient
+- Correct HTTP method
+- Correct request payload
+- Correct response shape
+- Correct ID field
+- Authentication handling
+- Loading state
+- Empty state
+- Error state
+- Mutation invalidation
+- No dummy data
+
+Pay special attention to MongoDB IDs.
+
+Backend responses may normalize:
+
+_id → id
+
+or list endpoints may return:
+
+_id
+
+Normalize consistently in the frontend.
+
+Do not assume all endpoints return the same shape.
+
+==================================================
+PART 6 — AUTHENTICATION AUDIT
+==================================================
+
+Verify:
+
+- Login
+- Register
+- Refresh token
+- Logout
+- /auth/me
+- Protected routes
+- Public routes
+- 401 handling
+- Automatic token refresh
+- Redirect to login when session expires
+
+Ensure the frontend never exposes:
+
+- JWT secrets
+- Refresh tokens
+- AI API keys
+- OAuth client secrets
+- Encryption keys
+
+Verify HttpOnly refresh-token handling remains intact.
+
+==================================================
+PART 7 — WORKSPACE AUDIT
+==================================================
+
+Verify workspace-aware functionality.
+
+Test:
+
+- Workspace selection
+- Workspace persistence
+- Workspace switching
+- Workspace CRUD
+- Team member listing
+- Member invitation
+- Role handling
+- Workspace-scoped API requests
+- Workspace isolation
+
+Ensure switching workspace correctly invalidates/refetches workspace-dependent queries.
+
+No stale data from the previously selected workspace should remain visible as if it belongs to the new workspace.
+
+==================================================
+PART 8 — SOCIAL INTEGRATION AUDIT
+==================================================
+
+Verify the current state of social integrations.
+
+IMPORTANT:
+
+Do not show functional OAuth Connect buttons for providers that are not implemented.
+
+Current known backend state:
+
+- YouTube OAuth provider may not be implemented
+- Instagram OAuth provider may not be implemented
+- LinkedIn OAuth provider may not be implemented
+- TikTok OAuth provider may not be implemented
+- X/Twitter OAuth provider may not be implemented
+
+Inspect the actual backend before deciding.
+
+If a provider is not implemented:
+
+Show:
+
+"Coming Soon"
+
+Do not create fake OAuth flows.
+
+For implemented functionality verify:
+
+- Connected account listing
+- Disconnect
+- Sync
+- Sync status
+- Error handling
+
+==================================================
+PART 9 — CONTENT PLANNER AUDIT
+==================================================
+
+Verify:
+
+- Planner list
+- Filters
+- Calendar
+- Generate plan
+- Status updates
+- Delete
+- Real backend data
+- Empty state
+- Loading state
+- Error state
+
+Ensure no fake planner items exist.
+
+==================================================
+PART 10 — COMPETITOR AUDIT
+==================================================
+
+Verify:
+
+- Competitor list
+- Add competitor
+- Delete competitor
+- Sync
+- Overview
+- Metrics
+- Charts
+
+Ensure empty competitor states are handled correctly.
+
+==================================================
+PART 11 — TREND AUDIT
+==================================================
+
+Verify:
+
+- Trending topics
+- Hashtags
+- Creators
+- Trend refresh
+- Filters
+- Trend details
+- Empty state
+
+Ensure refresh correctly invalidates/refetches trend queries.
+
+==================================================
+PART 12 — AI INSIGHTS AUDIT
+==================================================
+
+Verify:
+
+- AI strategy generation
+- AI insights
+- Generation status
+- Loading state
+- Error state
+- Empty state
+- Polling/refetching if asynchronous
+
+AI calls must ONLY happen through backend.
+
+Frontend must never call Gemini/OpenAI/Groq directly.
+
+If Gemini is configured as backend provider, frontend remains provider-agnostic.
+
+==================================================
+PART 13 — REPORTS & NOTIFICATIONS AUDIT
+==================================================
+
+After implementation, verify:
+
+Reports:
+- List
+- Generate
+- Status
+- Details
+- Empty state
+- Error state
+
+Notifications:
+- List
+- Unread count
+- Mark read
+- Mark all read
+- Delete if supported
+- Empty state
+
+Global notification bell:
+
+- Correct unread count
+- Correct recent notifications
+- Correct navigation
+
+==================================================
+NO DUMMY DATA — STRICT
+==================================================
+
+This requirement is NON-NEGOTIABLE.
+
+Do NOT add:
+
+- Fake reports
+- Fake notifications
+- Fake metrics
+- Fake AI insights
+- Fake trends
+- Fake competitors
+- Fake planner items
+- Fake dashboard numbers
+
+If backend returns no data:
+
+Show an empty state.
+
+If backend feature is unavailable:
+
+Show "Coming Soon" or a clear unavailable state.
+
+Never make the UI appear populated with fake production data.
+
+==================================================
+PERFORMANCE
+==================================================
+
+Use TanStack Query effectively.
+
+Avoid unnecessary duplicate requests.
+
+Use:
+
+- Query caching
+- Query invalidation
+- Appropriate staleTime
+- Mutation invalidation
+- Polling only when required
+
+Do not add aggressive polling.
+
+Do not create unnecessary API calls on every render.
+
+Use lazy loading/code splitting if the existing architecture supports it.
+
+==================================================
+RESPONSIVE UI
+==================================================
+
+Verify all implemented pages work on:
+
+- Desktop
+- Tablet
+- Mobile
+
+Pay special attention to:
+
+- Tables
+- Charts
+- Report details
+- Notification panel
+- Dashboard cards
+- Sidebar
+- Workspace switcher
+
+==================================================
+ACCESSIBILITY
+==================================================
+
+Verify:
+
+- Buttons have accessible labels
+- Icon-only buttons have tooltips/aria-labels
+- Dialogs are keyboard accessible
+- Forms have labels
+- Loading states are announced where appropriate
+- Color is not the only indicator of status
+
+==================================================
+VERIFICATION REQUIREMENTS
+==================================================
+
+After implementation:
+
+1. Run TypeScript check.
+
+2. Run production build.
+
+3. Verify all Phase 3C files compile.
+
+4. Verify all existing pages still compile.
+
+5. Test Reports API endpoints against the real backend.
+
+6. Test Notifications API endpoints against the real backend.
+
+7. Test Dashboard API calls.
+
+8. Test authentication flow.
+
+9. Test workspace switching.
+
+10. Test empty states.
+
+11. Test error states.
+
+12. Test loading states.
+
+13. Verify no dummy/mock/fake application data.
+
+14. Verify no secrets are exposed.
+
+15. Verify all frontend API calls use the existing apiClient.
+
+16. Verify no duplicate HTTP clients were introduced.
+
+17. Verify no incorrect /api vs /api/v1 paths.
+
+18. Verify production build.
+
+19. Verify responsive UI.
+
+20. Verify navigation across all pages.
+
+==================================================
+PROJECT_CONTEXT.md
+==================================================
+
+Update PROJECT_CONTEXT.md with:
+
+- Phase 3C status
+- Reports implementation
+- Notifications implementation
+- Dashboard audit results
+- Global integration audit results
+- Files created
+- Files modified
+- API endpoints integrated
+- Known limitations
+- Backend features unavailable
+- TypeScript result
+- Production build result
+- API verification results
+
+==================================================
+FINAL REPORT
+==================================================
+
+At the end provide a concise but complete report containing:
+
+1. Reports implementation
+2. Notifications implementation
+3. Global notification UI
+4. Dashboard audit
+5. Full frontend integration audit
+6. Authentication audit
+7. Workspace audit
+8. Social integration audit
+9. Content Planner audit
+10. Competitor audit
+11. Trend audit
+12. AI Insights audit
+13. Dummy data audit
+14. TypeScript result
+15. Production build result
+16. API verification result
+17. Remaining limitations
+18. Recommended next step
+
+IMPORTANT:
+
+Do not claim Phase 3C is complete unless:
+
+- Implementation is complete
+- TypeScript passes
+- Production build passes
+- Real backend APIs have been verified
+- No dummy application data was introduced
+- Existing frontend functionality remains intact
+
+After Phase 3C, the next stage will be:
+
+FRONTEND INTEGRATION FREEZE
+        ↓
+Manual End-to-End Testing
+        ↓
+Bug Fix Sprint
+        ↓
+Performance Optimization
+        ↓
+Security Review
+        ↓
+Production Deployment Preparation

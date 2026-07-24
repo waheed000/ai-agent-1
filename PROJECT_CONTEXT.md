@@ -571,6 +571,69 @@ Those belong to Phase 3C.
 
 ---
 
+# 11C. PHASE 3C-A — COMPLETED
+
+STATUS: COMPLETE (implemented 2026-07-24)
+
+### Files Created
+- `frontend/src/services/report-api.ts` — NEW. Typed service for all `/reports` endpoints. Exports `reportApi` (generate/list/getLatest/getById/delete) and full TypeScript types (Report, GrowthMetrics, EngagementMetrics, ContentPerformance, CompetitorComparison, TrendSummary, AiInsights, ReportKpi, ReportPeriod). Includes `getReportId()` normaliser.
+
+### Files Modified
+- `frontend/src/pages/reports.tsx` — REWRITTEN. Complete Reports dashboard replacing stub that used `@workspace/api-client-react` (wrong import). Full implementation with real apiClient.
+- `frontend/src/pages/dashboard.tsx` — UPDATED. Added Latest Report preview card using `reportApi.getLatest()` with 404 empty state and "Generate First Report" CTA.
+
+### Backend Endpoints Integrated
+- `POST /api/v1/reports/generate` — body: `{ type?, platform?, referenceDate? }` → Report (status: 'generating', HTTP 201)
+- `GET /api/v1/reports` — query: `{ type?, status?, limit?, skip? }` → `Report[]` (meta: count)
+- `GET /api/v1/reports/latest` — query: `{ type? }` → Report or 404
+- `GET /api/v1/reports/:id` → Report
+- `DELETE /api/v1/reports/:id` → null (soft-delete)
+
+### Response Shape (confirmed via live API)
+- Report response uses `id` (Mongoose virtual, not `_id`) — `getReportId()` prefers `id`, falls back to `_id`
+- Report keys: `id, type, period, platforms, title, growthMetrics, engagementMetrics, contentPerformance, competitorComparison, trendSummary, aiInsights, priorityScore, nextWeekGoals, status, isDeleted, deletedAt, kpis, createdAt, updatedAt`
+- List response: `{ success, data: Report[], message, meta: { count } }` — apiClient unwraps to `Report[]`
+- `GET /latest` returns `{ success: false, message: "No report found" }` (404) when no report exists
+
+### Reports Page Features
+- Two-panel layout: scrollable list (left) + detail panel (right)
+- Report list: title, status badge (Ready/Generating/Failed), type, period, created date; click to select
+- Type filter (all/weekly/monthly/quarterly/yearly) + Status filter (all/ready/generating/failed)
+- Generate Report dialog: type selector, optional platform selector, optional reference date
+- Async generation: page-level polling every 5s when any report has status 'generating'; detail panel polls every 4s
+- Report detail with 5 tabs: Overview (summary, KPIs, priority score, next period goals), Growth (6 metrics grid), Engagement (5 metrics grid), Content (content performance + competitor comparison + trend summary), AI Insights (narrative + strengths/weaknesses/recommendations/opportunities)
+- Delete with confirmation dialog (calls soft-delete endpoint)
+- Loading skeletons, empty state with Generate CTA, error state with retry, filter-specific empty state
+- Auto-selects first report when list loads
+
+### Dashboard Integration
+- Latest Report card added below Trending Now + AI Strategy row
+- Shows: title, status badge, type, period, generated date, priority score
+- 404 → "No reports generated yet" with "Generate First Report" CTA linking to /reports
+- Generating → spinner in status badge
+
+### Async Generation Behaviour
+- Report generation is asynchronous (BullMQ). Without Redis, jobs are queued but workers may not process them in dev (same as strategy generation). Backend still creates the Report document with status 'generating' immediately.
+- Frontend polls until status = 'ready' or 'failed'
+- No fake progress percentages shown
+
+### Known Limitations
+- Report generation requires Redis + BullMQ workers to be running for the job to complete. In dev without Redis, reports stay in 'generating' state. The UI handles this correctly (shows Generating spinner + descriptive message).
+- AI narrative (aiInsights.narrative) and deep competitor/trend analysis require backend AI keys (GEMINI_API_KEY) to be set.
+- No download/export endpoint exists in backend — Download button not shown.
+- `GET /reports/latest` does not support workspace scoping in current backend (user-scoped only).
+
+### Testing Results
+- TypeScript check: 0 errors (`npx tsc --noEmit`)
+- Production build: ✓ built in 7.67s (3195 modules)
+- `POST /api/v1/reports/generate`: ✓ 201, report created with status 'generating'
+- `GET /api/v1/reports`: ✓ 200, returns array with meta.count
+- `GET /api/v1/reports/latest`: ✓ 404 when empty (handled gracefully)
+- `DELETE /api/v1/reports/:id`: ✓ soft-deletes correctly
+- No dummy/mock data introduced
+
+---
+
 # 11B. PHASE 3B — COMPLETED
 
 STATUS: COMPLETE (implemented 2026-07-24)

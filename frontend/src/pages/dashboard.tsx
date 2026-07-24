@@ -3,6 +3,7 @@ import { analyticsApi, periodToDateRange, type Period } from '@/services/analyti
 import { integrationsApi } from '@/services/integrations-api';
 import { trendApi } from '@/services/trend-api';
 import { aiInsightsApi } from '@/services/ai-insights-api';
+import { reportApi } from '@/services/report-api';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -11,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import {
   ArrowUpRight, ArrowDownRight, Activity, Users, Eye, MousePointerClick,
   Heart, MessageCircle, Share2, RefreshCw, AlertCircle, CheckCircle2,
-  XCircle, Loader2, BarChart2, TrendingUp, BrainCircuit, Zap,
+  XCircle, Loader2, BarChart2, TrendingUp, BrainCircuit, Zap, FileText,
 } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -124,6 +125,17 @@ export default function DashboardHome() {
   const contentQ = useQuery({
     queryKey: ['analytics', 'content-performance', dateRange],
     queryFn: () => analyticsApi.getContentPerformance({ ...dateRange, limit: 4 }),
+  });
+
+  // Phase 3C-A: Latest report preview
+  const latestReportQ = useQuery({
+    queryKey: ['reports', 'latest'],
+    queryFn: () => reportApi.getLatest(),
+    staleTime: 120_000,
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && error.status === 404) return false;
+      return failureCount < 1;
+    },
   });
 
   // Phase 3B: Trend + AI Insights previews
@@ -600,6 +612,102 @@ export default function DashboardHome() {
         </Card>
 
       </div>
+
+      {/* Phase 3C-A: Latest Report preview */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <FileText size={18} className="text-primary" />
+              <div>
+                <CardTitle>Latest Report</CardTitle>
+                <CardDescription>Most recent AI-generated growth report</CardDescription>
+              </div>
+            </div>
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/reports">View Reports</Link>
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {latestReportQ.isLoading ? (
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-12 w-12 rounded-lg shrink-0" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-3 w-1/3" />
+              </div>
+            </div>
+          ) : latestReportQ.isError ? (
+            (() => {
+              const is404 = latestReportQ.error instanceof ApiError && latestReportQ.error.status === 404;
+              return is404 ? (
+                <div className="flex flex-col items-center gap-3 py-6 text-muted-foreground">
+                  <FileText size={30} className="opacity-30" />
+                  <p className="text-sm text-center">No reports generated yet.</p>
+                  <Button size="sm" asChild>
+                    <Link href="/reports">
+                      <Zap size={14} className="mr-1.5" /> Generate First Report
+                    </Link>
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-2 py-6 text-muted-foreground">
+                  <AlertCircle size={28} className="opacity-40" />
+                  <p className="text-sm">Could not load latest report.</p>
+                  <Button variant="ghost" size="sm" onClick={() => latestReportQ.refetch()}>Retry</Button>
+                </div>
+              );
+            })()
+          ) : latestReportQ.data == null ? (
+            <div className="flex flex-col items-center gap-3 py-6 text-muted-foreground">
+              <FileText size={30} className="opacity-30" />
+              <p className="text-sm text-center">No reports generated yet.</p>
+              <Button size="sm" asChild>
+                <Link href="/reports">
+                  <Zap size={14} className="mr-1.5" /> Generate First Report
+                </Link>
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                <FileText size={20} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                  <h3 className="font-semibold text-sm truncate">{latestReportQ.data.title}</h3>
+                  <Badge
+                    variant={latestReportQ.data.status === 'ready' ? 'default' : latestReportQ.data.status === 'generating' ? 'secondary' : 'destructive'}
+                    className="shrink-0 text-xs capitalize flex items-center gap-1"
+                  >
+                    {latestReportQ.data.status === 'generating' && <Loader2 size={10} className="animate-spin" />}
+                    {latestReportQ.data.status}
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground capitalize">
+                  {latestReportQ.data.type} report
+                  {latestReportQ.data.period
+                    ? ` · ${new Date(latestReportQ.data.period.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} – ${new Date(latestReportQ.data.period.endDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`
+                    : ''}
+                  {latestReportQ.data.generatedAt
+                    ? ` · Generated ${new Date(latestReportQ.data.generatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`
+                    : ''}
+                </p>
+                {latestReportQ.data.status === 'ready' && latestReportQ.data.priorityScore != null && (
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Priority score: <span className="font-mono font-semibold text-foreground">{latestReportQ.data.priorityScore}/100</span>
+                  </p>
+                )}
+              </div>
+              <Button variant="outline" size="sm" asChild className="shrink-0">
+                <Link href="/reports">View</Link>
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
     </div>
   );
 }
