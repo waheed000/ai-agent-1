@@ -1,0 +1,619 @@
+You are a Senior Frontend Engineer continuing the existing CreatorOS AI full-stack MERN project.
+
+IMPORTANT CONTEXT
+=================
+
+This is an EXISTING production-oriented project.
+
+Frontend:
+- React
+- TypeScript
+- Vite
+- Tailwind/shadcn-style UI
+- React Query where appropriate
+
+Backend:
+- Node.js
+- Express.js
+- MongoDB/Mongoose
+- Redis (optional in local development)
+- BullMQ
+- JWT authentication
+- AI multi-agent architecture
+- Backend lives in: backend/
+- Frontend lives in: frontend/
+
+The frontend and backend have already been integrated.
+
+DO NOT rebuild the project from scratch.
+DO NOT replace the existing architecture.
+DO NOT create duplicate services.
+DO NOT introduce dummy/mock/fake/hardcoded application data.
+
+Your job is to implement ONLY:
+
+PHASE 3B — TRENDS & AI
+======================
+
+1. Trend Intelligence
+2. AI Insights
+
+The previous Phase 3A already implemented:
+
+- Content Planner
+- Competitor Intelligence
+
+Existing frontend files include:
+
+- frontend/src/services/
+- frontend/src/context/
+- frontend/src/pages/
+- frontend/src/components/
+
+Phase 3A created/updated:
+
+- frontend/src/services/content-api.ts
+- frontend/src/services/competitor-api.ts
+- frontend/src/pages/content.tsx
+- frontend/src/pages/competitors.tsx
+- PROJECT_CONTEXT.md
+
+Phase 3A status:
+- TypeScript clean for Phase 3A
+- Production build successful
+- Real backend APIs verified
+- No dummy data
+- All displayed data comes from real backend responses
+- Empty states are used when data is unavailable
+
+IMPORTANT:
+Before making changes, read PROJECT_CONTEXT.md first.
+
+Then inspect the existing backend routes/controllers/services/models for:
+
+- Trend Intelligence
+- AI Agents
+- AI Insights
+- Analytics
+- Reports
+- Event system
+- AI provider abstraction
+
+Do NOT assume API contracts.
+Read the actual backend implementation and use its exact response shapes.
+
+==================================================
+PART 1 — TREND INTELLIGENCE
+==================================================
+
+Implement the frontend Trend Intelligence experience.
+
+Existing backend trend functionality includes the Trend Intelligence system from the backend phases.
+
+First inspect and confirm the exact available endpoints under:
+
+/api/v1/trends
+
+Determine from the backend code the exact routes for:
+
+- trends
+- topics
+- hashtags
+- creators
+- refresh
+
+Use the actual backend contracts.
+
+Create:
+
+frontend/src/services/trend-api.ts
+
+This service must:
+
+- Use the existing apiClient
+- Use the correct /api/v1 paths
+- Provide strongly typed TypeScript response types
+- Normalize MongoDB IDs consistently
+- Handle API errors consistently
+- Never contain mock data
+- Never hardcode fake trends
+
+Build/rewrite:
+
+frontend/src/pages/trends.tsx
+
+The page should provide a professional Trend Intelligence dashboard.
+
+Required functionality:
+
+1. Trending Topics
+
+Display real trending topics returned by the backend.
+
+Each trend should show useful available metadata such as:
+
+- Topic name
+- Category
+- Score
+- Trend direction
+- Growth/change
+- Platform
+- Related hashtags
+- Timestamp/freshness
+
+Only display fields actually returned by the backend.
+
+2. Trending Hashtags
+
+Display real hashtags from the backend.
+
+Include available information such as:
+
+- Hashtag
+- Usage/volume
+- Growth
+- Platform
+- Related topic
+
+3. Trending Creators
+
+Display available creator/trend intelligence data returned by the backend.
+
+Use real API data only.
+
+4. Filters
+
+Implement filters supported by the backend.
+
+Examples only if supported by the API:
+
+- Platform
+- Category
+- Trend type
+- Date/period
+
+Do not invent unsupported filters.
+
+5. Refresh Trends
+
+Add a "Refresh Trends" action.
+
+Call the real backend refresh endpoint.
+
+Show:
+
+- Loading state
+- Success feedback
+- Error feedback
+- Last refreshed timestamp when available
+
+If refresh is asynchronous/background-based, correctly represent that state.
+
+6. Trend Detail / Exploration
+
+If the backend provides enough data, allow the user to inspect a trend in more detail.
+
+For example:
+
+- Related hashtags
+- Related creators
+- Trend score
+- Growth
+- Platform information
+
+Do not create fake details.
+
+7. Content Planner Integration
+
+Where appropriate, provide a useful action such as:
+
+"Use Trend"
+
+or
+
+"Create Content"
+
+The action should integrate with the existing Content Planner flow.
+
+Do not duplicate planner logic.
+
+Reuse existing content-api.ts and existing planner routes.
+
+If the backend does not support pre-populating a planner item with a trend, do not fake it.
+Instead, use the cleanest supported workflow.
+
+8. UI States
+
+Implement:
+
+- Loading skeletons
+- Empty state
+- Error state
+- Retry action
+- Refresh loading state
+
+A fresh account with no trend data must show a professional empty state instead of fake content.
+
+==================================================
+PART 2 — AI INSIGHTS
+==================================================
+
+Implement the frontend AI Insights experience using the EXISTING backend AI architecture.
+
+IMPORTANT:
+
+Do not implement AI logic directly in React.
+
+The frontend must communicate with the backend.
+
+The backend is responsible for:
+
+- AI provider calls
+- AI agents
+- prompt execution
+- orchestration
+- AI execution tracking
+- error handling
+- token/cost tracking where supported
+
+The frontend should only consume backend APIs.
+
+First inspect the actual backend AI routes.
+
+Look for available endpoints related to:
+
+- AI insights
+- AI execution
+- Analytics
+- Growth
+- Content analysis
+- Recommendations
+- Agent orchestration
+
+Use the exact existing API contracts.
+
+If an appropriate backend endpoint already exists, integrate with it.
+
+DO NOT create a new backend AI system during this frontend task.
+
+Create:
+
+frontend/src/services/ai-insights-api.ts
+
+The service must:
+
+- Use existing apiClient
+- Use exact backend endpoints
+- Have strongly typed responses
+- Handle loading/errors
+- Normalize IDs where needed
+- Never return mock AI responses
+
+Rewrite/build:
+
+frontend/src/pages/ai-insights.tsx
+
+Create a professional AI Insights dashboard.
+
+The page should present useful AI-generated insights based on REAL backend data.
+
+Possible insight categories, ONLY if supported by backend:
+
+1. Growth Insights
+
+Examples:
+
+- Why growth increased/decreased
+- Important growth patterns
+- Follower trends
+- Engagement changes
+
+2. Content Insights
+
+Examples:
+
+- Best-performing content
+- Weak content patterns
+- Content format recommendations
+- Topic recommendations
+
+3. Audience Insights
+
+Examples:
+
+- Audience behavior
+- Audience demographics
+- Posting timing recommendations
+
+4. Competitor Insights
+
+Use existing Competitor Intelligence data where the backend supports it.
+
+Show:
+
+- Competitive gaps
+- Opportunities
+- Competitor performance comparisons
+
+5. Trend-Based Recommendations
+
+Connect Trend Intelligence with AI recommendations where supported.
+
+For example:
+
+- Which trends may be relevant to the creator
+- Which topics fit the creator's niche
+- Recommended content opportunities
+
+6. AI Growth Recommendations
+
+Display actionable recommendations.
+
+Each recommendation should ideally include:
+
+- Recommendation
+- Reason
+- Expected impact
+- Priority
+- Related metric/data
+
+Only show fields provided by backend.
+
+==================================================
+AI PROVIDER REQUIREMENTS
+==================================================
+
+The backend already contains an AI provider architecture.
+
+At the moment, Gemini may be configured as the primary provider.
+
+The frontend must NOT directly call:
+
+- Gemini
+- OpenAI
+- Groq
+- Any AI provider API
+
+All AI calls must go through the backend.
+
+The frontend must never expose:
+
+- GEMINI_API_KEY
+- OPENAI_API_KEY
+- Any AI secret
+
+No API keys in frontend environment variables.
+
+==================================================
+AI INSIGHTS UX
+==================================================
+
+Implement:
+
+- Generate/Refresh Insights action if supported
+- Loading skeletons
+- AI processing state
+- Empty state
+- Error state
+- Retry action
+
+If AI generation is asynchronous:
+
+Show appropriate states such as:
+
+"Generating insights..."
+
+"Analysis queued"
+
+"Analysis complete"
+
+Only use states supported by the backend.
+
+Do not fake progress percentages.
+
+If no analytics/content data exists:
+
+Show a helpful empty state explaining what the user needs to connect or sync before AI insights can be generated.
+
+Example:
+
+"Connect a social account and sync your data to generate personalized AI insights."
+
+Do not generate fake insights for empty accounts.
+
+==================================================
+DASHBOARD INTEGRATION
+==================================================
+
+After implementing Trends and AI Insights:
+
+Inspect the existing Dashboard.
+
+Add only useful integrations where appropriate.
+
+Examples:
+
+- Trending topic preview
+- Top trend
+- AI recommendation preview
+- "View all insights"
+- "Explore trends"
+
+Use real backend data.
+
+Do not duplicate API calls unnecessarily.
+
+Reuse React Query caching where appropriate.
+
+==================================================
+NAVIGATION
+==================================================
+
+Verify sidebar/navigation includes:
+
+- Content Planner
+- Competitors
+- Trends
+- AI Insights
+
+Ensure routes work correctly.
+
+Expected routes:
+
+/content
+/competitors
+/trends
+/ai-insights
+
+Use the existing routing architecture.
+
+Do not break:
+
+- Login
+- Register
+- Dashboard
+- Analytics
+- Settings
+- Workspaces
+- Team
+
+==================================================
+ERROR HANDLING
+==================================================
+
+All API requests must properly handle:
+
+- 401
+- 403
+- 404
+- 422
+- 429
+- 500
+
+Reuse the existing apiClient error handling.
+
+Do not create duplicate HTTP clients.
+
+If token refresh is already implemented, rely on it.
+
+==================================================
+NO DUMMY DATA — STRICT
+==================================================
+
+This is critical.
+
+DO NOT:
+
+- Add fake trends
+- Add hardcoded AI insights
+- Add fake creators
+- Add fake hashtags
+- Add placeholder metrics presented as real data
+- Add fake API responses
+- Add mock data to make the UI look populated
+
+If backend returns an empty array:
+
+Show an empty state.
+
+If AI is not configured:
+
+Show a clear configuration/error state.
+
+If no social accounts are connected:
+
+Explain what the user needs to do.
+
+==================================================
+QUALITY REQUIREMENTS
+==================================================
+
+Use:
+
+- TypeScript
+- Existing apiClient
+- Existing React Query patterns
+- Existing UI components
+- Existing design system
+- Responsive layouts
+- Accessible controls
+- Loading states
+- Error states
+- Empty states
+- Toasts where already used
+- Proper confirmation dialogs for destructive actions
+
+Do not introduce unnecessary dependencies.
+
+Do not rewrite unrelated pages.
+
+Do not modify backend code unless absolutely required to fix a genuine frontend integration contract issue.
+
+If a backend endpoint is missing for a feature, STOP and report it instead of implementing fake frontend behavior.
+
+==================================================
+VERIFICATION
+==================================================
+
+After implementation:
+
+1. Run TypeScript check.
+
+2. Run production build.
+
+3. Verify all new files compile.
+
+4. Verify existing frontend routes still work.
+
+5. Test Trend Intelligence against the real backend.
+
+6. Test trend refresh against the real backend.
+
+7. Test AI Insights against the real backend.
+
+8. Test empty-state behavior.
+
+9. Test API error behavior.
+
+10. Verify no dummy/mock/fake application data was introduced.
+
+11. Verify no AI API keys are exposed in frontend code.
+
+12. Verify responsive UI.
+
+13. Verify navigation.
+
+14. Verify Dashboard integration.
+
+15. Verify Content Planner integration where supported.
+
+16. Update PROJECT_CONTEXT.md with:
+
+- Phase 3B status
+- Files created/modified
+- API endpoints integrated
+- Backend dependencies
+- Known limitations
+- AI provider configuration requirements
+- Test results
+- Build results
+
+FINAL REPORT
+============
+
+At the end, provide:
+
+1. Files created
+2. Files modified
+3. Trend endpoints integrated
+4. AI endpoints integrated
+5. Dashboard integrations
+6. Content Planner integrations
+7. TypeScript result
+8. Production build result
+9. API verification results
+10. Any limitations
+11. Any backend features that are still unavailable
+
+IMPORTANT:
+Do not claim Phase 3B is complete unless the actual implementation, TypeScript check, production build, and real API verification all pass.

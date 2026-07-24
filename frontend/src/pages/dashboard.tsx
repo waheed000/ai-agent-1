@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { analyticsApi, periodToDateRange, type Period } from '@/services/analytics-api';
 import { integrationsApi } from '@/services/integrations-api';
+import { trendApi } from '@/services/trend-api';
+import { aiInsightsApi } from '@/services/ai-insights-api';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -9,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import {
   ArrowUpRight, ArrowDownRight, Activity, Users, Eye, MousePointerClick,
   Heart, MessageCircle, Share2, RefreshCw, AlertCircle, CheckCircle2,
-  XCircle, Loader2, BarChart2
+  XCircle, Loader2, BarChart2, TrendingUp, BrainCircuit, Zap,
 } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -122,6 +124,23 @@ export default function DashboardHome() {
   const contentQ = useQuery({
     queryKey: ['analytics', 'content-performance', dateRange],
     queryFn: () => analyticsApi.getContentPerformance({ ...dateRange, limit: 4 }),
+  });
+
+  // Phase 3B: Trend + AI Insights previews
+  const topTrendsQ = useQuery({
+    queryKey: ['trends', 'all', '', 'rising'],
+    queryFn: () => trendApi.list({ status: 'rising', limit: 4 }),
+    staleTime: 120_000,
+  });
+
+  const latestStrategyQ = useQuery({
+    queryKey: ['strategy', 'latest', undefined],
+    queryFn: () => aiInsightsApi.getLatest(),
+    staleTime: 120_000,
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && error.status === 404) return false;
+      return failureCount < 1;
+    },
   });
 
   // Transform timeSeries into chart-friendly format
@@ -401,6 +420,186 @@ export default function DashboardHome() {
           )}
         </CardContent>
       </Card>
+
+      {/* Phase 3B: Trending Now + AI Strategy row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        {/* Trending Now */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <TrendingUp size={18} className="text-primary" />
+                <div>
+                  <CardTitle>Trending Now</CardTitle>
+                  <CardDescription>Top rising trends across platforms</CardDescription>
+                </div>
+              </div>
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/trends">View All</Link>
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {topTrendsQ.isLoading ? (
+              <div className="space-y-3">
+                {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-12 w-full rounded-lg" />)}
+              </div>
+            ) : topTrendsQ.isError ? (
+              <div className="flex flex-col items-center gap-2 py-6 text-muted-foreground">
+                <AlertCircle size={28} className="opacity-40" />
+                <p className="text-sm">Could not load trends.</p>
+                <Button variant="ghost" size="sm" onClick={() => topTrendsQ.refetch()}>Retry</Button>
+              </div>
+            ) : !topTrendsQ.data?.length ? (
+              <div className="flex flex-col items-center gap-2 py-6 text-muted-foreground">
+                <TrendingUp size={28} className="opacity-30" />
+                <p className="text-sm">No trend data yet.</p>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/trends">Refresh Trends</Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {topTrendsQ.data.slice(0, 4).map((trend: import('@/services/trend-api').TrendItem, idx: number) => (
+                  <div
+                    key={String(trend._id ?? idx)}
+                    className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 border border-border hover:bg-secondary/50 transition-colors"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="text-xs font-mono text-muted-foreground w-4 shrink-0">#{idx + 1}</span>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium truncate">{trend.name}</p>
+                        <p className="text-xs text-muted-foreground capitalize">{trend.platform} · {trend.category}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Badge variant="secondary" className="font-mono text-xs">
+                        {(trend.trendScore ?? 0).toFixed(0)}
+                      </Badge>
+                      {trend.growthRate != null && (
+                        <span className={`text-xs font-mono flex items-center gap-0.5 ${trend.growthRate >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                          {trend.growthRate >= 0 ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+                          {Math.abs(trend.growthRate).toFixed(1)}%
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Latest AI Strategy */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <BrainCircuit size={18} className="text-primary" />
+                <div>
+                  <CardTitle>AI Strategy</CardTitle>
+                  <CardDescription>Your latest AI-generated content plan</CardDescription>
+                </div>
+              </div>
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/ai-insights">View Full</Link>
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {latestStrategyQ.isLoading ? (
+              <div className="space-y-3">
+                <Skeleton className="h-6 w-3/4 rounded" />
+                <Skeleton className="h-4 w-full rounded" />
+                <Skeleton className="h-4 w-5/6 rounded" />
+                <Skeleton className="h-10 w-full rounded-lg mt-2" />
+              </div>
+            ) : latestStrategyQ.isError ? (
+              (() => {
+                const is404 = latestStrategyQ.error instanceof ApiError && latestStrategyQ.error.status === 404;
+                return is404 ? (
+                  <div className="flex flex-col items-center gap-3 py-6 text-muted-foreground">
+                    <BrainCircuit size={32} className="opacity-30" />
+                    <p className="text-sm text-center">No strategy generated yet.</p>
+                    <Button size="sm" asChild>
+                      <Link href="/ai-insights">
+                        <Zap size={14} className="mr-1.5" /> Generate Strategy
+                      </Link>
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-2 py-6 text-muted-foreground">
+                    <AlertCircle size={28} className="opacity-40" />
+                    <p className="text-sm">Could not load strategy.</p>
+                    <Button variant="ghost" size="sm" onClick={() => latestStrategyQ.refetch()}>Retry</Button>
+                  </div>
+                );
+              })()
+            ) : latestStrategyQ.data == null ? (
+              <div className="flex flex-col items-center gap-3 py-6 text-muted-foreground">
+                <BrainCircuit size={32} className="opacity-30" />
+                <p className="text-sm text-center">No strategy generated yet.</p>
+                <Button size="sm" asChild>
+                  <Link href="/ai-insights">
+                    <Zap size={14} className="mr-1.5" /> Generate Strategy
+                  </Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-semibold text-sm leading-snug line-clamp-2">
+                      {latestStrategyQ.data.title ?? 'Content Strategy'}
+                    </h3>
+                    <Badge variant={latestStrategyQ.data.status === 'ready' ? 'default' : 'secondary'} className="shrink-0 capitalize text-xs">
+                      {latestStrategyQ.data.status}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground capitalize">
+                    {latestStrategyQ.data.planType?.replace(/(\d+)/, ' $1 ')} plan
+                    {latestStrategyQ.data.platforms?.length ? ` · ${latestStrategyQ.data.platforms.join(', ')}` : ''}
+                  </p>
+                </div>
+
+                {latestStrategyQ.data.status === 'ready' && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="rounded-lg bg-secondary/40 p-3 border border-border">
+                      <p className="text-xs text-muted-foreground mb-1">Success Probability</p>
+                      <p className="text-2xl font-bold font-mono">
+                        {latestStrategyQ.data.successProbability != null
+                          ? `${latestStrategyQ.data.successProbability}%`
+                          : '—'}
+                      </p>
+                    </div>
+                    <div className="rounded-lg bg-secondary/40 p-3 border border-border">
+                      <p className="text-xs text-muted-foreground mb-1">Primary Goal</p>
+                      <p className="text-sm font-medium line-clamp-2 leading-snug">
+                        {latestStrategyQ.data.primaryGoal ?? '—'}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {latestStrategyQ.data.status === 'generating' && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground py-2">
+                    <Loader2 size={16} className="animate-spin" />
+                    Strategy is being generated…
+                  </div>
+                )}
+
+                {latestStrategyQ.data.overview && latestStrategyQ.data.status === 'ready' && (
+                  <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
+                    {latestStrategyQ.data.overview}
+                  </p>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+      </div>
     </div>
   );
 }

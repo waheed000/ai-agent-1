@@ -571,6 +571,69 @@ Those belong to Phase 3C.
 
 ---
 
+# 11B. PHASE 3B — COMPLETED
+
+STATUS: COMPLETE (implemented 2026-07-24)
+
+### Files Changed
+- `frontend/src/services/trend-api.ts` — NEW. Typed service for all `/trends` endpoints. Exports `trendApi` (list/topics/hashtags/creators/refresh) and `getTrendId()` helper that normalises `_id` from lean documents.
+- `frontend/src/services/ai-insights-api.ts` — NEW. Typed service for all `/strategy` endpoints. Exports `aiInsightsApi` (generate/list/getLatest) and full TypeScript types (Strategy, DayPlan, GrowthExperiment, ChecklistItem, RiskItem).
+- `frontend/src/pages/trends.tsx` — REWRITTEN. Four-tab Trend Intelligence dashboard (All / Topics / Hashtags / Creators). Platform + status filters. Trend cards with real fields (trendScore, growthRate, volume, relatedTags, aiContentIdea). Trend detail dialog. "Create Draft" action. Refresh button (calls POST /trends/refresh). Loading skeletons, empty state, error/retry.
+- `frontend/src/pages/ai-insights.tsx` — REWRITTEN. Two-panel AI Insights page. Left: Generate panel (planType selector, optional platform) + strategy history list. Right: selected strategy detail with five tabs (Overview, Day Plan, Action Checklist, Experiments, Risks). Polls every 4 s when status is `generating` via useEffect + queryClient.invalidateQueries. Handles 404 (no strategy) gracefully.
+- `frontend/src/pages/dashboard.tsx` — UPDATED. Added "Trending Now" preview (top 4 rising trends with score + growth rate, links to /trends) and "AI Strategy" preview (latest strategy title, success probability, primary goal, links to /ai-insights). Both sections handle loading, error, and empty (404) states.
+
+### APIs Integrated
+- `GET /api/v1/trends` — all trends (filters: platform, category, status, limit, minScore); public endpoint
+- `GET /api/v1/trends/topics` — topics subset; public endpoint
+- `GET /api/v1/trends/hashtags` — hashtags subset; public endpoint
+- `GET /api/v1/trends/creators` — creator-format trends; public endpoint
+- `POST /api/v1/trends/refresh` — trigger trend collection + analysis cycle; requires auth
+- `POST /api/v1/strategy/generate` — queue async strategy generation (planType, platform); requires auth
+- `GET /api/v1/strategy` — list strategies (filters: planType, status, limit); requires auth
+- `GET /api/v1/strategy/latest` — latest strategy by planType; returns 404 if none; requires auth
+
+### Features Implemented
+
+**Trend Intelligence (`/trends`):**
+- Four tabs: All, Topics, Hashtags, Creators — each calls its own endpoint
+- Platform filter (all / tiktok / instagram / youtube / twitter) and Status filter (all / rising / viral / declining)
+- Trend card: name, platform badge, status badge, trend score, growth rate arrow (green/red), volume, related tags, AI content idea preview
+- Trend detail dialog: full description, peak date, expires at, full AI content idea, "Create Draft" CTA
+- "Refresh Trends" button (authenticated): calls POST /trends/refresh, toasts result, invalidates cache
+
+**AI Insights (`/ai-insights`):**
+- Plan type selector (7-day / 30-day / 90-day) with optional platform
+- Generate button → calls POST /strategy/generate, then polls every 4 s until status = ready or failed
+- Strategy history list: planType badge, status badge, date, click to select
+- Strategy detail panel with 5 tabs:
+  - Overview: title, platforms, success probability, primary goal, target metrics, overview text
+  - Day Plan: table of day / focus / actions / metrics for each day
+  - Action Checklist: checklist items with week and priority
+  - Experiments: growth experiment cards with hypothesis, action, measurement, risk
+  - Risks: risk table with severity colour-coding and mitigation
+- Generating skeleton state + polling; failed state with failReason; empty state with generate CTA
+
+**Dashboard integration:**
+- "Trending Now" card: top 4 rising trends (rank, name, platform/category, score, growth rate arrow)
+- "AI Strategy" card: latest strategy title, status badge, success probability, primary goal, overview excerpt; 404 → CTA to generate first strategy; `generating` → spinner
+
+### Backend Changes
+None — backend is unchanged.
+
+### Known Limitations
+- Trend data requires a refresh call to populate; fresh accounts show empty state with "Refresh Trends" button.
+- Strategy generation is async (BullMQ); page polls every 4 s — requires Redis for queueing. Without Redis, generation jobs are unavailable but the UI handles this gracefully (failed state).
+- `GET /strategy/latest` returns 404 when no strategy exists — query uses `retry: false` for 404 to avoid hammering the endpoint.
+- `trendApi.list()` returns `TrendItem[]` directly (not wrapped in `{ trends: [] }`) — dashboard code iterates the array directly.
+
+### Testing Results
+- TypeScript check: 0 errors (`npx tsc --noEmit`)
+- Production build: ✓ built in 7.06 s (3194 modules transformed)
+- Frontend dev server: running, HMR active
+- No dummy/mock data introduced — all data comes from real backend APIs
+
+---
+
 # 12. CONTENT PLANNER — EXPECTED FRONTEND FUNCTIONALITY
 
 The Content Planner frontend should integrate with the existing backend.
